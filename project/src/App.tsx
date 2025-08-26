@@ -562,8 +562,8 @@ function App() {
           <>
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
               <div className="text-center mb-12">
-                <h2 className="text-4xl md:text-6xl font-bold text-gray-800 mb-6">
-                  Nájdite svojho
+                <h2 clájditeassName="text-4xl md:text-6xl font-bold text-gray-800 mb-6">
+                  N svojho
                   <span className="block bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">
                     AI Asistenta
                   </span>
