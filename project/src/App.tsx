@@ -1,21 +1,21 @@
-import React, { useEffect, useMemo, useState } from 'react';
-import CompanyListPage from './pages/CompanyListPage';
-import AddCompanyPage from './pages/AddCompanyPage';
-import CompanyDetailPage from './pages/CompanyDetailPage';
-import HowItWorksPage from './pages/HowItWorksPage';
-import ReferencesPage from './pages/ReferencesPage';
-import NewsPage from './pages/NewsPage';
-import HelpCenterPage from './pages/HelpCenterPage';
-import ContactPage from './pages/ContactPage';
-import MyAccountPage from './pages/MyAccountPage';
-import MyOrdersPage from './pages/MyOrdersPage';
-import PaymentSuccessPage from './pages/PaymentSuccessPage';
-import PaymentCancelPage from './pages/PaymentCancelPage';
-import CookieConsentBanner from './components/CookieConsentBanner';
+import React, { useEffect, useMemo, useState } from "react";
+import CompanyListPage from "./pages/CompanyListPage";
+import AddCompanyPage from "./pages/AddCompanyPage";
+import CompanyDetailPage from "./pages/CompanyDetailPage";
+import HowItWorksPage from "./pages/HowItWorksPage";
+import ReferencesPage from "./pages/ReferencesPage";
+import NewsPage from "./pages/NewsPage";
+import HelpCenterPage from "./pages/HelpCenterPage";
+import ContactPage from "./pages/ContactPage";
+import MyAccountPage from "./pages/MyAccountPage";
+import MyOrdersPage from "./pages/MyOrdersPage";
+import PaymentSuccessPage from "./pages/PaymentSuccessPage";
+import PaymentCancelPage from "./pages/PaymentCancelPage";
+import CookieConsentBanner from "./components/CookieConsentBanner";
 
-import { supabase } from './lib/supabase';
-import { askAI, type ChatTurn } from './lib/askAI';
-import { createOrderAndRedirect } from './lib/createOrderAndRedirect';
+import { supabase } from "./lib/supabase";
+import { askAI, type ChatTurn } from "./lib/askAI";
+import { createOrderAndRedirect } from "./lib/createOrderAndRedirect";
 
 import {
   MessageCircle,
@@ -37,10 +37,10 @@ import {
   Calendar,
   Shield,
   Euro,
-} from 'lucide-react';
+} from "lucide-react";
 
 /** Lokálny storage kľúč pre preferovanú lokalitu */
-const LS_PREF_LOC = 'sa_pref_loc';
+const LS_PREF_LOC = "sa_pref_loc";
 
 type UICard = {
   id?: string | number;
@@ -66,9 +66,15 @@ function StarRating({ value = 0 }: { value?: number | null }) {
   const v = Math.max(0, Math.min(Number(value ?? 0), 5));
   const pct = (v / 5) * 100;
   return (
-    <div className="relative inline-block leading-none" aria-label={`Hodnotenie ${v} z 5`}>
+    <div
+      className="relative inline-block leading-none"
+      aria-label={`Hodnotenie ${v} z 5`}
+    >
       <div className="text-gray-300 select-none">★★★★★</div>
-      <div className="absolute inset-0 overflow-hidden" style={{ width: `${pct}%` }}>
+      <div
+        className="absolute inset-0 overflow-hidden"
+        style={{ width: `${pct}%` }}
+      >
         <div className="text-yellow-400 select-none">★★★★★</div>
       </div>
     </div>
@@ -78,7 +84,7 @@ function StarRating({ value = 0 }: { value?: number | null }) {
 function NavCta({
   onClick,
   children,
-  className = '',
+  className = "",
 }: {
   onClick: () => void;
   children: React.ReactNode;
@@ -95,7 +101,10 @@ function NavCta({
 }
 
 /* ---------- vzdialenosť (km) ---------- */
-function haversineKm(a: { lat: number; lng: number }, b: { lat: number; lng: number }) {
+function haversineKm(
+  a: { lat: number; lng: number },
+  b: { lat: number; lng: number }
+) {
   const toRad = (x: number) => (x * Math.PI) / 180;
   const R = 6371;
   const dLat = toRad(b.lat - a.lat);
@@ -109,43 +118,47 @@ function haversineKm(a: { lat: number; lng: number }, b: { lat: number; lng: num
   return R * c;
 }
 
-type SortBy = 'relevance' | 'rating' | 'distance';
+type SortBy = "relevance" | "rating" | "distance";
 
 function App() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [currentPage, setCurrentPage] = useState<
-    | 'home'
-    | 'companyList'
-    | 'addCompany'
-    | 'companyDetail'
-    | 'howItWorks'
-    | 'references'
-    | 'news'
-    | 'helpCenter'
-    | 'contact'
-    | 'myAccount'
-    | 'myOrders'
-    | 'paymentSuccess'
-    | 'paymentCancel'
-  >('home');
-  const [selectedService, setSelectedService] = useState<string>('');
-  const [selectedCompanyId, setSelectedCompanyId] = useState<string | null>(null);
+    | "home"
+    | "companyList"
+    | "addCompany"
+    | "companyDetail"
+    | "howItWorks"
+    | "references"
+    | "news"
+    | "helpCenter"
+    | "contact"
+    | "myAccount"
+    | "myOrders"
+    | "paymentSuccess"
+    | "paymentCancel"
+  >("home");
+  const [selectedService, setSelectedService] = useState<string>("");
+  const [selectedCompanyId, setSelectedCompanyId] = useState<string | null>(
+    null
+  );
 
   // AI
-  const [message, setMessage] = useState('');
-  const [lastQuery, setLastQuery] = useState('');
-  const [aiResponse, setAiResponse] = useState('');
+  const [message, setMessage] = useState("");
+  const [lastQuery, setLastQuery] = useState("");
+  const [aiResponse, setAiResponse] = useState("");
   const [cards, setCards] = useState<UICard[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [history, setHistory] = useState<ChatTurn[]>([]);
   const [page, setPage] = useState(0);
   const [limit] = useState(9);
   const [hasMore, setHasMore] = useState(false);
-  const [userLocation, setUserLocation] = useState('');
-  const [coords, setCoords] = useState<{ lat: number; lng: number } | null>(null);
-  const [ack, setAck] = useState('');
+  const [userLocation, setUserLocation] = useState("");
+  const [coords, setCoords] = useState<{ lat: number; lng: number } | null>(
+    null
+  );
+  const [ack, setAck] = useState("");
   const [aiActiveFilters, setAiActiveFilters] = useState<string[]>([]);
-  const [sortBy, setSortBy] = useState<SortBy>('relevance');
+  const [sortBy, setSortBy] = useState<SortBy>("relevance");
 
   // Auth
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -167,61 +180,65 @@ function App() {
 
   // Načítaj preferovanú lokalitu z localStorage pri štarte
   useEffect(() => {
-    const existing = (localStorage.getItem(LS_PREF_LOC) || '').trim();
+    const existing = (localStorage.getItem(LS_PREF_LOC) || "").trim();
     if (existing && !userLocation) setUserLocation(existing);
   }, []);
 
   // Ukladaj preferovanú lokalitu
   useEffect(() => {
     const t = setTimeout(() => {
-      const v = (userLocation || '').trim();
+      const v = (userLocation || "").trim();
       localStorage.setItem(LS_PREF_LOC, v);
     }, 250);
     return () => clearTimeout(t);
   }, [userLocation]);
 
   const services = [
-    { name: 'Murár', icon: Hammer, color: 'from-amber-500 to-orange-600' },
-    { name: 'Vodár', icon: Droplets, color: 'from-blue-500 to-cyan-600' },
-    { name: 'Elektrikár', icon: Zap, color: 'from-yellow-500 to-amber-600' },
-    { name: 'Obkladač', icon: Puzzle, color: 'from-purple-500 to-indigo-600' },
-    { name: 'Maliar', icon: Palette, color: 'from-pink-500 to-rose-600' },
-    { name: 'Záhradník', icon: Trees, color: 'from-green-500 to-emerald-600' },
-    { name: 'Tesár', icon: Wrench, color: 'from-stone-500 to-gray-600' },
-    { name: 'Kúrenár', icon: Flame, color: 'from-red-500 to-orange-600' },
-    { name: 'Iné služby', icon: HelpCircle, color: 'from-slate-500 to-gray-600' },
+    { name: "Murár", icon: Hammer, color: "from-amber-500 to-orange-600" },
+    { name: "Vodár", icon: Droplets, color: "from-blue-500 to-cyan-600" },
+    { name: "Elektrikár", icon: Zap, color: "from-yellow-500 to-amber-600" },
+    { name: "Obkladač", icon: Puzzle, color: "from-purple-500 to-indigo-600" },
+    { name: "Maliar", icon: Palette, color: "from-pink-500 to-rose-600" },
+    { name: "Záhradník", icon: Trees, color: "from-green-500 to-emerald-600" },
+    { name: "Tesár", icon: Wrench, color: "from-stone-500 to-gray-600" },
+    { name: "Kúrenár", icon: Flame, color: "from-red-500 to-orange-600" },
+    {
+      name: "Iné služby",
+      icon: HelpCircle,
+      color: "from-slate-500 to-gray-600",
+    },
   ];
 
   const aiQuickFilters = [
-    { id: 'verified', label: 'Overené', icon: Shield },
-    { id: 'rating-4plus', label: '★ 4+', icon: Star },
-    { id: 'today', label: 'Dnes', icon: Calendar },
-    { id: 'escrow', label: 'Escrow', icon: Shield },
-    { id: 'budget-50', label: 'Do 50 €', icon: Euro },
+    { id: "verified", label: "Overené", icon: Shield },
+    { id: "rating-4plus", label: "★ 4+", icon: Star },
+    { id: "today", label: "Dnes", icon: Calendar },
+    { id: "escrow", label: "Escrow", icon: Shield },
+    { id: "budget-50", label: "Do 50 €", icon: Euro },
   ];
 
   const menuItems = [
-    { label: 'Ako fungujeme?', action: 'howItWorks' },
-    { label: 'Referencie', action: 'references' },
-    { label: 'Novinky', action: 'news' },
-    { label: 'Centrum pomoci', action: 'helpCenter' },
-    { label: 'Kontakt', action: 'contact' },
-    { label: 'Moje objednávky', action: 'myOrders' },
+    { label: "Ako fungujeme?", action: "howItWorks" },
+    { label: "Referencie", action: "references" },
+    { label: "Novinky", action: "news" },
+    { label: "Centrum pomoci", action: "helpCenter" },
+    { label: "Kontakt", action: "contact" },
+    { label: "Moje objednávky", action: "myOrders" },
   ];
   const mainMenuItems = [...menuItems];
 
-  const relyOrEmpty = (s?: string) => (typeof s === 'string' ? s : '');
+  const relyOrEmpty = (s?: string) => (typeof s === "string" ? s : "");
 
   /* ---------- Geolokácia ---------- */
   const useMyLocation = () => {
-    if (!('geolocation' in navigator)) {
-      alert('Prehliadač nepodporuje geolokáciu.');
+    if (!("geolocation" in navigator)) {
+      alert("Prehliadač nepodporuje geolokáciu.");
       return;
     }
     const controller = new AbortController();
     const timer = setTimeout(() => {
       controller.abort();
-      alert('Nepodarilo sa získať polohu v časovom limite.');
+      alert("Nepodarilo sa získať polohu v časovom limite.");
     }, 9000);
 
     navigator.geolocation.getCurrentPosition(
@@ -229,28 +246,32 @@ function App() {
         clearTimeout(timer);
         const { latitude, longitude } = pos.coords;
         setCoords({ lat: latitude, lng: longitude });
-        if (!userLocation) setUserLocation('Moje okolie');
+        if (!userLocation) setUserLocation("Moje okolie");
       },
       (err) => {
         clearTimeout(timer);
         console.error(err);
-        alert('Nepodarilo sa získať polohu.');
+        alert("Nepodarilo sa získať polohu.");
       },
       { enableHighAccuracy: true, timeout: 8000, maximumAge: 300000 }
     );
   };
 
   const makeAck = (intent?: any, fallbackLocation?: string) => {
-    const s = (intent?.service ?? '').toString().trim();
-    const loc = (intent?.location ?? fallbackLocation ?? '').toString().trim();
+    const s = (intent?.service ?? "").toString().trim();
+    const loc = (intent?.location ?? fallbackLocation ?? "").toString().trim();
     const parts: string[] = [];
     if (s) parts.push(`službu ${s.toLowerCase()}`);
     if (loc) parts.push(`lokalita ${loc}`);
-    return parts.length ? `Rozumiem — ${parts.join(', ')}.` : '';
+    return parts.length ? `Rozumiem — ${parts.join(", ")}.` : "";
   };
 
   const toggleAiFilter = (filterId: string) => {
-    setAiActiveFilters((prev) => (prev.includes(filterId) ? prev.filter((f) => f !== filterId) : [...prev, filterId]));
+    setAiActiveFilters((prev) =>
+      prev.includes(filterId)
+        ? prev.filter((f) => f !== filterId)
+        : [...prev, filterId]
+    );
   };
 
   const withDistances = (arr: UICard[]): UICard[] => {
@@ -265,8 +286,9 @@ function App() {
   };
 
   const sortCards = (arr: UICard[], by: SortBy): UICard[] => {
-    if (by === 'rating') return [...arr].sort((a, b) => (b.rating ?? -1) - (a.rating ?? -1));
-    if (by === 'distance') {
+    if (by === "rating")
+      return [...arr].sort((a, b) => (b.rating ?? -1) - (a.rating ?? -1));
+    if (by === "distance") {
       return [...arr].sort((a, b) => {
         const da = a.distanceKm ?? Number.POSITIVE_INFINITY;
         const db = b.distanceKm ?? Number.POSITIVE_INFINITY;
@@ -283,8 +305,16 @@ function App() {
 
     setIsLoading(true);
     try {
-      const nextHistory: ChatTurn[] = [...history, { role: 'user', content: msg }];
-      const { reply, cards: incoming, intent, meta } = await askAI(msg, nextHistory, 0.7, {
+      const nextHistory: ChatTurn[] = [
+        ...history,
+        { role: "user", content: msg },
+      ];
+      const {
+        reply,
+        cards: incoming,
+        intent,
+        meta,
+      } = await askAI(msg, nextHistory, 0.7, {
         page: 0,
         limit,
         userLocation,
@@ -300,13 +330,15 @@ function App() {
       setAiResponse(relyOrEmpty(reply));
       setCards(sorted);
       setHasMore(!!meta?.hasMore);
-      setHistory([...nextHistory, { role: 'assistant', content: reply }]);
+      setHistory([...nextHistory, { role: "assistant", content: reply }]);
       if (!userLocation && intent?.location) setUserLocation(intent.location);
       setAck(makeAck(intent, userLocation));
-      setMessage('');
+      setMessage("");
     } catch (error: any) {
-      console.error('Chyba pri volaní AI asistenta:', error);
-      setAiResponse('Prepáčte, nastala chyba pri komunikácii s AI asistentom. Skúste to prosím znovu.');
+      console.error("Chyba pri volaní AI asistenta:", error);
+      setAiResponse(
+        "Prepáčte, nastala chyba pri komunikácii s AI asistentom. Skúste to prosím znovu."
+      );
       setCards([]);
       setHasMore(false);
     } finally {
@@ -351,35 +383,35 @@ function App() {
   /* ---------- Navigácia ---------- */
   const navigateToCompanyList = (serviceName: string) => {
     setSelectedService(serviceName);
-    setCurrentPage('companyList');
+    setCurrentPage("companyList");
   };
   const navigateToHome = () => {
-    setCurrentPage('home');
-    setSelectedService('');
+    setCurrentPage("home");
+    setSelectedService("");
   };
-  const navigateToAddCompany = () => setCurrentPage('addCompany');
-  const navigateToHowItWorks = () => setCurrentPage('howItWorks');
-  const navigateToReferences = () => setCurrentPage('references');
-  const navigateToNews = () => setCurrentPage('news');
-  const navigateToHelpCenter = () => setCurrentPage('helpCenter');
-  const navigateToContact = () => setCurrentPage('contact');
-  const navigateToMyAccount = () => setCurrentPage('myAccount');
-  const navigateToMyOrders = () => setCurrentPage('myOrders');
-  const navigateToPaymentSuccess = () => setCurrentPage('paymentSuccess');
-  const navigateToPaymentCancel = () => setCurrentPage('paymentCancel');
+  const navigateToAddCompany = () => setCurrentPage("addCompany");
+  const navigateToHowItWorks = () => setCurrentPage("howItWorks");
+  const navigateToReferences = () => setCurrentPage("references");
+  const navigateToNews = () => setCurrentPage("news");
+  const navigateToHelpCenter = () => setCurrentPage("helpCenter");
+  const navigateToContact = () => setCurrentPage("contact");
+  const navigateToMyAccount = () => setCurrentPage("myAccount");
+  const navigateToMyOrders = () => setCurrentPage("myOrders");
+  const navigateToPaymentSuccess = () => setCurrentPage("paymentSuccess");
+  const navigateToPaymentCancel = () => setCurrentPage("paymentCancel");
   const navigateToCompanyDetail = (companyId: string) => {
     setSelectedCompanyId(companyId);
-    setCurrentPage('companyDetail');
+    setCurrentPage("companyDetail");
   };
 
   const handleMenuClick = (action: string | null) => {
-    if (action === 'howItWorks') navigateToHowItWorks();
-    else if (action === 'references') navigateToReferences();
-    else if (action === 'news') navigateToNews();
-    else if (action === 'helpCenter') navigateToHelpCenter();
-    else if (action === 'contact') navigateToContact();
-    else if (action === 'myAccount') navigateToMyAccount();
-    else if (action === 'myOrders') navigateToMyOrders();
+    if (action === "howItWorks") navigateToHowItWorks();
+    else if (action === "references") navigateToReferences();
+    else if (action === "news") navigateToNews();
+    else if (action === "helpCenter") navigateToHelpCenter();
+    else if (action === "contact") navigateToContact();
+    else if (action === "myAccount") navigateToMyAccount();
+    else if (action === "myOrders") navigateToMyOrders();
   };
 
   const gpsBadge = useMemo(
@@ -426,12 +458,12 @@ function App() {
                   onClick={navigateToMyAccount}
                   className={`flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-lg transition-all transform hover:scale-105 shadow-md hover:shadow-lg ${
                     isLoggedIn
-                      ? 'bg-green-100 text-green-800 border border-green-200 hover:bg-green-200'
-                      : 'bg-red-100 text-red-800 border border-red-200 hover:bg-red-200'
+                      ? "bg-green-100 text-green-800 border border-green-200 hover:bg-green-200"
+                      : "bg-red-100 text-red-800 border border-red-200 hover:bg-red-200"
                   }`}
                 >
                   <User size={16} />
-                  {isLoggedIn ? 'Prihlásený' : 'Odhlásený'}
+                  {isLoggedIn ? "Prihlásený" : "Odhlásený"}
                 </button>
 
                 {isLoggedIn && (
@@ -489,12 +521,12 @@ function App() {
                 }}
                 className={`w-full flex items-center gap-2 px-3 py-3 text-base font-medium rounded-lg transition-all ${
                   isLoggedIn
-                    ? 'bg-green-100 text-green-800 border border-green-200 hover:bg-green-200'
-                    : 'bg-red-100 text-red-800 border border-red-200 hover:bg-red-200'
+                    ? "bg-green-100 text-green-800 border border-green-200 hover:bg-green-200"
+                    : "bg-red-100 text-red-800 border border-red-200 hover:bg-red-200"
                 }`}
               >
                 <User size={20} />
-                {isLoggedIn ? 'Prihlásený' : 'Odhlásený'}
+                {isLoggedIn ? "Prihlásený" : "Odhlásený"}
               </button>
 
               {isLoggedIn && (
@@ -526,19 +558,20 @@ function App() {
 
       {/* Content */}
       <div className="flex-1">
-        {currentPage === 'home' && (
+        {currentPage === "home" && (
           <>
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
               <div className="text-center mb-12">
                 <h2 className="text-4xl md:text-6xl font-bold text-gray-800 mb-6">
-                  Nájdite svojho
+                  ájdite svojho
                   <span className="block bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">
                     AI Asistenta
                   </span>
                 </h2>
                 <p className="text-xl text-gray-600 max-w-2xl mx-auto mb-12">
-                  Opýtajte sa nášho AI asistenta na čokoľvek o domácich službách. Pomôže vám nájsť správneho odborníka
-                  pre váš projekt.
+                  Opýtajte sa nášho AI asistenta na čokoľvek o domácich
+                  službách. Pomôže vám nájsť správneho odborníka pre váš
+                  projekt.
                 </p>
               </div>
 
@@ -548,7 +581,9 @@ function App() {
                   <div className="bg-gradient-to-r from-blue-500 to-indigo-600 p-3 rounded-xl mr-4">
                     <MessageCircle className="text-white" size={24} />
                   </div>
-                  <h3 className="text-2xl font-semibold text-gray-800">AI Asistent</h3>
+                  <h3 className="text-2xl font-semibold text-gray-800">
+                    AI Asistent
+                  </h3>
                 </div>
 
                 <div className="flex flex-col gap-3">
@@ -559,14 +594,16 @@ function App() {
                       onChange={(e) => setMessage(e.target.value)}
                       placeholder="Napíšte svoju otázku... napr. 'Potrebujem opraviť vodovodné potrubie'"
                       className="flex-1 px-6 py-4 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-lg bg-white/80 backdrop-blur-sm"
-                      onKeyDown={(e) => e.key === 'Enter' && !isLoading && handleAsk()}
+                      onKeyDown={(e) =>
+                        e.key === "Enter" && !isLoading && handleAsk()
+                      }
                     />
                     <button
                       onClick={handleAsk}
                       disabled={isLoading}
                       className="px-8 py-4 bg-gradient-to-r from-blue-500 to-indigo-600 text-white font-semibold rounded-xl hover:from-blue-600 hover:to-indigo-700 transition-all transform hover:scale-105 shadow-lg hover:shadow-xl disabled:opacity-50"
                     >
-                      {isLoading ? 'Načítavam...' : 'Odoslať'}
+                      {isLoading ? "Načítavam..." : "Odoslať"}
                     </button>
                   </div>
 
@@ -608,7 +645,9 @@ function App() {
                           key={filter.id}
                           onClick={() => toggleAiFilter(filter.id)}
                           className={`flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${
-                            isActive ? 'bg-blue-600 text-white shadow-md' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                            isActive
+                              ? "bg-blue-600 text-white shadow-md"
+                              : "bg-gray-100 text-gray-700 hover:bg-gray-200"
                           }`}
                         >
                           <IconComponent size={16} />
@@ -618,7 +657,9 @@ function App() {
                     })}
 
                     <div className="ml-auto flex items-center gap-2">
-                      <span className="text-sm text-gray-600">Zoradiť podľa:</span>
+                      <span className="text-sm text-gray-600">
+                        Zoradiť podľa:
+                      </span>
                       <select
                         value={sortBy}
                         onChange={(e) => setSortBy(e.target.value as SortBy)}
@@ -636,7 +677,9 @@ function App() {
                   <div className="mt-6 p-4 bg-blue-50 rounded-xl border border-blue-200">
                     <div className="flex items-center">
                       <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-blue-600 mr-3"></div>
-                      <p className="text-blue-700 font-medium">AI asistent premýšľa...</p>
+                      <p className="text-blue-700 font-medium">
+                        AI asistent premýšľa...
+                      </p>
                     </div>
                   </div>
                 )}
@@ -648,8 +691,12 @@ function App() {
                         <MessageCircle className="text-white" size={20} />
                       </div>
                       <div className="flex-1">
-                        <h4 className="text-lg font-semibold text-green-800 mb-2">AI Asistent odpovedá:</h4>
-                        <p className="text-green-700 leading-relaxed whitespace-pre-wrap">{aiResponse}</p>
+                        <h4 className="text-lg font-semibold text-green-800 mb-2">
+                          AI Asistent odpovedá:
+                        </h4>
+                        <p className="text-green-700 leading-relaxed whitespace-pre-wrap">
+                          {aiResponse}
+                        </p>
                       </div>
                     </div>
                   </div>
@@ -663,12 +710,20 @@ function App() {
                         <div
                           key={String(c.id ?? c.title)}
                           className="flex flex-col h-full rounded-2xl shadow p-5 bg-white cursor-pointer hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1"
-                          onClick={() => c.id && navigateToCompanyDetail(String(c.id))}
+                          onClick={() =>
+                            c.id && navigateToCompanyDetail(String(c.id))
+                          }
                         >
                           <div className="flex items-start justify-between gap-3">
                             <div className="min-w-0">
-                              <h3 className="text-lg font-semibold break-words">{c.title}</h3>
-                              {c.subtitle && <p className="text-sm text-gray-500 truncate">{c.subtitle}</p>}
+                              <h3 className="text-lg font-semibold break-words">
+                                {c.title}
+                              </h3>
+                              {c.subtitle && (
+                                <p className="text-sm text-gray-500 truncate">
+                                  {c.subtitle}
+                                </p>
+                              )}
                             </div>
                             <div className="flex items-center gap-2">
                               {coords && (
@@ -685,58 +740,82 @@ function App() {
                           </div>
 
                           <div className="mt-2 flex items-center gap-2 flex-wrap">
-                            {typeof c.rating === 'number' ? (
+                            {typeof c.rating === "number" ? (
                               <>
                                 <StarRating value={c.rating} />
-                                <span className="text-xs text-gray-500">{c.rating.toFixed(1)}</span>
+                                <span className="text-xs text-gray-500">
+                                  {c.rating.toFixed(1)}
+                                </span>
                               </>
                             ) : (
-                              <span className="text-xs px-2 py-0.5 rounded-full bg-gray-100 text-gray-600">Nová firma</span>
+                              <span className="text-xs px-2 py-0.5 rounded-full bg-gray-100 text-gray-600">
+                                Nová firma
+                              </span>
                             )}
 
                             {c.location && (
                               <span className="inline-flex items-center gap-1 text-xs text-gray-500 ml-2">
                                 <MapPin size={12} />
                                 {c.location}
-                                {typeof c.distanceKm === 'number' && (
-                                  <span className="text-gray-400">&nbsp;•&nbsp;{c.distanceKm} km</span>
+                                {typeof c.distanceKm === "number" && (
+                                  <span className="text-gray-400">
+                                    &nbsp;•&nbsp;{c.distanceKm} km
+                                  </span>
                                 )}
                               </span>
                             )}
-                            {!c.location && typeof c.distanceKm === 'number' && (
-                              <span className="inline-flex items-center gap-1 text-xs text-gray-500 ml-2">
-                                <MapPin size={12} />
-                                {c.distanceKm} km
-                              </span>
-                            )}
+                            {!c.location &&
+                              typeof c.distanceKm === "number" && (
+                                <span className="inline-flex items-center gap-1 text-xs text-gray-500 ml-2">
+                                  <MapPin size={12} />
+                                  {c.distanceKm} km
+                                </span>
+                              )}
                           </div>
 
-                          {c.description && <p className="mt-3 text-sm text-gray-700 line-clamp-3">{c.description}</p>}
+                          {c.description && (
+                            <p className="mt-3 text-sm text-gray-700 line-clamp-3">
+                              {c.description}
+                            </p>
+                          )}
 
                           <div className="mt-3 min-h-8 flex flex-wrap gap-2">
                             {Array.isArray(c.tags) &&
                               c.tags.map((t: string) => (
-                                <span key={t} className="text-xs bg-gray-100 text-gray-700 px-2 py-1 rounded-full">
+                                <span
+                                  key={t}
+                                  className="text-xs bg-gray-100 text-gray-700 px-2 py-1 rounded-full"
+                                >
                                   {t}
                                 </span>
                               ))}
                           </div>
 
                           {/* CTA + ESCROW */}
-                          <div className="mt-auto pt-4 flex flex-wrap gap-2" onClick={(e) => e.stopPropagation()}>
+                          <div
+                            className="mt-auto pt-4 flex flex-wrap gap-2"
+                            onClick={(e) => e.stopPropagation()}
+                          >
                             {/* Escrow platba */}
                             {c.id && (
                               <button
                                 onClick={async () => {
                                   if (!isLoggedIn) {
-                                    alert('Pre platbu sa prosím najprv prihláste.');
+                                    alert(
+                                      "Pre platbu sa prosím najprv prihláste."
+                                    );
                                     return;
                                   }
                                   try {
-                                    await createOrderAndRedirect(String(c.id), ORDER_AMOUNT_CENTS);
+                                    await createOrderAndRedirect(
+                                      String(c.id),
+                                      ORDER_AMOUNT_CENTS
+                                    );
                                   } catch (err) {
                                     console.error(err);
-                                    alert('Nepodarilo sa vytvoriť escrow objednávku.');
+                                    alert(
+                                      "Nepodarilo sa vytvoriť escrow objednávku."
+                                    );
                                   }
                                 }}
                                 className="px-3 py-2 rounded-xl bg-emerald-600 text-white hover:bg-emerald-700 transition"
@@ -756,22 +835,34 @@ function App() {
                                 Kontaktovať
                               </a>
                             ) : c.actions?.call ? (
-                              <a href={`tel:${c.actions.call}`} className="px-3 py-2 rounded-xl bg-blue-600 text-white">
+                              <a
+                                href={`tel:${c.actions.call}`}
+                                className="px-3 py-2 rounded-xl bg-blue-600 text-white"
+                              >
                                 Zavolať
                               </a>
                             ) : c.actions?.email ? (
-                              <a href={`mailto:${c.actions.email}`} className="px-3 py-2 rounded-xl bg-blue-600 text-white">
+                              <a
+                                href={`mailto:${c.actions.email}`}
+                                className="px-3 py-2 rounded-xl bg-blue-600 text-white"
+                              >
                                 Napísať e-mail
                               </a>
                             ) : null}
 
                             {c.actions?.call && (
-                              <a href={`tel:${c.actions.call}`} className="px-3 py-2 rounded-xl bg-blue-100 text-blue-700">
+                              <a
+                                href={`tel:${c.actions.call}`}
+                                className="px-3 py-2 rounded-xl bg-blue-100 text-blue-700"
+                              >
                                 Tel.
                               </a>
                             )}
                             {c.actions?.email && (
-                              <a href={`mailto:${c.actions.email}`} className="px-3 py-2 rounded-xl bg-blue-100 text-blue-700">
+                              <a
+                                href={`mailto:${c.actions.email}`}
+                                className="px-3 py-2 rounded-xl bg-blue-100 text-blue-700"
+                              >
                                 Email
                               </a>
                             )}
@@ -797,7 +888,7 @@ function App() {
                           disabled={isLoading}
                           className="px-6 py-3 rounded-xl bg-gray-900 text-white hover:bg-black transition disabled:opacity-60"
                         >
-                          {isLoading ? 'Načítavam…' : 'Zobraziť viac'}
+                          {isLoading ? "Načítavam…" : "Zobraziť viac"}
                         </button>
                       </div>
                     )}
@@ -807,8 +898,12 @@ function App() {
 
               {/* Služby */}
               <div className="text-center mb-12">
-                <h3 className="text-3xl font-bold text-gray-800 mb-4">Naše služby</h3>
-                <p className="text-lg text-gray-600">Vyberte si kategóriu služby, ktorú potrebujete</p>
+                <h3 className="text-3xl font-bold text-gray-800 mb-4">
+                  Naše služby
+                </h3>
+                <p className="text-lg text-gray-600">
+                  Vyberte si kategóriu služby, ktorú potrebujete
+                </p>
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -836,31 +931,58 @@ function App() {
           </>
         )}
 
-        {currentPage === 'companyList' && (
+        {currentPage === "companyList" && (
           <CompanyListPage
             selectedService={selectedService}
             onNavigateBack={navigateToHome}
             onNavigateToCompanyDetail={navigateToCompanyDetail}
           />
         )}
-        {currentPage === 'companyDetail' && selectedCompanyId && (
-          <CompanyDetailPage companyId={selectedCompanyId} onNavigateBack={() => setCurrentPage('companyList')} />
+        {currentPage === "companyDetail" && selectedCompanyId && (
+          <CompanyDetailPage
+            companyId={selectedCompanyId}
+            onNavigateBack={() => setCurrentPage("companyList")}
+          />
         )}
-        {currentPage === 'addCompany' && <AddCompanyPage onNavigateBack={navigateToHome} />}
-        {currentPage === 'howItWorks' && (
-          <HowItWorksPage onNavigateBack={navigateToHome} onNavigateToAddCompany={navigateToAddCompany} />
+        {currentPage === "addCompany" && (
+          <AddCompanyPage onNavigateBack={navigateToHome} />
         )}
-        {currentPage === 'references' && <ReferencesPage onNavigateBack={navigateToHome} />}
-        {currentPage === 'news' && <NewsPage onNavigateBack={navigateToHome} />}
-        {currentPage === 'helpCenter' && <HelpCenterPage onNavigateBack={navigateToHome} />}
-        {currentPage === 'contact' && <ContactPage onNavigateBack={navigateToHome} />}
-        {currentPage === 'myAccount' && <MyAccountPage onNavigateBack={navigateToHome} onNavigateToAddCompany={navigateToAddCompany} />}
-        {currentPage === 'myOrders' && <MyOrdersPage onNavigateBack={navigateToHome} />}
-        {currentPage === 'paymentSuccess' && (
-          <PaymentSuccessPage onNavigateBack={navigateToHome} onNavigateToMyOrders={navigateToMyOrders} />
+        {currentPage === "howItWorks" && (
+          <HowItWorksPage
+            onNavigateBack={navigateToHome}
+            onNavigateToAddCompany={navigateToAddCompany}
+          />
         )}
-        {currentPage === 'paymentCancel' && (
-          <PaymentCancelPage onNavigateBack={navigateToHome} onNavigateToMyOrders={navigateToMyOrders} />
+        {currentPage === "references" && (
+          <ReferencesPage onNavigateBack={navigateToHome} />
+        )}
+        {currentPage === "news" && <NewsPage onNavigateBack={navigateToHome} />}
+        {currentPage === "helpCenter" && (
+          <HelpCenterPage onNavigateBack={navigateToHome} />
+        )}
+        {currentPage === "contact" && (
+          <ContactPage onNavigateBack={navigateToHome} />
+        )}
+        {currentPage === "myAccount" && (
+          <MyAccountPage
+            onNavigateBack={navigateToHome}
+            onNavigateToAddCompany={navigateToAddCompany}
+          />
+        )}
+        {currentPage === "myOrders" && (
+          <MyOrdersPage onNavigateBack={navigateToHome} />
+        )}
+        {currentPage === "paymentSuccess" && (
+          <PaymentSuccessPage
+            onNavigateBack={navigateToHome}
+            onNavigateToMyOrders={navigateToMyOrders}
+          />
+        )}
+        {currentPage === "paymentCancel" && (
+          <PaymentCancelPage
+            onNavigateBack={navigateToHome}
+            onNavigateToMyOrders={navigateToMyOrders}
+          />
         )}
       </div>
 
@@ -872,16 +994,24 @@ function App() {
             <h2 className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent mb-4">
               ServisAI
             </h2>
-            <p className="text-gray-600 mb-6">Váš AI asistent pre domáce služby</p>
+            <p className="text-gray-600 mb-6">
+              Váš AI asistent pre domáce služby
+            </p>
             <div className="flex justify-center space-x-6">
               {menuItems.map((item, i) => (
-                <button key={i} onClick={() => handleMenuClick(item.action)} className="text-gray-500 hover:text-blue-600 transition-colors">
+                <button
+                  key={i}
+                  onClick={() => handleMenuClick(item.action)}
+                  className="text-gray-500 hover:text-blue-600 transition-colors"
+                >
                   {item.label}
                 </button>
               ))}
             </div>
             <div className="mt-8 pt-8 border-t border-gray-200">
-              <p className="text-gray-500 text-sm">© 2025 ServisAI. Všetky práva vyhradené.</p>
+              <p className="text-gray-500 text-sm">
+                © 2025 ServisAI. Všetky práva vyhradené.
+              </p>
             </div>
           </div>
         </div>
