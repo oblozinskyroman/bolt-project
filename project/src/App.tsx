@@ -457,27 +457,28 @@ function App() {
   }, [sortBy]);
 
   /* ---------- Navigácia ---------- */
-  const navigateToCompanyList = (serviceName: string) => {
+   const navigateToCompanyList = (serviceName: string) => {
     setSelectedService(serviceName);
-    setCurrentPage("companyList");
+    goTo("companyList");
   };
   const navigateToHome = () => {
-    setCurrentPage("home");
     setSelectedService("");
+    goTo("home");
   };
-  const navigateToAddCompany = () => setCurrentPage("addCompany");
-  const navigateToHowItWorks = () => setCurrentPage("howItWorks");
-  const navigateToReferences = () => setCurrentPage("references");
-  const navigateToNews = () => setCurrentPage("news");
-  const navigateToHelpCenter = () => setCurrentPage("helpCenter");
-  const navigateToContact = () => setCurrentPage("contact");
-  const navigateToMyAccount = () => setCurrentPage("myAccount");
-  const navigateToMyOrders = () => setCurrentPage("myOrders");
-  const navigateToPaymentSuccess = () => setCurrentPage("paymentSuccess");
-  const navigateToPaymentCancel = () => setCurrentPage("paymentCancel");
+
+  const navigateToAddCompany = () => goTo("addCompany");
+  const navigateToHowItWorks = () => goTo("howItWorks");
+  const navigateToReferences = () => goTo("references");
+  const navigateToNews = () => goTo("news");
+  const navigateToHelpCenter = () => goTo("helpCenter");
+  const navigateToContact = () => goTo("contact");
+  const navigateToMyAccount = () => goTo("myAccount");
+  const navigateToMyOrders = () => goTo("myOrders");
+  const navigateToPaymentSuccess = () => goTo("paymentSuccess");
+  const navigateToPaymentCancel = () => goTo("paymentCancel");
   const navigateToCompanyDetail = (companyId: string) => {
     setSelectedCompanyId(companyId);
-    setCurrentPage("companyDetail");
+    goTo("companyDetail");
   };
 
   const handleMenuClick = (action: string | null) => {
