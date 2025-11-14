@@ -37,6 +37,7 @@ import {
   Calendar,
   Shield,
   Euro,
+  ShoppingCart,
 } from "lucide-react";
 
 /** Lokálny storage kľúč pre preferovanú lokalitu */
@@ -193,18 +194,36 @@ function App() {
     return () => clearTimeout(t);
   }, [userLocation]);
 
+  // TU MENÍME: služby = use-cases AI asistenta
   const services = [
-    { name: "Murár", icon: Hammer, color: "from-amber-500 to-orange-600" },
-    { name: "Vodár", icon: Droplets, color: "from-blue-500 to-cyan-600" },
-    { name: "Elektrikár", icon: Zap, color: "from-yellow-500 to-amber-600" },
-    { name: "Obkladač", icon: Puzzle, color: "from-purple-500 to-indigo-600" },
-    { name: "Maliar", icon: Palette, color: "from-pink-500 to-rose-600" },
-    { name: "Záhradník", icon: Trees, color: "from-green-500 to-emerald-600" },
-    { name: "Tesár", icon: Wrench, color: "from-stone-500 to-gray-600" },
-    { name: "Kúrenár", icon: Flame, color: "from-red-500 to-orange-600" },
     {
-      name: "Iné služby",
+      name: "Chat na webe",
+      icon: MessageCircle,
+      color: "from-blue-500 to-indigo-600",
+    },
+    {
+      name: "Rezervácie a objednávky",
+      icon: Calendar,
+      color: "from-emerald-500 to-green-600",
+    },
+    {
+      name: "FAQ a zákaznícka podpora",
       icon: HelpCircle,
+      color: "from-sky-500 to-cyan-600",
+    },
+    {
+      name: "Zber dopytov a leadov",
+      icon: Zap,
+      color: "from-amber-500 to-orange-600",
+    },
+    {
+      name: "Podpora e-shopu",
+      icon: ShoppingCart,
+      color: "from-pink-500 to-rose-600",
+    },
+    {
+      name: "AI pre vaše interné tímy",
+      icon: Puzzle,
       color: "from-slate-500 to-gray-600",
     },
   ];
@@ -480,7 +499,7 @@ function App() {
                   onClick={navigateToAddCompany}
                   className="bg-gradient-to-r from-blue-500 to-indigo-600 text-white hover:from-blue-600 hover:to-indigo-700 border-blue-400"
                 >
-                  Pridať firmu
+                  Pridať web
                 </NavCta>
               </div>
             </div>
@@ -549,7 +568,7 @@ function App() {
                 }}
                 className="w-full inline-flex items-center justify-center gap-2 px-3 py-3 text-base font-bold rounded-lg transition-all transform hover:scale-105 shadow-lg hover:shadow-xl bg-gradient-to-r from-blue-500 to-indigo-600 text-white hover:from-blue-600 hover:to-indigo-700 border-2 border-blue-400"
               >
-                Pridať firmu
+                Pridať web
               </button>
             </div>
           </div>
@@ -561,31 +580,37 @@ function App() {
         {currentPage === "home" && (
           <>
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
-             <div className="text-center mb-12">
-  <h2 className="text-4xl md:text-6xl font-bold text-gray-800 mb-2">
-    AI asistent
-  </h2>
+              {/* HERO */}
+              <div className="text-center mb-12">
+                <h2 className="text-4xl md:text-6xl font-bold text-gray-800 mb-2">
+                  AI asistent
+                </h2>
+                <p className="text-3xl md:text-5xl font-bold mt-1 leading-tight">
+                  <span className="bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">
+                    ktorý vybavuje zákazníkov za vás
+                  </span>
+                </p>
+                <p className="text-xl text-gray-600 mt-6 max-w-3xl mx-auto">
+                  Automatizujte odpovede, objednávky a podporu. Asistent pozná
+                  vaše služby, ceny aj dostupnosť a pracuje nonstop – priamo na
+                  vašom webe.
+                </p>
+              </div>
 
-  <p className="text-3xl md:text-5xl font-bold mt-1 leading-snug">
-    <span className="bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">
-      ktorý vybavuje zákazníkov za vás
-    </span>
-  </p>
-
-  <p className="text-xl text-gray-600 max-w-2xl mx-auto mt-4">
-    Automatizujte odpovede, objednávky a podporu. Asistent pozná vaše služby,
-    ceny aj dostupnosť a pracuje nonstop.
-  </p>
-</div>
-{/* AI chat */}
+              {/* AI chat – DEMO */}
               <div className="bg-white/70 backdrop-blur-md rounded-2xl shadow-xl p-8 mb-20">
                 <div className="flex items-center mb-6">
                   <div className="bg-gradient-to-r from-blue-500 to-indigo-600 p-3 rounded-xl mr-4">
                     <MessageCircle className="text-white" size={24} />
                   </div>
-                  <h3 className="text-2xl font-semibold text-gray-800">
-                    AI Asistent
-                  </h3>
+                  <div>
+                    <h3 className="text-2xl font-semibold text-gray-800">
+                      AI Asistent – živé demo
+                    </h3>
+                    <p className="text-sm text-gray-500 mt-1">
+                      Spýtaj sa, čo všetko by mohol vybavovať na tvojom webe.
+                    </p>
+                  </div>
                 </div>
 
                 <div className="flex flex-col gap-3">
@@ -594,7 +619,7 @@ function App() {
                       type="text"
                       value={message}
                       onChange={(e) => setMessage(e.target.value)}
-                      placeholder="Napíšte svoju otázku... napr. 'Potrebujem opraviť vodovodné potrubie'"
+                      placeholder="Napíšte otázku... napr. 'Ako by AI riešila rezervácie pre môj salón?'"
                       className="flex-1 px-6 py-4 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-lg bg-white/80 backdrop-blur-sm"
                       onKeyDown={(e) =>
                         e.key === "Enter" && !isLoading && handleAsk()
@@ -621,7 +646,7 @@ function App() {
                       type="text"
                       value={userLocation}
                       onChange={(e) => setUserLocation(e.target.value)}
-                      placeholder="Uprednostniť lokalitu"
+                      placeholder="Uprednostniť lokalitu zákazníkov"
                       className="px-4 py-3 rounded-lg border border-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white/80 w-full sm:w-auto flex-1"
                     />
                     <div className="flex items-center gap-3">
@@ -798,7 +823,6 @@ function App() {
                             className="mt-auto pt-4 flex flex-wrap gap-2"
                             onClick={(e) => e.stopPropagation()}
                           >
-                            {/* Escrow platba */}
                             {c.id && (
                               <button
                                 onClick={async () => {
@@ -826,7 +850,6 @@ function App() {
                               </button>
                             )}
 
-                            {/* Pôvodné CTA */}
                             {c.actions?.website ? (
                               <a
                                 href={c.actions.website}
@@ -898,13 +921,13 @@ function App() {
                 )}
               </div>
 
-              {/* Služby */}
+              {/* Služby / use-cases */}
               <div className="text-center mb-12">
                 <h3 className="text-3xl font-bold text-gray-800 mb-4">
-                  Naše služby
+                  Na čo môžete AI asistenta nasadiť
                 </h3>
                 <p className="text-lg text-gray-600">
-                  Vyberte si kategóriu služby, ktorú potrebujete
+                  Vyberte, čo má na vašom webe vybavovať – zvyšok zvládne AI.
                 </p>
               </div>
 
@@ -997,7 +1020,7 @@ function App() {
               ServisAI
             </h2>
             <p className="text-gray-600 mb-6">
-              Váš AI asistent pre domáce služby
+              AI asistent, ktorý vybavuje zákazníkov za vás.
             </p>
             <div className="flex justify-center space-x-6">
               {menuItems.map((item, i) => (
