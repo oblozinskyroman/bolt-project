@@ -115,40 +115,45 @@ function haversineKm(
 
 type SortBy = "relevance" | "rating" | "distance";
 
+/** Stránky v rámci SPA – používame aj pre hash routing */
+type PageId =
+  | "home"
+  | "companyList"
+  | "addCompany"
+  | "companyDetail"
+  | "howItWorks"
+  | "references"
+  | "news"
+  | "helpCenter"
+  | "contact"
+  | "myAccount"
+  | "myOrders"
+  | "paymentSuccess"
+  | "paymentCancel";
+
 function App() {
-    // 🔒 Blokuje BACK button aby neopustil tvoju SPA stránku
-  useEffect(() => {
-    const handleBack = (e: PopStateEvent) => {
-      // znovu zapíš rovnaký stav do histórie = user nemôže ísť späť mimo stránky
-      window.history.pushState(null, "", window.location.pathname);
-    };
-
-    // vložíme jeden fake stav na začiatok
-    window.history.pushState(null, "", window.location.pathname);
-    window.addEventListener("popstate", handleBack);
-
-    return () => window.removeEventListener("popstate", handleBack);
-  }, []);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const [currentPage, setCurrentPage] = useState<
-    | "home"
-    | "companyList"
-    | "addCompany"
-    | "companyDetail"
-    | "howItWorks"
-    | "references"
-    | "news"
-    | "helpCenter"
-    | "contact"
-    | "myAccount"
-    | "myOrders"
-    | "paymentSuccess"
-    | "paymentCancel"
-  >("home");
+  const [currentPage, setCurrentPage] = useState<PageId>("home");
   const [selectedService, setSelectedService] = useState<string>("");
   const [selectedCompanyId, setSelectedCompanyId] = useState<string | null>(
     null
   );
+
+  const pageIds: PageId[] = [
+    "home",
+    "companyList",
+    "addCompany",
+    "companyDetail",
+    "howItWorks",
+    "references",
+    "news",
+    "helpCenter",
+    "contact",
+    "myAccount",
+    "myOrders",
+    "paymentSuccess",
+    "paymentCancel",
+  ];
 
   // AI
   const [message, setMessage] = useState("");
@@ -167,6 +172,44 @@ function App() {
   const [ack, setAck] = useState("");
   const [aiActiveFilters, setAiActiveFilters] = useState<string[]>([]);
   const [sortBy, setSortBy] = useState<SortBy>("relevance");
+
+  // ---------- hash routing: Back/Forward medzi podstránkami ----------
+
+  // reaguj na Back/Forward – čítaj hash a nastav currentPage
+  useEffect(() => {
+    const handlePopState = () => {
+      if (typeof window === "undefined") return;
+
+      const raw = window.location.hash.replace("#", "").trim();
+
+      if (!raw) {
+        setCurrentPage("home");
+        return;
+      }
+
+      if (pageIds.includes(raw as PageId)) {
+        setCurrentPage(raw as PageId);
+      } else {
+        setCurrentPage("home");
+      }
+    };
+
+    window.addEventListener("popstate", handlePopState);
+
+    // init – ak user príde napr. na /#contact
+    handlePopState();
+
+    return () => window.removeEventListener("popstate", handlePopState);
+  }, [pageIds]);
+
+  // pri zmene currentPage zapíš hash do URL (pridá sa záznam do histórie)
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+
+    const hash = currentPage === "home" ? "" : `#${currentPage}`;
+    const url = `${window.location.pathname}${hash}`;
+    window.history.pushState(null, "", url);
+  }, [currentPage]);
 
   // Auth
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -213,7 +256,8 @@ function App() {
       name: "Zákaznícka podpora 24/7",
       icon: MessageCircle,
       color: "from-emerald-500 to-teal-600",
-      description: "Odpovede na časté otázky, otváracie hodiny, ceny a podmienky.",
+      description:
+        "Odpovede na časté otázky, otváracie hodiny, ceny a podmienky.",
     },
     {
       name: "E-shop a produkty",
@@ -231,7 +275,8 @@ function App() {
       name: "Formuláre a dopyty",
       icon: Palette,
       color: "from-pink-500 to-rose-600",
-      description: "AI vyplní so zákazníkom všetko potrebné a odošle vám podklady.",
+      description:
+        "AI vyplní so zákazníkom všetko potrebné a odošle vám podklady.",
     },
     {
       name: "Interné otázky",
@@ -247,13 +292,13 @@ function App() {
     { id: "rating-4plus", label: "★ 4+", icon: Star },
   ];
 
-const menuItems = [
-  { label: "Ako fungujeme", action: "howItWorks" }, // <-- TU
-  { label: "Funkcie", action: "references" },
-  { label: "Cenník", action: "news" },
-  { label: "Integrácia", action: "helpCenter" },
-  { label: "Kontakt", action: "contact" },
-];
+  const menuItems = [
+    { label: "Ako fungujeme", action: "howItWorks" },
+    { label: "Funkcie", action: "references" },
+    { label: "Cenník", action: "news" },
+    { label: "Integrácia", action: "helpCenter" },
+    { label: "Kontakt", action: "contact" },
+  ];
 
   const mainMenuItems = [...menuItems];
 
@@ -404,7 +449,8 @@ const menuItems = [
     if (!cards.length) return;
     const enriched = withDistances(cards);
     setCards(sortCards(enriched, sortBy));
-  }, [coords]); // eslint-disable-line
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [coords]);
 
   useEffect(() => {
     setCards((prev) => sortCards(prev, sortBy));
@@ -458,7 +504,7 @@ const menuItems = [
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-amber-50 via-orange-50 to-yellow-100">
-           {/* Navbar */}
+      {/* Navbar */}
       <nav className="bg-white/80 backdrop-blur-md shadow-lg sticky top-0 z-50">
         <div className="max-w-screen-2xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between py-3">
@@ -474,7 +520,7 @@ const menuItems = [
 
             {/* Menu uprostred */}
             <div className="hidden md:flex flex-1 items-center justify-center space-x-6">
-              {menuItems.map((item, i) => (
+              {mainMenuItems.map((item, i) => (
                 <button
                   key={i}
                   onClick={() => handleMenuClick(item.action)}
@@ -751,7 +797,7 @@ const menuItems = [
                               ))}
                           </div>
 
-                          {/* CTA + ESCROW – nechávam ako demo logiku */}
+                          {/* CTA + ESCROW – demo logika */}
                           <div
                             className="mt-auto pt-4 flex flex-wrap gap-2"
                             onClick={(e) => e.stopPropagation()}
@@ -860,8 +906,9 @@ const menuItems = [
                   Na čo môžete AI asistenta nasadiť
                 </h3>
                 <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-                  Vyberte, čo má na vašom webe vybavovať – rezervácie, objednávky,
-                  otázky zákazníkov alebo interné procesy. Zvyšok zvládne AI.
+                  Vyberte, čo má na vašom webe vybavovať – rezervácie,
+                  objednávky, otázky zákazníkov alebo interné procesy. Zvyšok
+                  zvládne AI.
                 </p>
               </div>
 
@@ -923,7 +970,7 @@ const menuItems = [
           <HelpCenterPage onNavigateBack={navigateToHome} />
         )}
         {currentPage === "contact" && (
-          <ContactPage onNavigateBack={navigateToHome} />
+          <ContactPage onNavigateToHome={navigateToHome} />
         )}
         {currentPage === "myAccount" && (
           <MyAccountPage
