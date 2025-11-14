@@ -115,7 +115,6 @@ function haversineKm(
 
 type SortBy = "relevance" | "rating" | "distance";
 
-/** Stránky v rámci SPA – používame aj pre hash routing */
 type PageId =
   | "home"
   | "companyList"
@@ -131,29 +130,35 @@ type PageId =
   | "paymentSuccess"
   | "paymentCancel";
 
+const ALL_PAGES: PageId[] = [
+  "home",
+  "companyList",
+  "addCompany",
+  "companyDetail",
+  "howItWorks",
+  "references",
+  "news",
+  "helpCenter",
+  "contact",
+  "myAccount",
+  "myOrders",
+  "paymentSuccess",
+  "paymentCancel",
+];
+
+function getPageFromHash(): PageId {
+  if (typeof window === "undefined") return "home";
+  const raw = window.location.hash.replace("#", "").trim() as PageId;
+  return ALL_PAGES.includes(raw) ? raw : "home";
+}
+
 function App() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const [currentPage, setCurrentPage] = useState<PageId>("home");
+  const [currentPage, setCurrentPage] = useState<PageId>(getPageFromHash);
   const [selectedService, setSelectedService] = useState<string>("");
   const [selectedCompanyId, setSelectedCompanyId] = useState<string | null>(
     null
   );
-
-  const pageIds: PageId[] = [
-    "home",
-    "companyList",
-    "addCompany",
-    "companyDetail",
-    "howItWorks",
-    "references",
-    "news",
-    "helpCenter",
-    "contact",
-    "myAccount",
-    "myOrders",
-    "paymentSuccess",
-    "paymentCancel",
-  ];
 
   // AI
   const [message, setMessage] = useState("");
@@ -173,44 +178,6 @@ function App() {
   const [aiActiveFilters, setAiActiveFilters] = useState<string[]>([]);
   const [sortBy, setSortBy] = useState<SortBy>("relevance");
 
-  // ---------- hash routing: Back/Forward medzi podstránkami ----------
-
-  // reaguj na Back/Forward – čítaj hash a nastav currentPage
-  useEffect(() => {
-    const handlePopState = () => {
-      if (typeof window === "undefined") return;
-
-      const raw = window.location.hash.replace("#", "").trim();
-
-      if (!raw) {
-        setCurrentPage("home");
-        return;
-      }
-
-      if (pageIds.includes(raw as PageId)) {
-        setCurrentPage(raw as PageId);
-      } else {
-        setCurrentPage("home");
-      }
-    };
-
-    window.addEventListener("popstate", handlePopState);
-
-    // init – ak user príde napr. na /#contact
-    handlePopState();
-
-    return () => window.removeEventListener("popstate", handlePopState);
-  }, [pageIds]);
-
-  // pri zmene currentPage zapíš hash do URL (pridá sa záznam do histórie)
-  useEffect(() => {
-    if (typeof window === "undefined") return;
-
-    const hash = currentPage === "home" ? "" : `#${currentPage}`;
-    const url = `${window.location.pathname}${hash}`;
-    window.history.pushState(null, "", url);
-  }, [currentPage]);
-
   // Auth
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   useEffect(() => {
@@ -229,7 +196,37 @@ function App() {
     return () => subscription.unsubscribe();
   }, []);
 
-  // Načítaj preferovanú lokalitu z localStorage pri štarte (už len interné, UI ju nepoužíva)
+  // Hash routing – reaguje na back/forward a pri prvom načítaní
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+
+    const handler = () => {
+      setCurrentPage(getPageFromHash());
+    };
+
+    window.addEventListener("hashchange", handler);
+    // istota, že pri prvom load-e sedí stránka s hashom
+    handler();
+
+    return () => {
+      window.removeEventListener("hashchange", handler);
+    };
+  }, []);
+
+  // jednotné presúvanie medzi stránkami + zapis hash do URL
+  const goTo = (page: PageId) => {
+    if (typeof window !== "undefined") {
+      const hash = page === "home" ? "" : `#${page}`;
+      if (window.location.hash !== hash) {
+        window.location.hash = hash;
+        // currentPage sa nastaví cez hashchange handler
+        return;
+      }
+    }
+    setCurrentPage(page);
+  };
+
+  // Načítaj preferovanú lokalitu z localStorage pri štarte
   useEffect(() => {
     const existing = (localStorage.getItem(LS_PREF_LOC) || "").trim();
     if (existing && !userLocation) setUserLocation(existing);
@@ -244,7 +241,7 @@ function App() {
     return () => clearTimeout(t);
   }, [userLocation]);
 
-  // Namiesto remesiel: use-cases pre AI asistenta
+  // Use-cases pre AI asistenta
   const useCases = [
     {
       name: "Rezervácie a objednávky",
@@ -263,7 +260,8 @@ function App() {
       name: "E-shop a produkty",
       icon: Puzzle,
       color: "from-violet-500 to-purple-600",
-      description: "Pomoc s výberom produktu, dostupnosťou a stavom objednávky.",
+      description:
+        "Pomoc s výberom produktu, dostupnosťou a stavom objednávky.",
     },
     {
       name: "Servis a reklamácie",
@@ -287,7 +285,7 @@ function App() {
   ];
 
   const aiQuickFilters = [
-    // zostáva len kvôli kompatibilite s backendom – v UI ich už neukazujeme
+    // len kvôli kompatibilite s backendom – v UI ich už neukazujeme
     { id: "verified", label: "Overené", icon: Shield },
     { id: "rating-4plus", label: "★ 4+", icon: Star },
   ];
@@ -299,12 +297,11 @@ function App() {
     { label: "Integrácia", action: "helpCenter" },
     { label: "Kontakt", action: "contact" },
   ];
-
   const mainMenuItems = [...menuItems];
 
   const relyOrEmpty = (s?: string) => (typeof s === "string" ? s : "");
 
-  /* ---------- Geolokácia (momentálne bez tlačidla v UI, nechávam pripravené) ---------- */
+  /* ---------- Geolokácia (momentálne v deme bez tlačidla) ---------- */
   const useMyLocation = () => {
     if (!("geolocation" in navigator)) {
       alert("Prehliadač nepodporuje geolokáciu.");
@@ -457,7 +454,7 @@ function App() {
   }, [sortBy]);
 
   /* ---------- Navigácia ---------- */
-   const navigateToCompanyList = (serviceName: string) => {
+  const navigateToCompanyList = (serviceName: string) => {
     setSelectedService(serviceName);
     goTo("companyList");
   };
@@ -465,7 +462,6 @@ function App() {
     setSelectedService("");
     goTo("home");
   };
-
   const navigateToAddCompany = () => goTo("addCompany");
   const navigateToHowItWorks = () => goTo("howItWorks");
   const navigateToReferences = () => goTo("references");
@@ -570,7 +566,7 @@ function App() {
         {mobileMenuOpen && (
           <div className="md:hidden bg-white/95 backdrop-blur-md border-t">
             <div className="px-2 pt-2 pb-3 space-y-2">
-              {menuItems.map((item, i) => (
+              {mainMenuItems.map((item, i) => (
                 <button
                   key={i}
                   onClick={() => {
@@ -907,9 +903,8 @@ function App() {
                   Na čo môžete AI asistenta nasadiť
                 </h3>
                 <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-                  Vyberte, čo má na vašom webe vybavovať – rezervácie,
-                  objednávky, otázky zákazníkov alebo interné procesy. Zvyšok
-                  zvládne AI.
+                  Vyberte, čo má na vašom webe vybavovať – rezervácie, objednávky,
+                  otázky zákazníkov alebo interné procesy. Zvyšok zvládne AI.
                 </p>
               </div>
 
@@ -951,7 +946,7 @@ function App() {
         {currentPage === "companyDetail" && selectedCompanyId && (
           <CompanyDetailPage
             companyId={selectedCompanyId}
-            onNavigateBack={() => setCurrentPage("companyList")}
+            onNavigateBack={() => goTo("companyList")}
           />
         )}
         {currentPage === "addCompany" && (
@@ -971,7 +966,7 @@ function App() {
           <HelpCenterPage onNavigateBack={navigateToHome} />
         )}
         {currentPage === "contact" && (
-          <ContactPage onNavigateToHome={navigateToHome} />
+          <ContactPage onNavigateBack={navigateToHome} />
         )}
         {currentPage === "myAccount" && (
           <MyAccountPage
