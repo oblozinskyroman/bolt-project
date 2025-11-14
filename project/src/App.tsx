@@ -576,7 +576,7 @@ function App() {
                  Automatizujte odpovede, objednávky a podporu. Asistent pozná vaše služby, ceny aj dostupnosť a pracuje nonstop.
                 </p>
               </div>
-
+             
               {/* AI chat */}
               <div className="bg-white/70 backdrop-blur-md rounded-2xl shadow-xl p-8 mb-20">
                 <div className="flex items-center mb-6">
