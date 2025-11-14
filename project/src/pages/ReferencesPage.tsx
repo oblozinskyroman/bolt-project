@@ -1,21 +1,15 @@
-import React, { useState } from 'react';
-import { 
-  ArrowLeft, 
-  Star, 
-  Shield, 
-  Info, 
-  Calendar, 
-  MapPin, 
+import React, { useState } from "react";
+import {
+  ArrowLeft,
+  Star,
+  Shield,
+  Calendar,
+  MapPin,
   CheckCircle,
-  AlertCircle,
   Users,
-  Camera,
   FileCheck,
   MessageSquare,
-  Menu,
-  X,
-  User
-} from 'lucide-react';
+} from "lucide-react";
 
 interface ReferencesPageProps {
   onNavigateBack: () => void;
@@ -24,89 +18,97 @@ interface ReferencesPageProps {
 interface Review {
   id: number;
   name: string;
+  company: string;
   location: string;
   rating: number;
   text: string;
-  service: string;
+  useCase: string;
   date: string;
-  type: 'verified' | 'sample';
-  avatar?: string;
+  type: "verified" | "sample";
 }
 
 function ReferencesPage({ onNavigateBack }: ReferencesPageProps) {
-  const [activeTab, setActiveTab] = useState<'all' | 'verified' | 'sample'>('all');
-  const [showTooltip, setShowTooltip] = useState<number | null>(null);
+  const [activeTab, setActiveTab] = useState<"all" | "verified" | "sample">(
+    "all"
+  );
 
-  // Mock data for reviews
   const reviews: Review[] = [
     {
       id: 1,
-      name: 'Marek K.',
-      location: 'Bratislava',
+      name: "Marek K.",
+      company: "Barber & Style",
+      location: "Bratislava",
       rating: 5,
-      text: 'Výborná skúsenosť s AI asistentom. Rýchlo mi našiel kvalitného vodára, ktorý vyriešil problém s potrubiami za rozumnú cenu. Escrow platba mi dala istotu.',
-      service: 'Vodár',
-      date: '2024-12-15',
-      type: 'verified'
+      text: "Predtým sme nestíhali reagovať na správy z webu a Facebooku. Po nasadení AI asistenta ide 80 % rezervácií cez chat a telefón nám takmer nevolá nikto.",
+      useCase: "Rezervácie termínov",
+      date: "2024-12-15",
+      type: "verified",
     },
     {
       id: 2,
-      name: 'Jana S.',
-      location: 'Košice',
-      rating: 4,
-      text: 'Potrebovala som murára na opravu balkóna. Cez platformu som dostala 3 ponuky do hodiny. Vybrala som si podľa hodnotení a ceny. Práca bola dokončená včas.',
-      service: 'Murár',
-      date: '2024-12-10',
-      type: 'verified'
+      name: "Jana S.",
+      company: "Studio Vita",
+      location: "Košice",
+      rating: 5,
+      text: "Asistent odpovedá na ceny, dostupnosť a základné otázky nonstop. Večer vidím v prehľade, koľko rezervácií urobil a čo ľudí najviac zaujímalo.",
+      useCase: "Wellness & beauty",
+      date: "2024-12-10",
+      type: "verified",
     },
     {
       id: 3,
-      name: 'Peter M.',
-      location: 'Žilina',
-      rating: 5,
-      text: 'Elektrikár prišiel už na druhý deň. Profesionálny prístup, čistá práca. Platba cez escrow bola bezpečná - peniaze sa uvoľnili až po mojom súhlase.',
-      service: 'Elektrikár',
-      date: '2024-12-08',
-      type: 'verified'
+      name: "Peter M.",
+      company: "TechPoint Servis",
+      location: "Žilina",
+      rating: 4,
+      text: "Na support nám chodilo množstvo opakujúcich sa otázok. AI asistent vyrieši väčšinu z nich sám a na operátorov zostávajú už len zložitejšie prípady.",
+      useCase: "Zákaznícka podpora",
+      date: "2024-12-08",
+      type: "verified",
     },
     {
       id: 4,
-      name: 'Lucia T.',
-      location: 'Nitra',
-      rating: 4,
-      text: 'AI asistent mi pomohol nájsť záhradníka pre strihanie stromov. Porovnanie ponúk bolo jednoduché. Oceňujem transparentnosť celého procesu.',
-      service: 'Záhradník',
-      date: '2024-12-05',
-      type: 'verified'
+      name: "Lucia T.",
+      company: "Bloom Flowers",
+      location: "Nitra",
+      rating: 5,
+      text: "Ľudia si cez chat vyberú kyticu, doplnia text na kartičku a objednávku dokončia na webe. Asistent vie pracovať s naším cenníkom aj dopravou.",
+      useCase: "E-shop s kvetmi",
+      date: "2024-12-05",
+      type: "verified",
     },
     {
       id: 5,
-      name: 'Tomáš H.',
-      location: 'Trnava',
-      rating: 5,
-      text: 'Obkladač dokončil kúpeľňu presne podľa dohody. Kvalita práce výborná, komunikácia cez platformu bezproblémová. Určite budem používať znovu.',
-      service: 'Obkladač',
-      date: '2024-12-01',
-      type: 'verified'
-    }
+      name: "Tomáš H.",
+      company: "FitPoint Gym",
+      location: "Trnava",
+      rating: 4,
+      text: "Najviac oceňujem, že asistent vysvetľuje členstvá a rozdiel medzi balíkmi. Máme menej zbytočných návštev len kvôli otázkam a viac reálnych registrácií.",
+      useCase: "Fitness & členstvá",
+      date: "2024-12-01",
+      type: "verified",
+    },
   ];
 
-  const filteredReviews = reviews.filter(review => {
-    if (activeTab === 'all') return true;
+  const filteredReviews = reviews.filter((review) => {
+    if (activeTab === "all") return true;
     return review.type === activeTab;
   });
 
-  const verifiedCount = reviews.length; // Všetky recenzie sú teraz overené
+  const verifiedCount = reviews.filter((r) => r.type === "verified").length;
 
-  const renderStars = (rating: number) => {
-    return Array.from({ length: 5 }, (_, index) => (
+  const renderStars = (rating: number) =>
+    Array.from({ length: 5 }, (_, index) => (
       <Star
         key={index}
         size={16}
-        className={index < rating ? 'text-yellow-400 fill-current' : 'text-gray-300'}
+        className={
+          index < rating
+            ? "text-yellow-400 fill-current"
+            : "text-gray-300"
+        }
       />
     ));
-  };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-amber-50 via-orange-50 to-yellow-100">
@@ -122,10 +124,11 @@ function ReferencesPage({ onNavigateBack }: ReferencesPageProps) {
             </button>
           </div>
           <h1 className="text-5xl md:text-6xl font-bold mb-6">
-            Čo hovoria používatelia
+            Skúsenosti klientov
           </h1>
           <p className="text-xl md:text-2xl text-blue-100 max-w-3xl mx-auto leading-relaxed">
-            Reálne skúsenosti našich spokojných zákazníkov
+            Ako sa z pasívneho webu stal AI asistent, ktorý vybavuje zákazníkov
+            za nich.
           </p>
         </div>
       </div>
@@ -135,26 +138,26 @@ function ReferencesPage({ onNavigateBack }: ReferencesPageProps) {
         <div className="bg-white/70 backdrop-blur-md rounded-2xl shadow-lg p-2 mb-8">
           <div className="flex flex-wrap gap-2">
             <button
-              onClick={() => setActiveTab('all')}
+              onClick={() => setActiveTab("all")}
               className={`flex items-center gap-2 px-6 py-3 rounded-xl font-medium transition-all duration-200 ${
-                activeTab === 'all'
-                  ? 'bg-gradient-to-r from-blue-500 to-indigo-600 text-white shadow-md'
-                  : 'text-gray-600 hover:bg-gray-100'
+                activeTab === "all"
+                  ? "bg-gradient-to-r from-blue-500 to-indigo-600 text-white shadow-md"
+                  : "text-gray-600 hover:bg-gray-100"
               }`}
             >
               <Users size={18} />
               Všetky ({reviews.length})
             </button>
             <button
-              onClick={() => setActiveTab('verified')}
+              onClick={() => setActiveTab("verified")}
               className={`flex items-center gap-2 px-6 py-3 rounded-xl font-medium transition-all duration-200 ${
-                activeTab === 'verified'
-                  ? 'bg-gradient-to-r from-green-500 to-emerald-600 text-white shadow-md'
-                  : 'text-gray-600 hover:bg-gray-100'
+                activeTab === "verified"
+                  ? "bg-gradient-to-r from-green-500 to-emerald-600 text-white shadow-md"
+                  : "text-gray-600 hover:bg-gray-100"
               }`}
             >
               <Shield size={18} />
-              Overené ({verifiedCount})
+              Overené projekty ({verifiedCount})
             </button>
           </div>
         </div>
@@ -167,10 +170,11 @@ function ReferencesPage({ onNavigateBack }: ReferencesPageProps) {
             <div className="bg-white/70 backdrop-blur-md rounded-2xl p-12 shadow-lg">
               <CheckCircle className="text-gray-400 mx-auto mb-4" size={48} />
               <h3 className="text-xl font-semibold text-gray-600 mb-2">
-                Zatiaľ žiadne overené referencie
+                Zatiaľ nemáme zobrazené žiadne referencie
               </h3>
               <p className="text-gray-500">
-                Buďte medzi prvými, ktorí vyskúšajú našu službu!
+                Buďte medzi prvými, ktorí si nechajú nasadiť AI asistenta na
+                svoj web.
               </p>
             </div>
           </div>
@@ -190,32 +194,35 @@ function ReferencesPage({ onNavigateBack }: ReferencesPageProps) {
                       </span>
                     </div>
                     <div>
-                      <h4 className="font-semibold text-gray-800">{review.name}</h4>
-                      <div className="flex items-center text-sm text-gray-500">
+                      <h4 className="font-semibold text-gray-800">
+                        {review.name}
+                      </h4>
+                      <div className="text-sm text-gray-500">
+                        {review.company}
+                      </div>
+                      <div className="flex items-center text-xs text-gray-500">
                         <MapPin size={12} className="mr-1" />
                         {review.location}
                       </div>
                     </div>
                   </div>
-                  
-                  {/* Type Badge */}
-                  <div className="relative">
-                    <div className="flex items-center bg-green-100 text-green-800 px-3 py-1 rounded-full text-xs font-medium">
-                      <Shield size={12} className="mr-1" />
-                      Overená objednávka
-                    </div>
+
+                  {/* Badge */}
+                  <div className="flex items-center bg-green-100 text-green-800 px-3 py-1 rounded-full text-xs font-medium">
+                    <Shield size={12} className="mr-1" />
+                    Overený klient
                   </div>
                 </div>
 
                 {/* Rating */}
                 <div className="flex items-center mb-3">
-                  <div className="flex mr-2">
-                    {renderStars(review.rating)}
-                  </div>
-                  <span className="font-semibold text-gray-700">{review.rating}/5</span>
+                  <div className="flex mr-2">{renderStars(review.rating)}</div>
+                  <span className="font-semibold text-gray-700">
+                    {review.rating}/5
+                  </span>
                 </div>
 
-                {/* Review Text */}
+                {/* Text */}
                 <p className="text-gray-600 mb-4 leading-relaxed">
                   "{review.text}"
                 </p>
@@ -224,12 +231,12 @@ function ReferencesPage({ onNavigateBack }: ReferencesPageProps) {
                 <div className="flex items-center justify-between text-sm text-gray-500 pt-4 border-t border-gray-200">
                   <div className="flex items-center">
                     <span className="bg-blue-100 text-blue-800 px-2 py-1 rounded-full text-xs font-medium">
-                      {review.service}
+                      {review.useCase}
                     </span>
                   </div>
                   <div className="flex items-center">
                     <Calendar size={12} className="mr-1" />
-                    {new Date(review.date).toLocaleDateString('sk-SK')}
+                    {new Date(review.date).toLocaleDateString("sk-SK")}
                   </div>
                 </div>
               </div>
@@ -242,26 +249,21 @@ function ReferencesPage({ onNavigateBack }: ReferencesPageProps) {
       <div className="bg-gradient-to-r from-blue-400 to-indigo-500 text-white py-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <h2 className="text-4xl font-bold mb-6">
-            Chcete reálnu skúsenosť?
+            Chcete vidieť, ako by AI fungovala na vašom webe?
           </h2>
           <p className="text-xl text-blue-100 mb-12 max-w-2xl mx-auto">
-            Objednajte si službu s bezpečnou platbou cez escrow. Po dokončení dostanete výzvu na pridanie overenej recenzie.
+            Najskôr si asistenta vyskúšajte v živom deme, potom ho prispôsobíme
+            presne podľa vašich stránok a cieľov.
           </p>
-          
+
           <div className="flex flex-col sm:flex-row gap-6 justify-center">
             <button
               onClick={onNavigateBack}
               className="bg-white text-blue-600 px-8 py-4 rounded-xl font-semibold text-lg hover:bg-blue-50 transition-all duration-200 transform hover:scale-105 shadow-lg hover:shadow-xl flex items-center justify-center gap-2"
             >
               <MessageSquare size={20} />
-              Vyskúšať službu
+              Vrátiť sa k živému demu
             </button>
-          </div>
-          
-          <div className="mt-8 p-4 bg-blue-800/30 rounded-xl max-w-2xl mx-auto">
-            <p className="text-blue-100 text-sm">
-              💡 <strong>Bonus:</strong> Získajte 10% zľavu za pridanie overenej recenzie po dokončení práce.
-            </p>
           </div>
         </div>
       </div>
@@ -271,10 +273,11 @@ function ReferencesPage({ onNavigateBack }: ReferencesPageProps) {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
             <h2 className="text-3xl font-bold text-gray-800 mb-4">
-              Ako overujeme referencie
+              Ako pracujeme s referenciami a dátami
             </h2>
             <p className="text-lg text-gray-600">
-              Transparentnosť a dôveryhodnosť sú pre nás prioritou
+              Dôležité je nielen to, čo AI odpovedá, ale aj to, čo sa z toho
+              naučí váš biznis.
             </p>
           </div>
 
@@ -284,34 +287,37 @@ function ReferencesPage({ onNavigateBack }: ReferencesPageProps) {
                 <FileCheck className="text-white" size={28} />
               </div>
               <h3 className="text-lg font-semibold text-gray-800 mb-2">
-                Väzba na objednávku
+                Dáta z reálnych rozhovorov
               </h3>
               <p className="text-gray-600 text-sm">
-                Recenziu môže pridať len zákazník s dokončenou a zaplatenou objednávkou
+                V prehľade vidíte najčastejšie otázky, dokončené konverzácie a
+                miesta, kde zákazníkovi ešte treba pomôcť.
               </p>
             </div>
 
             <div className="text-center">
               <div className="bg-gradient-to-r from-blue-500 to-cyan-600 w-16 h-16 rounded-xl flex items-center justify-center mx-auto mb-4">
-                <Camera className="text-white" size={28} />
+                <Shield className="text-white" size={28} />
               </div>
               <h3 className="text-lg font-semibold text-gray-800 mb-2">
-                Fotodôkazy
+                Bezpečná práca s obsahom
               </h3>
               <p className="text-gray-600 text-sm">
-                Zákazníci môžu priložiť fotografie dokončenej práce ako dôkaz
+                Asistent používa vaše texty, cenníky a interné dokumenty. Prístup
+                k nim máte pod kontrolou vy.
               </p>
             </div>
 
             <div className="text-center">
               <div className="bg-gradient-to-r from-purple-500 to-indigo-600 w-16 h-16 rounded-xl flex items-center justify-center mx-auto mb-4">
-                <Shield className="text-white" size={28} />
+                <CheckCircle className="text-white" size={28} />
               </div>
               <h3 className="text-lg font-semibold text-gray-800 mb-2">
-                Moderácia
+                Meranie výsledkov
               </h3>
               <p className="text-gray-600 text-sm">
-                Všetky recenzie prechádzajú kontrolou pred zverejnením
+                Sledujeme, koľko rozhovorov skončilo rezerváciou alebo
+                objednávkou, a podľa toho asistenta ďalej ladíme.
               </p>
             </div>
           </div>
