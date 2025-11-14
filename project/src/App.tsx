@@ -236,14 +236,14 @@ function App() {
     { id: "budget-50", label: "Do 50 €", icon: Euro },
   ];
 
-  const menuItems = [
-    { label: "Ako fungujeme?", action: "howItWorks" },
-    { label: "Referencie", action: "references" },
-    { label: "Novinky", action: "news" },
-    { label: "Centrum pomoci", action: "helpCenter" },
-    { label: "Kontakt", action: "contact" },
-    { label: "Moje objednávky", action: "myOrders" },
-  ];
+const menuItems = [
+  { label: "Ako funguje", action: "howItWorks" },   // vysvetlenie produktu
+  { label: "Funkcie", action: "references" },       // neskôr zmeníme obsah stránky
+  { label: "Cenník", action: "news" },              // dočasne použijeme NewsPage
+  { label: "Integrácia", action: "helpCenter" },    // ako napojiť asistenta na web
+  { label: "Kontakt", action: "contact" },
+];
+
   const mainMenuItems = [...menuItems];
 
   const relyOrEmpty = (s?: string) => (typeof s === "string" ? s : "");
