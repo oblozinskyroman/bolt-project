@@ -26,74 +26,79 @@ interface HowItWorksPageProps {
 }
 
 function HowItWorksPage({ onNavigateBack, onNavigateToAddCompany }: HowItWorksPageProps) {
+  // 4 kroky pre nasadenie AI asistenta
   const steps = [
     {
       number: 1,
       icon: Edit3,
-      title: 'Opíšte, čo potrebujete',
-      description: 'Do nášho formulára alebo AI asistenta napíšete, akú prácu potrebujete.',
-      example: 'Príklad: „Potrebujem opraviť vodovodné potrubie v kúpeľni"',
-      color: 'from-blue-500 to-cyan-600'
+      title: 'Vyplníte krátky onboarding',
+      description:
+        'Povieme si, čo robí váš web, akých zákazníkov obsluhujete a aký je ideálny výsledok – rezervácia, objednávka, dopyt alebo kontakt.',
+      example: 'Príklad: „Kaderníctvo v centre, chcem aby si klienti vedeli sami rezervovať termín.“',
+      color: 'from-blue-500 to-cyan-600',
     },
     {
       number: 2,
-      icon: BarChart3,
-      title: 'Porovnajte ponuky od overených firiem',
-      description: 'Získate ponuky od remeselníkov vo vašom okolí. Porovnajte cenu, hodnotenia a dostupnosť.',
+      icon: Shield,
+      title: 'Naučíme AI váš obsah',
+      description:
+        'Do systému pridáme vaše služby, ceny, často kladené otázky a interné pravidlá. Asistent nikdy nevymýšľa vlastné podmienky, drží sa vašich dát.',
       example: '',
-      color: 'from-green-500 to-emerald-600'
+      color: 'from-emerald-500 to-green-600',
     },
     {
       number: 3,
-      icon: CheckCircle,
-      title: 'Vyberte a objednajte',
-      description: 'Vyberiete si toho, kto vám najviac vyhovuje. Dohodnete termín priamo v aplikácii.',
+      icon: Building2,
+      title: 'Vložíte asistenta na web',
+      description:
+        'Dostanete krátky kód, ktorý vloží váš správca webu (WordPress, Webnode, vlastný web…). Asistent sa zobrazí ako chat alebo bublina v rohu stránky.',
       example: '',
-      color: 'from-purple-500 to-indigo-600'
+      color: 'from-purple-500 to-indigo-600',
     },
     {
       number: 4,
-      icon: Shield,
-      title: 'Zaplatíte bezpečne až po dokončení práce (Escrow)',
-      description: 'Peniaze držíme v úschove a uvoľníme ich firme až keď potvrdíte, že je práca hotová.',
+      icon: BarChart3,
+      title: 'Meriate výsledky a ladíte',
+      description:
+        'V prehľade vidíte počet rozhovorov, rezervácií a zodpovedaných otázok. Môžeme spolu doladiť odpovede, scenáre a konverziu.',
       example: '',
-      color: 'from-orange-500 to-red-600'
-    }
+      color: 'from-orange-500 to-red-600',
+    },
   ];
 
   const benefits = [
     {
       icon: Verified,
-      title: 'Overené firmy',
-      description: 'Kontrolujeme IČO a recenzie.',
-      color: 'text-blue-600'
+      title: 'Presné odpovede z vášho webu',
+      description: 'Asistent čerpá z vašich textov, cenníka a interných pravidiel. Neháda a nevymýšľa.',
+      color: 'text-blue-600',
     },
     {
       icon: Timer,
-      title: 'Rýchle reakcie',
-      description: 'Priemerná odpoveď do 20 minút.',
-      color: 'text-green-600'
+      title: 'Nonstop prevádzka',
+      description: 'Odpovedá 24/7, aj keď nezdvíhate telefón alebo nemáte človeka na support.',
+      color: 'text-green-600',
     },
     {
       icon: DollarSign,
-      title: 'Bezpečná platba',
-      description: 'Peniaze idú firme až po odvedení práce.',
-      color: 'text-purple-600'
+      title: 'Viac objednávok bez call centra',
+      description: 'Zákazníka privedie až k výsledku – rezervácia, objednávka, formulár alebo odkaz na platbu.',
+      color: 'text-purple-600',
     },
     {
       icon: Users,
-      title: 'Hodnotenia po práci',
-      description: 'Reálni zákazníci, reálne skúsenosti.',
-      color: 'text-orange-600'
-    }
+      title: 'Kontrola a spätná väzba',
+      description: 'Vidíte reálne rozhovory, viete upraviť odpovede a sledovať, čo ľudia najčastejšie riešia.',
+      color: 'text-orange-600',
+    },
   ];
 
   const timelineSteps = [
-    { label: 'Zadanie dopytu', emoji: '📝' },
-    { label: 'Ponuky', emoji: '📊' },
-    { label: 'Výber', emoji: '✅' },
-    { label: 'Dokončenie', emoji: '🔨' },
-    { label: 'Platba', emoji: '💳' }
+    { label: 'Onboarding', emoji: '📝' },
+    { label: 'Nastavenie AI', emoji: '🤖' },
+    { label: 'Nasadenie na web', emoji: '🌐' },
+    { label: 'Testovanie', emoji: '✅' },
+    { label: 'Reálni zákazníci', emoji: '💬' },
   ];
 
   return (
@@ -110,10 +115,10 @@ function HowItWorksPage({ onNavigateBack, onNavigateToAddCompany }: HowItWorksPa
             </button>
           </div>
           <h1 className="text-5xl md:text-6xl font-bold mb-6">
-            Ako fungujeme
+            Ako funguje ServisAI
           </h1>
           <p className="text-xl md:text-2xl text-blue-100 max-w-3xl mx-auto leading-relaxed">
-            Nájdite spoľahlivého odborníka rýchlo, bezpečne a bez stresu.
+            Z pasívneho webu spravíme asistenta, ktorý odpovedá, vysvetľuje a vybavuje zákazníkov za vás.
           </p>
         </div>
       </div>
@@ -136,7 +141,9 @@ function HowItWorksPage({ onNavigateBack, onNavigateToAddCompany }: HowItWorksPa
                 </div>
 
                 {/* Icon */}
-                <div className={`w-16 h-16 bg-gradient-to-r ${step.color} rounded-xl flex items-center justify-center mb-6 mx-auto`}>
+                <div
+                  className={`w-16 h-16 bg-gradient-to-r ${step.color} rounded-xl flex items-center justify-center mb-6 mx-auto`}
+                >
                   <IconComponent className="text-white" size={28} />
                 </div>
 
@@ -147,13 +154,11 @@ function HowItWorksPage({ onNavigateBack, onNavigateToAddCompany }: HowItWorksPa
                 <p className="text-gray-600 text-center mb-4 leading-relaxed">
                   {step.description}
                 </p>
-                
+
                 {/* Example */}
                 {step.example && (
                   <div className="bg-blue-50 rounded-lg p-3 mt-4">
-                    <p className="text-sm text-blue-700 italic">
-                      {step.example}
-                    </p>
+                    <p className="text-sm text-blue-700 italic">{step.example}</p>
                   </div>
                 )}
 
@@ -174,10 +179,10 @@ function HowItWorksPage({ onNavigateBack, onNavigateToAddCompany }: HowItWorksPa
         <div className="max-w-screen-xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
             <h2 className="text-4xl font-bold text-gray-800 mb-4">
-              Prečo to funguje lepšie
+              Čo presne vám AI asistent prinesie
             </h2>
             <p className="text-xl text-gray-600 max-w-2xl mx-auto">
-              Naša platforma kombinuje najlepšie technológie s overenými odborníkmi
+              Menej mailov a telefonátov, viac vybavených zákazníkov – bez toho, aby ste sedeli pri počítači.
             </p>
           </div>
 
@@ -185,20 +190,18 @@ function HowItWorksPage({ onNavigateBack, onNavigateToAddCompany }: HowItWorksPa
             {benefits.map((benefit, index) => {
               const IconComponent = benefit.icon;
               return (
-                <div
-                  key={index}
-                  className="text-center group"
-                >
+                <div key={index} className="text-center group">
                   <div className="bg-white rounded-2xl p-6 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-2">
                     <div className="mb-4">
-                      <IconComponent className={`${benefit.color} mx-auto group-hover:scale-110 transition-transform duration-300`} size={48} />
+                      <IconComponent
+                        className={`${benefit.color} mx-auto group-hover:scale-110 transition-transform duration-300`}
+                        size={48}
+                      />
                     </div>
                     <h3 className="text-lg font-bold text-gray-800 mb-2">
                       {benefit.title}
                     </h3>
-                    <p className="text-gray-600">
-                      {benefit.description}
-                    </p>
+                    <p className="text-gray-600">{benefit.description}</p>
                   </div>
                 </div>
               );
@@ -211,10 +214,10 @@ function HowItWorksPage({ onNavigateBack, onNavigateToAddCompany }: HowItWorksPa
       <div className="max-w-screen-xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
         <div className="text-center mb-16">
           <h2 className="text-4xl font-bold text-gray-800 mb-4">
-            Jednoduchý proces
+            Ako bude vyzerať prvý týždeň
           </h2>
           <p className="text-xl text-gray-600">
-            Od zadania po dokončenie v 5 krokoch
+            Od prvého kontaktu po nasadenie asistenta na vašom webe v 5 krokoch.
           </p>
         </div>
 
@@ -223,16 +226,14 @@ function HowItWorksPage({ onNavigateBack, onNavigateToAddCompany }: HowItWorksPa
           <div className="relative">
             {/* Timeline Line */}
             <div className="absolute top-1/2 left-0 right-0 h-1 bg-gradient-to-r from-blue-500 to-indigo-600 transform -translate-y-1/2"></div>
-            
+
             {/* Timeline Steps */}
             <div className="flex justify-between items-center relative">
               {timelineSteps.map((step, index) => (
                 <div key={index} className="flex flex-col items-center">
-                  {/* Circle */}
                   <div className="w-16 h-16 bg-white border-4 border-blue-500 rounded-full flex items-center justify-center text-2xl mb-4 shadow-lg">
                     {step.emoji}
                   </div>
-                  {/* Label */}
                   <div className="bg-white/80 backdrop-blur-md rounded-lg px-4 py-2 shadow-md">
                     <p className="text-sm font-semibold text-gray-800 whitespace-nowrap">
                       {step.label}
@@ -265,26 +266,26 @@ function HowItWorksPage({ onNavigateBack, onNavigateToAddCompany }: HowItWorksPa
       <div className="bg-gradient-to-r from-blue-400 to-indigo-500 text-white py-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <h2 className="text-4xl font-bold mb-6">
-            Ste pripravení začať?
+            Chcete AI asistenta aj na vašom webe?
           </h2>
           <p className="text-xl text-blue-100 mb-12 max-w-2xl mx-auto">
-            Pripojte sa k tisíckam spokojných zákazníkov a nájdite svojho odborníka už dnes
+            Najprv si ho vyskúšajte, potom ho nasadíme na váš web a spolu zmeriame výsledok.
           </p>
-          
+
           <div className="flex flex-col sm:flex-row gap-6 justify-center">
             <button
               onClick={onNavigateBack}
               className="bg-white text-blue-600 px-8 py-4 rounded-xl font-semibold text-lg hover:bg-blue-50 transition-all duration-200 transform hover:scale-105 shadow-lg hover:shadow-xl flex items-center justify-center gap-2"
             >
               <MessageSquare size={20} />
-              Zadať dopyt
+              Vrátiť sa k živému demu
             </button>
             <button
               onClick={onNavigateToAddCompany}
               className="bg-gradient-to-r from-orange-500 to-red-600 text-white px-8 py-4 rounded-xl font-semibold text-lg hover:from-orange-600 hover:to-red-700 transition-all duration-200 transform hover:scale-105 shadow-lg hover:shadow-xl flex items-center justify-center gap-2"
             >
               <Building2 size={20} />
-              Pridať firmu
+              Pridať môj web do ServisAI
             </button>
           </div>
         </div>
