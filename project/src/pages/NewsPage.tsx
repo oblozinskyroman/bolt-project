@@ -2,279 +2,281 @@ import React from "react";
 import {
   ArrowLeft,
   CheckCircle2,
-  Sparkles,
   Shield,
-  Clock,
+  Sparkles,
   Zap,
-  Globe2,
+  MessageCircle,
+  Clock,
+  HelpCircle,
 } from "lucide-react";
 
 interface NewsPageProps {
   onNavigateBack: () => void;
 }
 
-type PlanId = "starter" | "pro" | "agency";
+type PlanId = "starter" | "pro" | "custom";
 
-interface PricingPlan {
+const PLANS: {
   id: PlanId;
   name: string;
-  headline: string;
   price: string;
-  priceNote?: string;
+  note?: string;
   description: string;
-  tag?: string;
-  popular?: boolean;
+  bestFor: string;
+  highlights: string[];
   features: string[];
-}
-
-const plans: PricingPlan[] = [
+  cta: string;
+  popular?: boolean;
+}[] = [
   {
     id: "starter",
     name: "Starter",
-    headline: "Prvý AI asistent na web",
-    price: "39 € / mesiac",
-    priceNote: "pri ročnej platbe",
-    description:
-      "Ideálne pre jeden web alebo menší biznis, ktorý chce otestovať AI asistenta v praxi.",
+    price: "49 € / mes.",
+    description: "Jednoduchý AI asistent pre jeden web.",
+    bestFor: "malé podniky, salóny, lokálne služby",
+    highlights: ["1 web", "Základné FAQ + rezervácie", "Email notifikácie"],
     features: [
-      "1 web / doména",
-      "do 1 500 AI konverzácií mesačne",
-      "jednoduché vloženie kódu na web",
-      "nastavenie podľa textov z vášho webu",
-      "základný report – počet otázok a dopytov",
+      "AI chatbot vložený na váš web",
+      "Tréning na vašom texte (FAQ, cenník, služby)",
+      "Jednoduchý formulár na zadanie požiadavky",
+      "Základné štatistiky – počet dopytov",
+      "Emailové upozornenia na nové dopyty",
     ],
+    cta: "Začať so Starter",
   },
   {
     id: "pro",
-    name: "Pro",
-    headline: "AI asistent ako hlavný kanál podpory",
-    price: "89 € / mesiac",
-    priceNote: "pri ročnej platbe",
-    description:
-      "Pre firmy, ktoré chcú, aby AI riešila väčšinu objednávok, otázok a dopytov za ľudí.",
-    tag: "Najobľúbenejší",
-    popular: true,
-    features: [
-      "až 3 weby / domény",
-      "do 8 000 AI konverzácií mesačne",
-      "pokročilé scenáre (rezervácie, objednávky, formuláre)",
-      "napojenie na e-mail / CRM / ticketing",
-      "prioritná podpora – úpravy nastavení za vás",
+    name: "Growth",
+    price: "99 € / mes.",
+    note: "Najobľúbenejší",
+    description: "AI asistent, ktorý skutočne nahradí prvú líniu podpory.",
+    bestFor: "rastúce e-shopy, salóny, agentúry",
+    highlights: [
+      "Do 3 webov / projektov",
+      "Pokročilé tréningové datasety",
+      "Prioritná podpora",
     ],
+    features: [
+      "Všetko zo Starter",
+      "Pokročilé scenáre (rezervácie, objednávky, statusy)",
+      "Export dopytov do e-mailu alebo CRM",
+      "Jednoduché A/B testovanie textov",
+      "Prioritná podpora do 24 hodín",
+    ],
+    cta: "Rozbehnúť Growth plán",
+    popular: true,
   },
   {
-    id: "agency",
-    name: "Agency / Custom",
-    headline: "AI asistent pre väčšie projekty a agentúry",
-    price: "na mieru",
-    priceNote: "podľa počtu webov a objemu konverzácií",
-    description:
-      "Pre agentúry, siete pobočiek alebo projekty, kde ide o tisíce zákazníkov mesačne.",
+    id: "custom",
+    name: "Custom / White-label",
+    price: "Individuálna cenotvorba",
+    description: "Integrácie na mieru, viac webov, vlastná značka.",
+    bestFor: "väčšie firmy, siete pobočiek, agentúry",
+    highlights: ["Viac webov", "API integrácie", "SLA support"],
     features: [
-      "neobmedzený počet webov v rámci dohody",
-      "vysoký objem AI konverzácií",
-      "white-label možnosť pre agentúry",
-      "vlastné integrácie (API, interné systémy)",
-      "dedikovaný kontakt pre úpravy a konzultácie",
+      "Nastavenie AI asistenta na mieru",
+      "Integrácie (CRM, rezervačné systémy, interné API)",
+      "Možnosť white-label riešenia",
+      "Vyhradený konzultant",
+      "Dohodnuté KPI a SLA",
     ],
+    cta: "Dohodnúť stretnutie",
   },
 ];
 
-const faqs = [
+const FAQ = [
   {
-    q: "Ako AI asistenta nasadíme na náš web?",
-    a: "Po objednaní dostanete krátky kód (script), ktorý sa vloží na váš web – podobne ako Google Analytics alebo chat widget. Ak nechcete riešiť technické veci, kód vieme vložiť za vás.",
+    q: "Je v cene aj nastavenie asistenta?",
+    a: "Áno. Pri štarte vám pomôžeme pripraviť podklady (FAQ, služby, cenník) a nahrať ich do systému tak, aby AI odpovedala zrozumiteľne a bezpečne.",
   },
   {
-    q: "Z čoho sa AI učí?",
-    a: "Primárne z textov na vašom webe (služby, cenník, často kladené otázky, podmienky, blog). Podľa potreby vieme doplniť vlastné interné podklady – PDF, dokumenty alebo manuály.",
+    q: "Čo ak nemám technického človeka na webe?",
+    a: "Stačí, ak nám pošlete prístup k webu alebo kontakt na vášho tvorcu webu. Implementácia je väčšinou len vloženie jedného skriptu.",
   },
   {
-    q: "Čo ak prekročíme limit konverzácií?",
-    a: "Pri prekročení limitu vás budeme vopred informovať a navrhneme vyšší balík alebo individuálnu dohodu. Asistent sa nikdy „len tak“ nevypne bez upozornenia.",
+    q: "Koľko dopytov zvládne AI asistent?",
+    a: "Neobmedzene. Asistent odpovedá 24/7 bez príplatku za počet konverzácií.",
   },
   {
-    q: "Je možné začať len na skúšku?",
-    a: "Áno. Bežne začíname 1–2 mesačným testom na Starter alebo Pro balíku. Ak uvidíte výsledky, prepneme to na dlhodobú spoluprácu.",
+    q: "Môžem plán kedykoľvek zrušiť?",
+    a: "Áno, pri mesačnom účtovaní môžete plán kedykoľvek zrušiť bez viazanosti.",
   },
 ];
 
 function NewsPage({ onNavigateBack }: NewsPageProps) {
   return (
     <div className="min-h-screen bg-gradient-to-br from-amber-50 via-orange-50 to-yellow-100">
-      {/* Hero */}
-      <div className="bg-gradient-to-r from-blue-500 to-indigo-600 text-white py-16 md:py-20 shadow-lg">
-        <div className="max-w-screen-2xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center mb-6">
+      {/* HERO */}
+      <div className="bg-gradient-to-r from-blue-400 to-indigo-500 text-white py-20">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex justify-start mb-6">
             <button
               onClick={onNavigateBack}
-              className="p-2 rounded-lg hover:bg-white/15 transition-colors duration-200"
+              className="p-2 rounded-lg hover:bg-white/20 transition-colors duration-200"
             >
-              <ArrowLeft size={20} className="text-white" />
+              <ArrowLeft className="text-white" size={20} />
             </button>
           </div>
-
-          <div className="max-w-3xl">
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/15 border border-white/25 text-sm mb-4">
-              <Sparkles size={16} />
-              <span>Cenník ServisAI</span>
-            </div>
-            <h1 className="text-4xl md:text-5xl font-bold mb-4">
-              Cenník AI asistenta pre váš web
-            </h1>
-            <p className="text-lg md:text-xl text-blue-100 mb-4">
-              Vyberte si balík podľa toho, koľko webov máte a koľko vecí má
-              asistent vybavovať namiesto vás – od jednoduchých otázok až po
-              rezervácie a objednávky.
-            </p>
-            <p className="text-sm md:text-base text-blue-100/90 flex items-center gap-2">
+          <h1 className="text-5xl md:text-6xl font-bold mb-4 text-center">
+            Cenník ServisAI
+          </h1>
+          <p className="text-xl md:text-2xl text-blue-100 max-w-3xl mx-auto text-center leading-relaxed">
+            Vyberte si plán podľa toho, koľko práce chcete preniesť z ľudí na
+            AI asistenta.
+          </p>
+          <div className="mt-6 flex justify-center gap-3 text-sm text-blue-100">
+            <div className="flex items-center gap-2">
               <Shield size={16} />
-              <span>
-                Všetky balíky obsahujú bezpečné spracovanie dát a možnosť
-                kedykoľvek meniť nastavenia asistenta.
-              </span>
-            </p>
+              <span>Bez viazanosti</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <Zap size={16} />
+              <span>Neobmedzené konverzácie</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <Sparkles size={16} />
+              <span>Nastavenie pri štarte v cene</span>
+            </div>
           </div>
         </div>
       </div>
 
-      {/* Pricing plans */}
-      <div className="max-w-screen-2xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
-        <div className="grid gap-8 md:grid-cols-3">
-          {plans.map((plan) => (
+      {/* PLÁNY */}
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+          {PLANS.map((plan) => (
             <div
               key={plan.id}
-              className={`relative flex flex-col h-full rounded-2xl border shadow-sm bg-white/80 backdrop-blur-md p-6 md:p-7
-              ${
+              className={`relative bg-white/80 backdrop-blur-md rounded-2xl p-8 shadow-lg border ${
                 plan.popular
                   ? "border-blue-500 shadow-xl scale-[1.02]"
-                  : "border-gray-200"
+                  : "border-gray-100"
               }`}
             >
-              {plan.tag && (
-                <div className="absolute -top-3 left-6">
-                  <span className="inline-flex items-center rounded-full bg-blue-600 text-white text-xs font-semibold px-3 py-1 shadow-md">
-                    <Sparkles size={14} className="mr-1" /> {plan.tag}
-                  </span>
+              {plan.popular && (
+                <div className="absolute -top-4 left-1/2 -translate-x-1/2 bg-gradient-to-r from-blue-500 to-indigo-600 text-white text-xs font-semibold px-3 py-1 rounded-full shadow-md">
+                  Najobľúbenejší
                 </div>
               )}
 
-              <div className="mb-4">
-                <h2 className="text-sm font-semibold tracking-wide text-gray-500 uppercase">
-                  {plan.name}
-                </h2>
-                <p className="text-xl font-bold text-gray-900 mt-1 mb-2">
-                  {plan.headline}
+              <h2 className="text-2xl font-bold text-gray-900 mb-2">
+                {plan.name}
+              </h2>
+              <p className="text-3xl font-extrabold text-gray-900 mb-2">
+                {plan.price}
+              </p>
+              {plan.note && (
+                <p className="text-sm text-blue-600 font-semibold mb-2">
+                  {plan.note}
                 </p>
-                <div className="flex items-baseline gap-1 mb-1">
-                  <span className="text-2xl font-extrabold text-gray-900">
-                    {plan.price}
+              )}
+              <p className="text-gray-600 text-sm mb-4">{plan.description}</p>
+              <p className="text-gray-500 text-xs mb-4">
+                Najlepšie pre: <span className="font-medium">{plan.bestFor}</span>
+              </p>
+
+              <div className="flex flex-wrap gap-2 mb-4">
+                {plan.highlights.map((h) => (
+                  <span
+                    key={h}
+                    className="inline-flex items-center gap-1 text-xs px-2 py-1 rounded-full bg-blue-50 text-blue-700"
+                  >
+                    <CheckCircle2 size={12} />
+                    {h}
                   </span>
-                </div>
-                {plan.priceNote && (
-                  <p className="text-xs text-gray-500">{plan.priceNote}</p>
-                )}
-                <p className="mt-3 text-sm text-gray-600">{plan.description}</p>
+                ))}
               </div>
 
-              <ul className="mt-4 space-y-2 text-sm text-gray-700 flex-1">
-                {plan.features.map((feature) => (
-                  <li key={feature} className="flex items-start gap-2">
-                    <CheckCircle2
-                      size={16}
-                      className="mt-0.5 text-emerald-500 flex-shrink-0"
-                    />
-                    <span>{feature}</span>
+              <ul className="mt-4 space-y-2 text-sm text-gray-700 mb-6">
+                {plan.features.map((f) => (
+                  <li key={f} className="flex items-start gap-2">
+                    <CheckCircle2 className="mt-0.5 text-emerald-500" size={16} />
+                    <span>{f}</span>
                   </li>
                 ))}
               </ul>
 
-              <div className="mt-6">
-                <button
-                  onClick={onNavigateBack}
-                  className={`w-full inline-flex items-center justify-center gap-2 px-4 py-3 rounded-xl text-sm font-semibold transition-all
-                    ${
-                      plan.popular
-                        ? "bg-gradient-to-r from-blue-600 to-indigo-600 text-white hover:from-blue-700 hover:to-indigo-700 shadow-md hover:shadow-lg"
-                        : "bg-gray-900 text-white hover:bg-black shadow-sm hover:shadow-md"
-                    }`}
-                >
-                  Chcem nasadiť asistenta
-                </button>
-                <p className="mt-2 text-xs text-gray-500 text-center">
-                  Po kliknutí sa vrátite na hlavnú stránku, kde môžete pokračovať
-                  cez „Pridať web“.
-                </p>
-              </div>
+              <button
+                className={`w-full mt-auto inline-flex items-center justify-center gap-2 px-4 py-3 rounded-xl font-semibold text-sm transition-all ${
+                  plan.popular
+                    ? "bg-gradient-to-r from-blue-500 to-indigo-600 text-white hover:from-blue-600 hover:to-indigo-700 shadow-lg hover:shadow-xl"
+                    : "bg-gray-900 text-white hover:bg-black"
+                }`}
+              >
+                {plan.cta}
+              </button>
             </div>
           ))}
         </div>
 
-        {/* What’s included */}
-        <div className="mt-16 grid gap-8 md:grid-cols-3">
-          <div className="bg-white/80 backdrop-blur-md rounded-2xl p-6 shadow-sm border border-gray-200">
-            <div className="w-10 h-10 rounded-xl bg-blue-50 flex items-center justify-center mb-4">
-              <Clock size={20} className="text-blue-600" />
+        {/* Info pod tabuľkou */}
+        <div className="mt-10 grid grid-cols-1 md:grid-cols-3 gap-6 text-sm">
+          <div className="flex items-start gap-3 bg-white/70 rounded-xl p-4 shadow-sm">
+            <Clock className="mt-1 text-blue-600" size={18} />
+            <div>
+              <p className="font-semibold text-gray-800">
+                Nasadenie typicky do 7 dní
+              </p>
+              <p className="text-gray-600">
+                Podľa zložitosti webu a množstva podkladov.
+              </p>
             </div>
-            <h3 className="text-lg font-semibold mb-2">
-              Nonstop odpovede pre zákazníkov
-            </h3>
-            <p className="text-sm text-gray-600">
-              Asistent odpovedá 24/7 – bez prestávok, PN a bez toho, aby ste
-              museli riešiť klasický support chat.
-            </p>
           </div>
-          <div className="bg-white/80 backdrop-blur-md rounded-2xl p-6 shadow-sm border border-gray-200">
-            <div className="w-10 h-10 rounded-xl bg-emerald-50 flex items-center justify-center mb-4">
-              <Zap size={20} className="text-emerald-600" />
+          <div className="flex items-start gap-3 bg-white/70 rounded-xl p-4 shadow-sm">
+            <MessageCircle className="mt-1 text-emerald-600" size={18} />
+            <div>
+              <p className="font-semibold text-gray-800">
+                Pomoc s obsahom v cene
+              </p>
+              <p className="text-gray-600">
+                Pomôžeme vám preformulovať texty tak, aby im AI rozumela.
+              </p>
             </div>
-            <h3 className="text-lg font-semibold mb-2">
-              Rezervácie, objednávky, formuláre
-            </h3>
-            <p className="text-sm text-gray-600">
-              Nielen odpovede – AI vie vyzbierať údaje od zákazníka a pripraviť
-              celý dopyt alebo rezerváciu tak, aby vám len „pristála“ do mailu
-              alebo systému.
-            </p>
           </div>
-          <div className="bg-white/80 backdrop-blur-md rounded-2xl p-6 shadow-sm border border-gray-200">
-            <div className="w-10 h-10 rounded-xl bg-indigo-50 flex items-center justify-center mb-4">
-              <Globe2 size={20} className="text-indigo-600" />
+          <div className="flex items-start gap-3 bg-white/70 rounded-xl p-4 shadow-sm">
+            <Shield className="mt-1 text-indigo-600" size={18} />
+            <div>
+              <p className="font-semibold text-gray-800">
+                Bezpečné spracovanie dát
+              </p>
+              <p className="text-gray-600">
+                AI odpovedá len z podkladov, ktoré jej dáte, a loguje každý
+                dopyt.
+              </p>
             </div>
-            <h3 className="text-lg font-semibold mb-2">
-              Funguje na väčšine bežných platforiem
-            </h3>
-            <p className="text-sm text-gray-600">
-              WordPress, Shoptet, Shopify, vlastný web… všade, kde viete vložiť
-              kúsok kódu, vieme nasadiť aj ServisAI asistenta.
-            </p>
           </div>
         </div>
+      </div>
 
-        {/* FAQ */}
-        <div className="mt-16 max-w-3xl mx-auto">
-          <h2 className="text-2xl font-bold text-gray-900 text-center mb-6">
-            Často kladené otázky
-          </h2>
+      {/* FAQ */}
+      <div className="bg-white/50 backdrop-blur-md py-16">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-10">
+            <h2 className="text-3xl font-bold text-gray-800 mb-3">
+              Často kladené otázky
+            </h2>
+            <p className="text-gray-600">
+              Ak máte inú otázku, napíšte nám – doplníme ju aj sem.
+            </p>
+          </div>
           <div className="space-y-4">
-            {faqs.map((item) => (
+            {FAQ.map((item, i) => (
               <div
-                key={item.q}
-                className="bg-white/80 backdrop-blur-md rounded-2xl p-4 border border-gray-200 shadow-sm"
+                key={i}
+                className="bg-white/80 rounded-xl p-5 shadow-sm border border-gray-100"
               >
-                <h3 className="text-sm font-semibold text-gray-900 mb-1">
-                  {item.q}
-                </h3>
-                <p className="text-sm text-gray-600">{item.a}</p>
+                <div className="flex items-start gap-3">
+                  <HelpCircle className="mt-1 text-blue-500" size={18} />
+                  <div>
+                    <p className="font-semibold text-gray-900 mb-1">
+                      {item.q}
+                    </p>
+                    <p className="text-gray-600 text-sm">{item.a}</p>
+                  </div>
+                </div>
               </div>
             ))}
           </div>
-
-          <p className="mt-8 text-xs text-gray-500 text-center">
-            Ak máte špecifický typ webu alebo vyšší objem zákazníkov, je
-            pravdepodobné, že sa zmestíte do jedného z balíkov – zvyšok doladíme
-            individuálne.
-          </p>
         </div>
       </div>
     </div>
