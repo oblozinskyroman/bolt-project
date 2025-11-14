@@ -234,13 +234,14 @@ function App() {
     { id: "rating-4plus", label: "★ 4+", icon: Star },
   ];
 
-  const menuItems = [
-    { label: "Ako funguje", action: "howItWorks" },
-    { label: "Funkcie", action: "references" },
-    { label: "Cenník", action: "news" },
-    { label: "Integrácia", action: "helpCenter" },
-    { label: "Kontakt", action: "contact" },
-  ];
+const menuItems = [
+  { label: "Ako fungujeme", action: "howItWorks" }, // <-- TU
+  { label: "Funkcie", action: "references" },
+  { label: "Cenník", action: "news" },
+  { label: "Integrácia", action: "helpCenter" },
+  { label: "Kontakt", action: "contact" },
+];
+
   const mainMenuItems = [...menuItems];
 
   const relyOrEmpty = (s?: string) => (typeof s === "string" ? s : "");
@@ -444,11 +445,11 @@ function App() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-amber-50 via-orange-50 to-yellow-100">
-      {/* Navbar */}
+           {/* Navbar */}
       <nav className="bg-white/80 backdrop-blur-md shadow-lg sticky top-0 z-50">
         <div className="max-w-screen-2xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between py-3">
-            {/* Logo */}
+            {/* Logo vľavo */}
             <div className="flex-shrink-0">
               <button
                 onClick={navigateToHome}
@@ -458,8 +459,8 @@ function App() {
               </button>
             </div>
 
-            {/* Desktop menu */}
-            <div className="hidden md:flex items-center space-x-6">
+            {/* Menu uprostred */}
+            <div className="hidden md:flex flex-1 items-center justify-center space-x-6">
               {menuItems.map((item, i) => (
                 <button
                   key={i}
@@ -469,8 +470,10 @@ function App() {
                   {item.label}
                 </button>
               ))}
+            </div>
 
-              {/* Stav účtu */}
+            {/* Account + CTA vpravo */}
+            <div className="hidden md:flex items-center space-x-4">
               <button
                 onClick={navigateToMyAccount}
                 className={`flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-lg transition-all transform hover:scale-105 shadow-md hover:shadow-lg ${
@@ -483,7 +486,6 @@ function App() {
                 {isLoggedIn ? "Prihlásený" : "Odhlásený"}
               </button>
 
-              {/* CTA – pridať web */}
               <NavCta
                 onClick={navigateToAddCompany}
                 className="bg-gradient-to-r from-blue-500 to-indigo-600 text-white hover:from-blue-600 hover:to-indigo-700 border-blue-400"
@@ -492,7 +494,7 @@ function App() {
               </NavCta>
             </div>
 
-            {/* Mobile burger */}
+            {/* Burger na mobile */}
             <div className="md:hidden">
               <button
                 onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
@@ -549,7 +551,6 @@ function App() {
           </div>
         )}
       </nav>
-
 
       {/* Content */}
       <div className="flex-1">
