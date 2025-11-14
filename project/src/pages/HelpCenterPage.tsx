@@ -1,222 +1,92 @@
-import React, { useState } from 'react';
-import { 
-  ArrowLeft, 
-  Search, 
-  PlayCircle, 
-  User, 
-  CreditCard, 
-  Building2, 
-  MessageCircle, 
-  Star, 
-  Lock, 
-  Wrench,
-  TrendingUp,
-  MessageSquare,
+import React, { useState } from "react";
+import {
+  ArrowLeft,
+  MessageCircle,
+  Globe,
+  Code2,
+  Settings,
+  Shield,
+  Zap,
+  CheckCircle,
   FileText,
-  ChevronRight,
-  ThumbsUp,
-  ThumbsDown,
-  ExternalLink,
-  Clock,
-  Eye,
-  HelpCircle,
-  Menu,
-  X
-} from 'lucide-react';
+  Copy,
+} from "lucide-react";
 
 interface HelpCenterPageProps {
   onNavigateBack: () => void;
 }
-
-interface Category {
-  id: string;
-  title: string;
-  description: string;
-  icon: React.ComponentType<any>;
-  color: string;
-  articleCount: number;
-}
-
-interface Article {
-  id: number;
-  title: string;
-  description: string;
-  category: string;
-  readTime: number;
-  views: number;
-  helpful: number;
-  notHelpful: number;
-  lastUpdated: string;
-}
-
 function HelpCenterPage({ onNavigateBack }: HelpCenterPageProps) {
-  const [searchQuery, setSearchQuery] = useState('');
-  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
-  const [articleFeedback, setArticleFeedback] = useState<{[key: number]: 'helpful' | 'not-helpful' | null}>({});
+  const [activeTab, setActiveTab] = useState<"simple" | "dev">("simple");
 
-  const categories: Category[] = [
+  const simpleSteps = [
     {
-      id: 'getting-started',
-      title: 'Začíname',
-      description: 'Prvé kroky s platformou ServisAI',
-      icon: PlayCircle,
-      color: 'from-green-500 to-emerald-600',
-      articleCount: 8
-    },
-    {
-      id: 'account',
-      title: 'Účet',
-      description: 'Správa profilu a nastavení',
-      icon: User,
-      color: 'from-blue-500 to-cyan-600',
-      articleCount: 12
-    },
-    {
-      id: 'payments-escrow',
-      title: 'Platby & Escrow',
-      description: 'Bezpečné platby a escrow systém',
-      icon: CreditCard,
-      color: 'from-purple-500 to-indigo-600',
-      articleCount: 15
-    },
-    {
-      id: 'companies',
-      title: 'Firmy',
-      description: 'Registrácia a správa firiem',
-      icon: Building2,
-      color: 'from-orange-500 to-red-600',
-      articleCount: 10
-    },
-    {
-      id: 'requests',
-      title: 'Dopyty',
-      description: 'Zadávanie a správa dopytov',
       icon: MessageCircle,
-      color: 'from-teal-500 to-cyan-600',
-      articleCount: 9
+      title: "1. Vytvoríte projekt v ServisAI",
+      text: "Po prihlásení si založíte nový web/projekt. Vyplníte názov, URL a základné nastavenia asistenta (jazyk, typ otázok, časť dňa, kedy má byť aktívny).",
     },
     {
-      id: 'reviews',
-      title: 'Hodnotenia',
-      description: 'Recenzie a hodnotenia služieb',
-      icon: Star,
-      color: 'from-yellow-500 to-amber-600',
-      articleCount: 6
+      icon: Globe,
+      title: "2. Skopírujete krátky kód na váš web",
+      text: "Vygenerujeme vám jednoduchý script, ktorý vložíte do hlavičky alebo cez váš CMS (WordPress, Webnode, Shoptet, vlastný kód...).",
     },
     {
-      id: 'security',
-      title: 'Bezpečnosť',
-      description: 'Ochrana údajov a bezpečnosť',
-      icon: Lock,
-      color: 'from-red-500 to-pink-600',
-      articleCount: 7
+      icon: Shield,
+      title: "3. Asistent sa učí z vašich dát",
+      text: "Pridáte cenník, FAQ, texty služieb alebo URL s popisom firmy. Asistent z nich číta odpovede a vybavuje zákazníkov priamo na vašom webe.",
     },
-    {
-      id: 'technical',
-      title: 'Technické',
-      description: 'Riešenie technických problémov',
-      icon: Wrench,
-      color: 'from-gray-500 to-slate-600',
-      articleCount: 11
-    }
   ];
 
-  const topArticles: Article[] = [
+  const devBlocks = [
     {
-      id: 1,
-      title: 'Ako funguje escrow platba?',
-      description: 'Kompletný sprievodca bezpečnými platbami cez escrow systém',
-      category: 'payments-escrow',
-      readTime: 4,
-      views: 2847,
-      helpful: 156,
-      notHelpful: 8,
-      lastUpdated: '2025-01-10'
+      icon: Code2,
+      title: "REST API / Edge Function",
+      text: "Asistenta môžete volať priamo z vášho backendu. Odovzdáte históriu chatu + meta dáta (ID zákazníka, typ služby, lokalitu) a späť dostanete odpoveď aj štruktúrované dáta.",
     },
     {
-      id: 2,
-      title: 'Prvé kroky po registrácii',
-      description: 'Čo robiť po vytvorení účtu - nastavenie profilu a prvý dopyt',
-      category: 'getting-started',
-      readTime: 3,
-      views: 1923,
-      helpful: 134,
-      notHelpful: 12,
-      lastUpdated: '2025-01-08'
+      icon: Settings,
+      title: "Vlastné UI komponenty",
+      text: "Ak nechcete bublinu v rohu, môžete si urobiť vlastný chat, formulár alebo wizard. Stačí volať jedno API a ServisAI sa postará o logiku odpovedí.",
     },
     {
-      id: 3,
-      title: 'Ako vybrať správnu firmu?',
-      description: 'Tipy na výber kvalitného odborníka na základe hodnotení a referencií',
-      category: 'requests',
-      readTime: 5,
-      views: 1654,
-      helpful: 98,
-      notHelpful: 5,
-      lastUpdated: '2025-01-05'
+      icon: Shield,
+      title: "Bezpečnosť a limity",
+      text: "Každý projekt má vlastný API kľúč a kvóty. Môžete obmedziť zdroje, z ktorých asistent čerpá (napr. len konkrétne služby, konkrétnu lokalitu alebo jazyk).",
     },
-    {
-      id: 4,
-      title: 'Registrácia firmy krok za krokom',
-      description: 'Podrobný návod na pridanie vašej firmy do zoznamu',
-      category: 'companies',
-      readTime: 6,
-      views: 1432,
-      helpful: 87,
-      notHelpful: 9,
-      lastUpdated: '2025-01-03'
-    },
-    {
-      id: 5,
-      title: 'Čo robiť, ak sa firma neozýva?',
-      description: 'Riešenie situácií, keď firma nereaguje na váš dopyt',
-      category: 'requests',
-      readTime: 3,
-      views: 1289,
-      helpful: 76,
-      notHelpful: 14,
-      lastUpdated: '2024-12-28'
-    },
-    {
-      id: 6,
-      title: 'Ako napísať dobrú recenziu?',
-      description: 'Sprievodca písaním užitočných hodnotení pre ostatných používateľov',
-      category: 'reviews',
-      readTime: 4,
-      views: 1156,
-      helpful: 65,
-      notHelpful: 7,
-      lastUpdated: '2024-12-25'
-    }
   ];
 
-  const handleArticleFeedback = (articleId: number, feedback: 'helpful' | 'not-helpful') => {
-    setArticleFeedback(prev => ({
-      ...prev,
-      [articleId]: prev[articleId] === feedback ? null : feedback
-    }));
-    
-    // TODO: Send feedback to backend
-    console.log(`Article ${articleId} marked as ${feedback}`);
-  };
+  const checklist = [
+    "Máte stránku, kam viete vložiť krátky script (alebo prístup k človeku, čo spravuje web).",
+    "Viete, aké typy otázok má asistent riešiť (rezervácie, cenník, základné FAQ, tracking objednávok...).",
+    "Máte aspoň základný textový podklad – cenník, popis služieb, podmienky, otváracie hodiny.",
+    "Viete, kam majú padať dopyty – e-mail, CRM, jednoduchá notifikácia, alebo len interný prehľad.",
+  ];
 
-  const getCategoryByTitle = (categoryId: string) => {
-    return categories.find(cat => cat.id === categoryId);
-  };
+  const scriptExample = `<script
+  src="https://cdn.servisai.sk/widget.js"
+  data-project-id="VAS_PROJECT_ID"
+  async
+></script>`;
 
-  const filteredArticles = topArticles.filter(article => {
-    const matchesSearch = searchQuery === '' || 
-      article.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      article.description.toLowerCase().includes(searchQuery.toLowerCase());
-    
-    const matchesCategory = selectedCategory === null || article.category === selectedCategory;
-    
-    return matchesSearch && matchesCategory;
-  });
+  const apiExample = `POST https://api.vasweb.sk/ai-assistant
+
+Body:
+{
+  "message": "Potrebujem preložiť termín rezervácie na piatok",
+  "history": [...],
+  "meta": {
+    "projectId": "VAS_PROJECT_ID",
+    "userId": "123",
+    "locale": "sk-SK"
+  }
+}`;
+
+  const copyToClipboard = (text: string) => {
+    navigator.clipboard?.writeText(text).catch(() => undefined);
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-amber-50 via-orange-50 to-yellow-100">
-      {/* Hero Section with Search */}
+      {/* Hero */}
       <div className="bg-gradient-to-r from-blue-400 to-indigo-500 text-white py-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <div className="flex justify-start mb-6">
@@ -227,236 +97,295 @@ function HelpCenterPage({ onNavigateBack }: HelpCenterPageProps) {
               <ArrowLeft className="text-white" size={20} />
             </button>
           </div>
+
           <div className="bg-white/20 backdrop-blur-md rounded-2xl p-3 w-16 h-16 mx-auto mb-6 flex items-center justify-center">
-            <HelpCircle className="text-white" size={32} />
+            <Settings className="text-white" size={32} />
           </div>
+
           <h1 className="text-5xl md:text-6xl font-bold mb-6">
-            Centrum pomoci
+            Integrácia ServisAI
           </h1>
-          <p className="text-xl md:text-2xl text-blue-100 max-w-3xl mx-auto leading-relaxed mb-12">
-            Nájdite odpovede na vaše otázky rýchlo a jednoducho
+          <p className="text-xl md:text-2xl text-blue-100 max-w-3xl mx-auto leading-relaxed">
+            Pridajte AI asistenta na váš web za pár minút – bez programovania
+            alebo s plnou kontrolou cez API.
           </p>
-          
-          {/* Search Bar */}
-          <div className="max-w-2xl mx-auto">
-            <div className="relative">
-              <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400" size={24} />
-              <input
-                type="text"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                placeholder="Napíš, s čím potrebuješ pomôcť..."
-                className="w-full pl-12 pr-6 py-4 rounded-2xl border-0 focus:outline-none focus:ring-4 focus:ring-white/30 text-lg bg-white/90 backdrop-blur-sm text-gray-800 placeholder-gray-500"
-              />
-            </div>
-          </div>
         </div>
       </div>
 
-      {/* Categories Section */}
-      <div className="max-w-screen-2xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
-        <div className="text-center mb-12">
-          <h2 className="text-3xl font-bold text-gray-800 mb-4">Kategórie pomoci</h2>
-          <p className="text-lg text-gray-600">Vyberte si kategóriu, ktorá vás zaujíma</p>
+      {/* Tabs */}
+      <div className="max-w-screen-2xl mx-auto px-4 sm:px-6 lg:px-8 pt-16">
+        <div className="bg-white/80 backdrop-blur-md rounded-2xl shadow-lg p-2 mb-10 flex flex-wrap gap-2 justify-center">
+          <button
+            onClick={() => setActiveTab("simple")}
+            className={`flex items-center gap-2 px-6 py-3 rounded-xl text-sm md:text-base font-medium transition-all ${
+              activeTab === "simple"
+                ? "bg-gradient-to-r from-blue-500 to-indigo-600 text-white shadow-md"
+                : "text-gray-700 hover:bg-gray-100"
+            }`}
+          >
+            <MessageCircle size={18} />
+            Bez programovania
+          </button>
+          <button
+            onClick={() => setActiveTab("dev")}
+            className={`flex items-center gap-2 px-6 py-3 rounded-xl text-sm md:text-base font-medium transition-all ${
+              activeTab === "dev"
+                ? "bg-gradient-to-r from-slate-700 to-gray-900 text-white shadow-md"
+                : "text-gray-700 hover:bg-gray-100"
+            }`}
+          >
+            <Code2 size={18} />
+            Pre vývojárov
+          </button>
         </div>
-
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-          {categories.map((category) => {
-            const IconComponent = category.icon;
-            const isSelected = selectedCategory === category.id;
-            
-            return (
-              <div
-                key={category.id}
-                onClick={() => setSelectedCategory(isSelected ? null : category.id)}
-                className={`bg-white/70 backdrop-blur-md rounded-2xl p-6 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-2 cursor-pointer group ${
-                  isSelected ? 'ring-2 ring-blue-500 bg-blue-50/70' : ''
-                }`}
-              >
-                <div className={`w-16 h-16 bg-gradient-to-r ${category.color} rounded-xl flex items-center justify-center mb-4 mx-auto group-hover:scale-110 transition-transform duration-300`}>
-                  <IconComponent className="text-white" size={28} />
-                </div>
-                <h3 className="text-xl font-semibold text-gray-800 text-center mb-2 group-hover:text-blue-600 transition-colors duration-200">
-                  {category.title}
-                </h3>
-                <p className="text-gray-600 text-center text-sm mb-3">
-                  {category.description}
-                </p>
-                <div className="text-center">
-                  <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-600">
-                    {category.articleCount} článkov
-                  </span>
-                </div>
-              </div>
-            );
-          })}
-        </div>
-
-        {/* Clear Category Filter */}
-        {selectedCategory && (
-          <div className="text-center mt-8">
-            <button
-              onClick={() => setSelectedCategory(null)}
-              className="inline-flex items-center gap-2 px-4 py-2 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors duration-200 text-gray-700"
-            >
-              Zobraziť všetky kategórie
-              <ChevronRight size={16} />
-            </button>
-          </div>
-        )}
       </div>
 
-      {/* Top Articles Section */}
-      <div className="bg-white/50 backdrop-blur-md py-16">
-        <div className="max-w-screen-xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-12">
-            <div className="flex items-center justify-center gap-2 mb-4">
-              <TrendingUp className="text-orange-600" size={28} />
-              <h2 className="text-3xl font-bold text-gray-800">
-                {selectedCategory ? `Články - ${getCategoryByTitle(selectedCategory)?.title}` : 'Najčítanejšie články'}
-              </h2>
-            </div>
-            <p className="text-lg text-gray-600">
-              {selectedCategory 
-                ? `Najužitočnejšie články z kategórie ${getCategoryByTitle(selectedCategory)?.title}`
-                : 'Najužitočnejšie články podľa našich používateľov'
-              }
+      {/* Content – Simple integration */}
+      {activeTab === "simple" && (
+        <div className="max-w-screen-2xl mx-auto px-4 sm:px-6 lg:px-8 pb-20 space-y-16">
+          {/* 3 kroky */}
+          <div>
+            <h2 className="text-3xl font-bold text-gray-800 text-center mb-4">
+              3 kroky k AI asistentovi na vašom webe
+            </h2>
+            <p className="text-lg text-gray-600 text-center mb-10 max-w-3xl mx-auto">
+              Typický klient zvládne nasadenie do 30 minút. Technické veci
+              pripravíme za vás, stačí vložiť krátky kód na web.
             </p>
+
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+              {simpleSteps.map((step, i) => {
+                const Icon = step.icon;
+                return (
+                  <div
+                    key={i}
+                    className="bg-white/80 backdrop-blur-md rounded-2xl p-6 shadow-lg hover:shadow-xl transition-all transform hover:-translate-y-1"
+                  >
+                    <div className="flex items-center justify-between mb-4">
+                      <div className="w-12 h-12 rounded-xl bg-gradient-to-r from-blue-500 to-indigo-600 flex items-center justify-center">
+                        <Icon className="text-white" size={24} />
+                      </div>
+                      <span className="text-sm font-semibold text-blue-600">
+                        Krok {i + 1}
+                      </span>
+                    </div>
+                    <h3 className="text-lg font-bold text-gray-800 mb-2">
+                      {step.title}
+                    </h3>
+                    <p className="text-sm text-gray-600 leading-relaxed">
+                      {step.text}
+                    </p>
+                  </div>
+                );
+              })}
+            </div>
           </div>
 
-          {/* Articles Grid */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {filteredArticles.map((article) => {
-              const category = getCategoryByTitle(article.category);
-              const userFeedback = articleFeedback[article.id];
-              
-              return (
-                <div
-                  key={article.id}
-                  className="bg-white/80 backdrop-blur-md rounded-2xl p-6 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1"
-                >
-                  {/* Article Header */}
-                  <div className="flex items-center justify-between mb-4">
-                    <span className={`px-3 py-1 rounded-full text-xs font-medium ${
-                      category ? `bg-gradient-to-r ${category.color} text-white` : 'bg-gray-100 text-gray-600'
-                    }`}>
-                      {category?.title || 'Všeobecné'}
-                    </span>
-                    <div className="flex items-center text-xs text-gray-500">
-                      <Clock size={12} className="mr-1" />
-                      {article.readTime} min
-                    </div>
-                  </div>
-
-                  {/* Title and Description */}
-                  <h3 className="text-xl font-bold text-gray-800 mb-3 hover:text-blue-600 transition-colors duration-200 cursor-pointer">
-                    {article.title}
-                  </h3>
-                  <p className="text-gray-600 mb-4 line-clamp-3">
-                    {article.description}
-                  </p>
-
-                  {/* Stats */}
-                  <div className="flex items-center justify-between text-sm text-gray-500 mb-4">
-                    <div className="flex items-center gap-4">
-                      <div className="flex items-center">
-                        <Eye size={14} className="mr-1" />
-                        {article.views.toLocaleString()}
-                      </div>
-                      <div className="flex items-center">
-                        <ThumbsUp size={14} className="mr-1" />
-                        {article.helpful}
-                      </div>
-                    </div>
-                    <span className="text-xs">
-                      {new Date(article.lastUpdated).toLocaleDateString('sk-SK')}
-                    </span>
-                  </div>
-
-                  {/* Feedback Buttons */}
-                  <div className="border-t pt-4">
-                    <p className="text-sm text-gray-600 mb-3">Bol tento článok užitočný?</p>
-                    <div className="flex gap-2">
-                      <button
-                        onClick={() => handleArticleFeedback(article.id, 'helpful')}
-                        className={`flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${
-                          userFeedback === 'helpful'
-                            ? 'bg-green-100 text-green-800 border border-green-200'
-                            : 'bg-gray-100 text-gray-600 hover:bg-green-50 hover:text-green-700'
-                        }`}
-                      >
-                        <ThumbsUp size={16} />
-                        Áno
-                      </button>
-                      <button
-                        onClick={() => handleArticleFeedback(article.id, 'not-helpful')}
-                        className={`flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${
-                          userFeedback === 'not-helpful'
-                            ? 'bg-red-100 text-red-800 border border-red-200'
-                            : 'bg-gray-100 text-gray-600 hover:bg-red-50 hover:text-red-700'
-                        }`}
-                      >
-                        <ThumbsDown size={16} />
-                        Nie
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-
-          {/* No Results */}
-          {filteredArticles.length === 0 && (
-            <div className="text-center py-12">
-              <div className="bg-white/80 backdrop-blur-md rounded-2xl p-8 max-w-md mx-auto">
-                <Search className="text-gray-400 mx-auto mb-4" size={48} />
-                <h3 className="text-xl font-semibold text-gray-600 mb-2">
-                  Žiadne výsledky
+          {/* Script snippet */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 items-start">
+            <div className="bg-white/80 backdrop-blur-md rounded-2xl p-6 shadow-lg">
+              <div className="flex items-center gap-2 mb-3">
+                <FileText className="text-blue-600" size={20} />
+                <h3 className="text-xl font-bold text-gray-800">
+                  Vloženie na web (príklad)
                 </h3>
-                <p className="text-gray-500 mb-4">
-                  Skúste zmeniť vyhľadávací výraz alebo kategóriu
-                </p>
+              </div>
+              <p className="text-sm text-gray-600 mb-4">
+                Tento kód je ukážka, ako bude vyzerať skript pre váš projekt.
+                Skutočný kód nájdete po prihlásení v administrácii ServisAI.
+              </p>
+              <div className="relative">
+                <pre className="text-xs md:text-sm bg-gray-900 text-green-100 rounded-xl p-4 overflow-x-auto">
+{scriptExample}
+                </pre>
                 <button
-                  onClick={() => {
-                    setSearchQuery('');
-                    setSelectedCategory(null);
-                  }}
-                  className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors duration-200"
+                  onClick={() => copyToClipboard(scriptExample)}
+                  className="absolute top-3 right-3 inline-flex items-center gap-1 px-2 py-1 rounded-md bg-white/10 hover:bg-white/20 text-xs text-white"
                 >
-                  Vymazať filtre
+                  <Copy size={12} />
+                  Kopírovať
                 </button>
               </div>
+              <ul className="mt-4 text-sm text-gray-600 list-disc list-inside space-y-1">
+                <li>Kód vložte ideálne pred koniec tagu {'</head>'}.</li>
+                <li>
+                  Na WordPresse môžete použiť vlastný HTML blok alebo plugin na
+                  vloženie scriptov.
+                </li>
+                <li>
+                  Asistent sa zobrazí ako bublina v pravom dolnom rohu – klikom
+                  sa otvorí chat okno.
+                </li>
+              </ul>
             </div>
-          )}
-        </div>
-      </div>
 
-      {/* CTA Section - Still Need Help */}
+            {/* Checklist */}
+            <div className="bg-white/80 backdrop-blur-md rounded-2xl p-6 shadow-lg">
+              <div className="flex items-center gap-2 mb-4">
+                <CheckCircle className="text-emerald-600" size={22} />
+                <h3 className="text-xl font-bold text-gray-800">
+                  Čo si pripraviť pred integráciou
+                </h3>
+              </div>
+              <ul className="space-y-3">
+                {checklist.map((item, i) => (
+                  <li key={i} className="flex items-start gap-3 text-sm">
+                    <span className="mt-1">
+                      <CheckCircle
+                        size={16}
+                        className="text-emerald-500 flex-shrink-0"
+                      />
+                    </span>
+                    <span className="text-gray-700">{item}</span>
+                  </li>
+                ))}
+              </ul>
+              <div className="mt-6 p-4 rounded-xl bg-blue-50 border border-blue-100 text-sm text-blue-800 flex gap-2">
+                <Shield size={16} className="mt-0.5" />
+                <p>
+                  Údaje, ktoré nahráte (FAQ, cenníky, interné texty), sú
+                  použité len na trénovanie vášho asistenta. Nesdieľame ich s
+                  inými projektmi.
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Content – Dev integration */}
+      {activeTab === "dev" && (
+        <div className="max-w-screen-2xl mx-auto px-4 sm:px-6 lg:px-8 pb-20 space-y-16">
+          {/* Blocks */}
+          <div>
+            <h2 className="text-3xl font-bold text-gray-800 text-center mb-4">
+              Integrácia pre vývojárov
+            </h2>
+            <p className="text-lg text-gray-600 text-center mb-10 max-w-3xl mx-auto">
+              ServisAI môžete použiť ako čisté AI backend riešenie. Frontend
+              aj UX si viete postaviť na mieru – my dodáme odpovede a logiku.
+            </p>
+
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+              {devBlocks.map((block, i) => {
+                const Icon = block.icon;
+                return (
+                  <div
+                    key={i}
+                    className="bg-white/80 backdrop-blur-md rounded-2xl p-6 shadow-lg hover:shadow-xl transition-all transform hover:-translate-y-1"
+                  >
+                    <div className="w-12 h-12 rounded-xl bg-gradient-to-r from-slate-700 to-gray-900 flex items-center justify-center mb-4">
+                      <Icon className="text-white" size={22} />
+                    </div>
+                    <h3 className="text-lg font-bold text-gray-800 mb-2">
+                      {block.title}
+                    </h3>
+                    <p className="text-sm text-gray-600 leading-relaxed">
+                      {block.text}
+                    </p>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+
+          {/* API example */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 items-start">
+            <div className="bg-white/80 backdrop-blur-md rounded-2xl p-6 shadow-lg">
+              <div className="flex items-center gap-2 mb-3">
+                <Code2 className="text-slate-800" size={20} />
+                <h3 className="text-xl font-bold text-gray-800">
+                  Volanie asistenta cez API (príklad)
+                </h3>
+              </div>
+              <p className="text-sm text-gray-600 mb-4">
+                Jednoduchý príklad requestu. V reále dostanete aj štruktúrované
+                polia (napr. rozpoznaná služba, lokalita, budúci termín,
+                typ zákazníka…).
+              </p>
+              <div className="relative">
+                <pre className="text-xs md:text-sm bg-gray-900 text-green-100 rounded-xl p-4 overflow-x-auto">
+{apiExample}
+                </pre>
+                <button
+                  onClick={() => copyToClipboard(apiExample)}
+                  className="absolute top-3 right-3 inline-flex items-center gap-1 px-2 py-1 rounded-md bg-white/10 hover:bg-white/20 text-xs text-white"
+                >
+                  <Copy size={12} />
+                  Kopírovať
+                </button>
+              </div>
+              <ul className="mt-4 text-sm text-gray-600 list-disc list-inside space-y-1">
+                <li>Autentifikácia prebieha cez projektový API kľúč.</li>
+                <li>
+                  V histórii môžete posielať predošlé správy chatu pre
+                  kontextové odpovede.
+                </li>
+                <li>
+                  Meta dáta slúžia na filtrovanie služieb, miest a interných
+                  pravidiel.
+                </li>
+              </ul>
+            </div>
+
+            {/* Latency / reliability */}
+            <div className="bg-white/80 backdrop-blur-md rounded-2xl p-6 shadow-lg">
+              <div className="flex items-center gap-2 mb-3">
+                <Zap className="text-amber-600" size={20} />
+                <h3 className="text-xl font-bold text-gray-800">
+                  Prevádzka a limity
+                </h3>
+              </div>
+              <ul className="space-y-3 text-sm text-gray-700">
+                <li>
+                  <strong>Latencia:</strong> odpovede typicky do 1–4 sekúnd
+                  podľa zložitosti dotazu.
+                </li>
+                <li>
+                  <strong>Rate limiting:</strong> podľa zvoleného plánu
+                  (počet požiadaviek / min, mesačné limity).
+                </li>
+                <li>
+                  <strong>Sandbox:</strong> možnosť oddeliť testovací a
+                  produkčný projekt, aby sa nemiešali dáta.
+                </li>
+                <li>
+                  <strong>Logy:</strong> každá konverzácia sa dá spätne
+                  analyzovať (čo sa pýtal zákazník, čo odpovedal asistent).
+                </li>
+              </ul>
+              <div className="mt-6 p-4 rounded-xl bg-slate-900 text-slate-100 text-sm flex gap-2">
+                <Shield size={16} className="mt-0.5 flex-shrink-0" />
+                <p>
+                  Pri vlastnej integrácii máte plnú kontrolu nad tým, aké dáta
+                  sa k nám posielajú. Môžete anonymizovať osobné údaje alebo
+                  posielať len interné ID.
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Bottom CTA */}
       <div className="bg-gradient-to-r from-blue-400 to-indigo-500 text-white py-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <h2 className="text-4xl font-bold mb-6">
-            Stále potrebuješ pomoc?
+            Chcete vidieť integráciu naživo?
           </h2>
-          <p className="text-xl text-blue-100 mb-12 max-w-2xl mx-auto">
-            Ak si nenašiel odpoveď na svoju otázku, kontaktuj nás priamo
+          <p className="text-xl text-blue-100 mb-10 max-w-2xl mx-auto">
+            Dohodnite si krátke demo. Ukážeme vám, ako ServisAI vybavuje
+            zákazníkov na reálnom webe – od prvej otázky až po zaplatenú
+            objednávku.
           </p>
-          
           <div className="flex flex-col sm:flex-row gap-6 justify-center">
-            <button className="bg-white text-blue-600 px-8 py-4 rounded-xl font-semibold text-lg hover:bg-blue-50 transition-all duration-200 transform hover:scale-105 shadow-lg hover:shadow-xl flex items-center justify-center gap-2">
-              <MessageSquare size={20} />
-              Spustiť chat
+            <button
+              onClick={onNavigateBack}
+              className="bg-white text-blue-600 px-8 py-4 rounded-xl font-semibold text-lg hover:bg-blue-50 transition-all duration-200 transform hover:scale-105 shadow-lg hover:shadow-xl flex items-center justify-center gap-2"
+            >
+              <MessageCircle size={20} />
+              Späť na úvod
             </button>
-            <button className="bg-gradient-to-r from-orange-500 to-red-600 text-white px-8 py-4 rounded-xl font-semibold text-lg hover:from-orange-600 hover:to-red-700 transition-all duration-200 transform hover:scale-105 shadow-lg hover:shadow-xl flex items-center justify-center gap-2">
-              <FileText size={20} />
-              Vytvoriť ticket
-            </button>
-          </div>
-          
-          <div className="mt-8 p-4 bg-blue-800/30 rounded-xl max-w-2xl mx-auto">
-            <p className="text-blue-100 text-sm">
-              💡 <strong>Tip:</strong> Pred vytvorením ticketu skús vyhľadať podobnú otázku vyššie - možno už máme odpoveď!
-            </p>
           </div>
         </div>
       </div>
