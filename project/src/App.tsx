@@ -116,6 +116,19 @@ function haversineKm(
 type SortBy = "relevance" | "rating" | "distance";
 
 function App() {
+    // 🔒 Blokuje BACK button aby neopustil tvoju SPA stránku
+  useEffect(() => {
+    const handleBack = (e: PopStateEvent) => {
+      // znovu zapíš rovnaký stav do histórie = user nemôže ísť späť mimo stránky
+      window.history.pushState(null, "", window.location.pathname);
+    };
+
+    // vložíme jeden fake stav na začiatok
+    window.history.pushState(null, "", window.location.pathname);
+    window.addEventListener("popstate", handleBack);
+
+    return () => window.removeEventListener("popstate", handleBack);
+  }, []);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [currentPage, setCurrentPage] = useState<
     | "home"
