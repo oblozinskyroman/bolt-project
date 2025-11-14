@@ -565,14 +565,12 @@ function App() {
                 <h2 className="text-4xl md:text-6xl font-bold text-gray-800 mb-6">
                   Nájdite svojho
                   <span className="block bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">
-                    AI Asistenta AI Asistenta DEPLOY 2
+                    AI asistent, ktorý vybavuje zákazníkov za vás
 
                   </span>
                 </h2>
                 <p className="text-xl text-gray-600 max-w-2xl mx-auto mb-12">
-                  Opýtajte sa nášho AI asistenta na čokoľvek o domácich
-                  službách. Pomôže vám nájsť správneho odborníka pre váš
-                  projekt.
+                 Automatizujte odpovede, objednávky a podporu. Asistent pozná vaše služby, ceny aj dostupnosť a pracuje nonstop.
                 </p>
               </div>
 
