@@ -19,25 +19,19 @@ import { createOrderAndRedirect } from "./lib/createOrderAndRedirect";
 
 import {
   MessageCircle,
-  Hammer,
-  Droplets,
+  HelpCircle,
+  Calendar,
+  Shield,
   Zap,
   Puzzle,
   Palette,
-  Trees,
-  Wrench,
-  Flame,
-  HelpCircle,
   Menu,
   X,
   User,
   MapPin,
   CheckCircle,
   Star,
-  Calendar,
-  Shield,
   Euro,
-  ShoppingCart,
 } from "lucide-react";
 
 /** Lokálny storage kľúč pre preferovanú lokalitu */
@@ -179,7 +173,7 @@ function App() {
     return () => subscription.unsubscribe();
   }, []);
 
-  // Načítaj preferovanú lokalitu z localStorage pri štarte
+  // Načítaj preferovanú lokalitu z localStorage pri štarte (už len interné, UI ju nepoužíva)
   useEffect(() => {
     const existing = (localStorage.getItem(LS_PREF_LOC) || "").trim();
     if (existing && !userLocation) setUserLocation(existing);
@@ -194,61 +188,64 @@ function App() {
     return () => clearTimeout(t);
   }, [userLocation]);
 
-  // TU MENÍME: služby = use-cases AI asistenta
-  const services = [
-    {
-      name: "Chat na webe",
-      icon: MessageCircle,
-      color: "from-blue-500 to-indigo-600",
-    },
+  // Namiesto remesiel: use-cases pre AI asistenta
+  const useCases = [
     {
       name: "Rezervácie a objednávky",
       icon: Calendar,
-      color: "from-emerald-500 to-green-600",
+      color: "from-blue-500 to-indigo-600",
+      description: "Prijímanie rezervácií, termínov a dopytov bez telefonovania.",
     },
     {
-      name: "FAQ a zákaznícka podpora",
-      icon: HelpCircle,
-      color: "from-sky-500 to-cyan-600",
+      name: "Zákaznícka podpora 24/7",
+      icon: MessageCircle,
+      color: "from-emerald-500 to-teal-600",
+      description: "Odpovede na časté otázky, otváracie hodiny, ceny a podmienky.",
     },
     {
-      name: "Zber dopytov a leadov",
-      icon: Zap,
-      color: "from-amber-500 to-orange-600",
-    },
-    {
-      name: "Podpora e-shopu",
-      icon: ShoppingCart,
-      color: "from-pink-500 to-rose-600",
-    },
-    {
-      name: "AI pre vaše interné tímy",
+      name: "E-shop a produkty",
       icon: Puzzle,
+      color: "from-violet-500 to-purple-600",
+      description: "Pomoc s výberom produktu, dostupnosťou a stavom objednávky.",
+    },
+    {
+      name: "Servis a reklamácie",
+      icon: Shield,
+      color: "from-amber-500 to-orange-600",
+      description: "Zber údajov k poruche, otvorenie ticketu, základné rady.",
+    },
+    {
+      name: "Formuláre a dopyty",
+      icon: Palette,
+      color: "from-pink-500 to-rose-600",
+      description: "AI vyplní so zákazníkom všetko potrebné a odošle vám podklady.",
+    },
+    {
+      name: "Interné otázky",
+      icon: Zap,
       color: "from-slate-500 to-gray-600",
+      description: "Návody, procesy a interné know-how dostupné na pár kliknutí.",
     },
   ];
 
   const aiQuickFilters = [
+    // zostáva len kvôli kompatibilite s backendom – v UI ich už neukazujeme
     { id: "verified", label: "Overené", icon: Shield },
     { id: "rating-4plus", label: "★ 4+", icon: Star },
-    { id: "today", label: "Dnes", icon: Calendar },
-    { id: "escrow", label: "Escrow", icon: Shield },
-    { id: "budget-50", label: "Do 50 €", icon: Euro },
   ];
 
-const menuItems = [
-  { label: "Ako funguje", action: "howItWorks" },   // vysvetlenie produktu
-  { label: "Funkcie", action: "references" },       // neskôr zmeníme obsah stránky
-  { label: "Cenník", action: "news" },              // dočasne použijeme NewsPage
-  { label: "Integrácia", action: "helpCenter" },    // ako napojiť asistenta na web
-  { label: "Kontakt", action: "contact" },
-];
-
+  const menuItems = [
+    { label: "Ako funguje", action: "howItWorks" },
+    { label: "Funkcie", action: "references" },
+    { label: "Cenník", action: "news" },
+    { label: "Integrácia", action: "helpCenter" },
+    { label: "Kontakt", action: "contact" },
+  ];
   const mainMenuItems = [...menuItems];
 
   const relyOrEmpty = (s?: string) => (typeof s === "string" ? s : "");
 
-  /* ---------- Geolokácia ---------- */
+  /* ---------- Geolokácia (momentálne bez tlačidla v UI, nechávam pripravené) ---------- */
   const useMyLocation = () => {
     if (!("geolocation" in navigator)) {
       alert("Prehliadač nepodporuje geolokáciu.");
@@ -496,7 +493,7 @@ const menuItems = [
                 )}
 
                 <NavCta
-                  onClick={navigateToAddCompany}
+                  onClick={navigateToMyAccount}
                   className="bg-gradient-to-r from-blue-500 to-indigo-600 text-white hover:from-blue-600 hover:to-indigo-700 border-blue-400"
                 >
                   Pridať web
@@ -563,7 +560,7 @@ const menuItems = [
 
               <button
                 onClick={() => {
-                  navigateToAddCompany();
+                  navigateToMyAccount();
                   setMobileMenuOpen(false);
                 }}
                 className="w-full inline-flex items-center justify-center gap-2 px-3 py-3 text-base font-bold rounded-lg transition-all transform hover:scale-105 shadow-lg hover:shadow-xl bg-gradient-to-r from-blue-500 to-indigo-600 text-white hover:from-blue-600 hover:to-indigo-700 border-2 border-blue-400"
@@ -582,24 +579,24 @@ const menuItems = [
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
               {/* HERO */}
               <div className="text-center mb-12">
-                <h2 className="text-4xl md:text-6xl font-bold text-gray-800 mb-2">
-                  AI asistent
-                </h2>
-                <p className="text-3xl md:text-5xl font-bold mt-1 leading-tight">
+                <h1 className="text-4xl md:text-6xl font-bold text-gray-800 mb-4">
+                  AI asistent pre váš web
+                </h1>
+                <p className="text-3xl md:text-5xl font-bold mb-4">
                   <span className="bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">
                     ktorý vybavuje zákazníkov za vás
                   </span>
                 </p>
-                <p className="text-xl text-gray-600 mt-6 max-w-3xl mx-auto">
+                <p className="text-lg text-gray-600 max-w-2xl mx-auto">
                   Automatizujte odpovede, objednávky a podporu. Asistent pozná
                   vaše služby, ceny aj dostupnosť a pracuje nonstop – priamo na
                   vašom webe.
                 </p>
               </div>
 
-              {/* AI chat – DEMO */}
+              {/* AI chat – živé demo */}
               <div className="bg-white/70 backdrop-blur-md rounded-2xl shadow-xl p-8 mb-20">
-                <div className="flex items-center mb-6">
+                <div className="flex items-center mb-3">
                   <div className="bg-gradient-to-r from-blue-500 to-indigo-600 p-3 rounded-xl mr-4">
                     <MessageCircle className="text-white" size={24} />
                   </div>
@@ -609,17 +606,18 @@ const menuItems = [
                     </h3>
                     <p className="text-sm text-gray-500 mt-1">
                       Spýtaj sa, čo všetko by mohol vybavovať na tvojom webe.
+                      Napr.: „Ako by AI riešila rezervácie pre môj salón?“
                     </p>
                   </div>
                 </div>
 
-                <div className="flex flex-col gap-3">
+                <div className="flex flex-col gap-3 mt-4">
                   <div className="flex flex-col sm:flex-row gap-4">
                     <input
                       type="text"
                       value={message}
                       onChange={(e) => setMessage(e.target.value)}
-                      placeholder="Napíšte otázku... napr. 'Ako by AI riešila rezervácie pre môj salón?'"
+                      placeholder="Napíšte svoju otázku... napr. 'Ako by AI riešila rezervácie pre môj salón?'"
                       className="flex-1 px-6 py-4 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-lg bg-white/80 backdrop-blur-sm"
                       onKeyDown={(e) =>
                         e.key === "Enter" && !isLoading && handleAsk()
@@ -640,64 +638,6 @@ const menuItems = [
                       <span>{ack}</span>
                     </div>
                   )}
-
-                  <div className="flex flex-col sm:flex-row gap-4 items-center">
-                    <input
-                      type="text"
-                      value={userLocation}
-                      onChange={(e) => setUserLocation(e.target.value)}
-                      placeholder="Uprednostniť lokalitu zákazníkov"
-                      className="px-4 py-3 rounded-lg border border-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white/80 w-full sm:w-auto flex-1"
-                    />
-                    <div className="flex items-center gap-3">
-                      <button
-                        type="button"
-                        onClick={useMyLocation}
-                        className="px-6 py-3 bg-gray-200 text-gray-800 hover:bg-gray-300 font-semibold rounded-xl transition-all transform hover:scale-105 shadow-lg hover:shadow-xl flex items-center justify-center gap-2"
-                      >
-                        <MapPin size={18} />
-                        Firmy v mojom okolí
-                      </button>
-                      {gpsBadge}
-                    </div>
-                  </div>
-
-                  {/* Quick Filters + Sort */}
-                  <div className="flex flex-wrap gap-2 mt-4 items-center">
-                    {aiQuickFilters.map((filter) => {
-                      const IconComponent = filter.icon;
-                      const isActive = aiActiveFilters.includes(filter.id);
-                      return (
-                        <button
-                          key={filter.id}
-                          onClick={() => toggleAiFilter(filter.id)}
-                          className={`flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${
-                            isActive
-                              ? "bg-blue-600 text-white shadow-md"
-                              : "bg-gray-100 text-gray-700 hover:bg-gray-200"
-                          }`}
-                        >
-                          <IconComponent size={16} />
-                          {filter.label}
-                        </button>
-                      );
-                    })}
-
-                    <div className="ml-auto flex items-center gap-2">
-                      <span className="text-sm text-gray-600">
-                        Zoradiť podľa:
-                      </span>
-                      <select
-                        value={sortBy}
-                        onChange={(e) => setSortBy(e.target.value as SortBy)}
-                        className="text-sm border border-gray-200 rounded-lg px-2 py-2 bg-white"
-                      >
-                        <option value="relevance">Relevancia</option>
-                        <option value="rating">Hodnotenie</option>
-                        <option value="distance">Vzdialenosť</option>
-                      </select>
-                    </div>
-                  </div>
                 </div>
 
                 {isLoading && (
@@ -729,7 +669,7 @@ const menuItems = [
                   </div>
                 )}
 
-                {/* ------ KARTY ------ */}
+                {/* Výsledky ako ukážkové karty */}
                 {cards.length > 0 && (
                   <>
                     <div className="flex flex-col space-y-6 mt-6">
@@ -755,7 +695,7 @@ const menuItems = [
                             <div className="flex items-center gap-2">
                               {coords && (
                                 <span className="text-xs px-2 py-1 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200">
-                                  Moje okolie
+                                  Demo: podľa lokality
                                 </span>
                               )}
                               {c.verified && (
@@ -776,7 +716,7 @@ const menuItems = [
                               </>
                             ) : (
                               <span className="text-xs px-2 py-0.5 rounded-full bg-gray-100 text-gray-600">
-                                Nová firma
+                                Ukážkový kontakt
                               </span>
                             )}
 
@@ -818,7 +758,7 @@ const menuItems = [
                               ))}
                           </div>
 
-                          {/* CTA + ESCROW */}
+                          {/* CTA + ESCROW – nechávam ako demo logiku */}
                           <div
                             className="mt-auto pt-4 flex flex-wrap gap-2"
                             onClick={(e) => e.stopPropagation()}
@@ -921,33 +861,37 @@ const menuItems = [
                 )}
               </div>
 
-              {/* Služby / use-cases */}
+              {/* Use cases sekcia */}
               <div className="text-center mb-12">
                 <h3 className="text-3xl font-bold text-gray-800 mb-4">
                   Na čo môžete AI asistenta nasadiť
                 </h3>
-                <p className="text-lg text-gray-600">
-                  Vyberte, čo má na vašom webe vybavovať – zvyšok zvládne AI.
+                <p className="text-lg text-gray-600 max-w-2xl mx-auto">
+                  Vyberte, čo má na vašom webe vybavovať – rezervácie, objednávky,
+                  otázky zákazníkov alebo interné procesy. Zvyšok zvládne AI.
                 </p>
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                {services.map((service, index) => {
-                  const IconComponent = service.icon;
+                {useCases.map((useCase, index) => {
+                  const IconComponent = useCase.icon;
                   return (
                     <div
                       key={index}
-                      onClick={() => navigateToCompanyList(service.name)}
+                      onClick={() => navigateToCompanyList(useCase.name)}
                       className="bg-white/70 backdrop-blur-md rounded-2xl p-6 shadow-lg hover:shadow-xl transition-all transform hover:-translate-y-2 cursor-pointer group"
                     >
                       <div
-                        className={`w-16 h-16 bg-gradient-to-r ${service.color} rounded-xl flex items-center justify-center mb-4 mx-auto group-hover:scale-110 transition-transform`}
+                        className={`w-16 h-16 bg-gradient-to-r ${useCase.color} rounded-xl flex items-center justify-center mb-4 mx-auto group-hover:scale-110 transition-transform`}
                       >
                         <IconComponent className="text-white" size={28} />
                       </div>
-                      <h4 className="text-xl font-semibold text-gray-800 text-center group-hover:text-blue-600 transition-colors">
-                        {service.name}
+                      <h4 className="text-xl font-semibold text-gray-800 text-center group-hover:text-blue-600 transition-colors mb-2">
+                        {useCase.name}
                       </h4>
+                      <p className="text-sm text-gray-600 text-center">
+                        {useCase.description}
+                      </p>
                     </div>
                   );
                 })}
@@ -1020,9 +964,9 @@ const menuItems = [
               ServisAI
             </h2>
             <p className="text-gray-600 mb-6">
-              AI asistent, ktorý vybavuje zákazníkov za vás.
+              Váš AI asistent pre web a zákaznícku podporu.
             </p>
-            <div className="flex justify-center space-x-6">
+            <div className="flex justify-center space-x-6 flex-wrap gap-3">
               {menuItems.map((item, i) => (
                 <button
                   key={i}
