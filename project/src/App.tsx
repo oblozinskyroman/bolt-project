@@ -482,17 +482,7 @@ function App() {
                   {isLoggedIn ? "Prihlásený" : "Odhlásený"}
                 </button>
 
-                {isLoggedIn && (
-                  <NavCta
-                    onClick={navigateToMyOrders}
-                    className="bg-gradient-to-r from-green-500 to-emerald-600 text-white hover:from-green-600 hover:to-emerald-700 border-green-400"
-                  >
-                    <Euro size={18} />
-                    Moje objednávky
-                  </NavCta>
-                )}
-
-                <NavCta
+              <NavCta
                   onClick={navigateToMyAccount}
                   className="bg-gradient-to-r from-blue-500 to-indigo-600 text-white hover:from-blue-600 hover:to-indigo-700 border-blue-400"
                 >
@@ -544,20 +534,7 @@ function App() {
                 <User size={20} />
                 {isLoggedIn ? "Prihlásený" : "Odhlásený"}
               </button>
-
-              {isLoggedIn && (
-                <button
-                  onClick={() => {
-                    navigateToMyOrders();
-                    setMobileMenuOpen(false);
-                  }}
-                  className="w-full inline-flex items-center justify-center gap-2 px-3 py-3 text-base font-bold rounded-lg transition-all transform hover:scale-105 shadow-lg hover:shadow-xl bg-gradient-to-r from-green-500 to-emerald-600 text-white hover:from-green-600 hover:to-emerald-700 border-2 border-green-400"
-                >
-                  <Euro size={22} />
-                  Moje objednávky
-                </button>
-              )}
-
+          
               <button
                 onClick={() => {
                   navigateToMyAccount();
