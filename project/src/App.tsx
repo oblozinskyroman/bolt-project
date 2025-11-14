@@ -561,24 +561,23 @@ function App() {
         {currentPage === "home" && (
           <>
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
-              <div className="text-center mb-12">
-            <h2 className="text-4xl md:text-6xl font-bold text-gray-800 mb-8 leading-[1.35]">
- <h2 className="text-4xl md:text-6xl font-bold text-gray-800 mb-2">
-  AI asistent
-</h2>
+             <div className="text-center mb-12">
+  <h2 className="text-4xl md:text-6xl font-bold text-gray-800 mb-2">
+    AI asistent
+  </h2>
 
-<p className="text-3xl md:text-5xl font-bold mt-1 leading-tight">
-  <span className="bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">
-    ktorý vybavuje zákazníkov za vás
-  </span>
-</p>
+  <p className="text-3xl md:text-5xl font-bold mt-1 leading-snug">
+    <span className="bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">
+      ktorý vybavuje zákazníkov za vás
+    </span>
+  </p>
 
-<p className="text-xl text-gray-600 max-w-2xl mx-auto mb-12">
-  Automatizujte odpovede, objednávky a podporu. Asistent pozná vaše služby, ceny aj dostupnosť a pracuje nonstop.
-</p>
-              </div>
-             
-              {/* AI chat */}
+  <p className="text-xl text-gray-600 max-w-2xl mx-auto mt-4">
+    Automatizujte odpovede, objednávky a podporu. Asistent pozná vaše služby,
+    ceny aj dostupnosť a pracuje nonstop.
+  </p>
+</div>
+{/* AI chat */}
               <div className="bg-white/70 backdrop-blur-md rounded-2xl shadow-xl p-8 mb-20">
                 <div className="flex items-center mb-6">
                   <div className="bg-gradient-to-r from-blue-500 to-indigo-600 p-3 rounded-xl mr-4">
