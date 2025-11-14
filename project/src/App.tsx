@@ -562,13 +562,13 @@ function App() {
           <>
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
               <div className="text-center mb-12">
-                <h2 className="text-4xl md:text-6xl font-bold text-gray-800 mb-6 leading-[1.15]">
-                  AI asistent
-                  <span className="block bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">
-                    ktorý vybavuje zákazníkov za vás
+                <h2 className="text-4xl md:text-6xl font-bold text-gray-800 mb-8 leading-snug">
+  <span className="block">AI asistent</span>
+  <span className="block bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">
+    ktorý vybavuje zákazníkov za vás
+  </span>
+</h2>
 
-                  </span>
-                </h2>
                 <p className="text-xl text-gray-600 max-w-2xl mx-auto mb-12">
                  Automatizujte odpovede, objednávky a podporu. Asistent pozná vaše služby, ceny aj dostupnosť a pracuje nonstop.
                 </p>
