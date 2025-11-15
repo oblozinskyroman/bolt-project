@@ -14,14 +14,6 @@ import PaymentCancelPage from "./pages/PaymentCancelPage";
 import CookieConsentBanner from "./components/CookieConsentBanner";
 import FloatingChatWidget from "./components/FloatingChatWidget";
 
-// NOVÉ USE-CASE STRÁNKY
-import UseCaseReservationsPage from "./pages/UseCaseReservationsPage";
-import UseCaseSupportPage from "./pages/UseCaseSupportPage";
-import UseCaseShopPage from "./pages/UseCaseShopPage";
-import UseCaseServicePage from "./pages/UseCaseServicePage";
-import UseCaseFormsPage from "./pages/UseCaseFormsPage";
-import UseCaseInternalPage from "./pages/UseCaseInternalPage";
-
 import { supabase } from "./lib/supabase";
 import { askAI, type ChatTurn } from "./lib/askAI";
 
@@ -137,14 +129,7 @@ type PageId =
   | "myAccount"
   | "myOrders"
   | "paymentSuccess"
-  | "paymentCancel"
-  // nové use-case stránky
-  | "useReservations"
-  | "useSupport"
-  | "useShop"
-  | "useService"
-  | "useForms"
-  | "useInternal";
+  | "paymentCancel";
 
 const ALL_PAGES: PageId[] = [
   "home",
@@ -160,12 +145,6 @@ const ALL_PAGES: PageId[] = [
   "myOrders",
   "paymentSuccess",
   "paymentCancel",
-  "useReservations",
-  "useSupport",
-  "useShop",
-  "useService",
-  "useForms",
-  "useInternal",
 ];
 
 function getPageFromHash(): PageId {
@@ -173,15 +152,6 @@ function getPageFromHash(): PageId {
   const raw = window.location.hash.replace("#", "").trim() as PageId;
   return ALL_PAGES.includes(raw) ? raw : "home";
 }
-
-// typ pre use-case kartu
-type UseCaseConfig = {
-  name: string;
-  icon: React.ComponentType<{ size?: number }>;
-  color: string;
-  description: string;
-  page: PageId;
-};
 
 function App() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -311,14 +281,13 @@ function App() {
     return () => clearTimeout(t);
   }, [userLocation]);
 
-  // Use-cases pre AI asistenta – teraz každá má svoju vlastnú stránku
-  const useCases: UseCaseConfig[] = [
+  // Use-cases pre AI asistenta
+  const useCases = [
     {
       name: "Rezervácie a objednávky",
       icon: Calendar,
       color: "from-blue-500 to-indigo-600",
       description: "Prijímanie rezervácií, termínov a dopytov bez telefonovania.",
-      page: "useReservations",
     },
     {
       name: "Zákaznícka podpora 24/7",
@@ -326,7 +295,6 @@ function App() {
       color: "from-emerald-500 to-teal-600",
       description:
         "Odpovede na časté otázky, otváracie hodiny, ceny a podmienky.",
-      page: "useSupport",
     },
     {
       name: "E-shop a produkty",
@@ -334,14 +302,12 @@ function App() {
       color: "from-violet-500 to-purple-600",
       description:
         "Pomoc s výberom produktu, dostupnosťou a stavom objednávky.",
-      page: "useShop",
     },
     {
       name: "Servis a reklamácie",
       icon: Shield,
       color: "from-amber-500 to-orange-600",
       description: "Zber údajov k poruche, otvorenie ticketu, základné rady.",
-      page: "useService",
     },
     {
       name: "Formuláre a dopyty",
@@ -349,14 +315,12 @@ function App() {
       color: "from-pink-500 to-rose-600",
       description:
         "AI vyplní so zákazníkom všetko potrebné a odošle vám podklady.",
-      page: "useForms",
     },
     {
       name: "Interné otázky",
       icon: Zap,
       color: "from-slate-500 to-gray-600",
       description: "Návody, procesy a interné know-how dostupné na pár kliknutí.",
-      page: "useInternal",
     },
   ];
 
@@ -933,7 +897,7 @@ function App() {
                   return (
                     <div
                       key={index}
-                      onClick={() => goTo(useCase.page)}
+                      onClick={() => navigateToCompanyList(useCase.name)}
                       className="bg-white/70 backdrop-blur-md rounded-2xl p-6 shadow-lg hover:shadow-xl transition-all transform hover:-translate-y-2 cursor-pointer group"
                     >
                       <div
@@ -1007,26 +971,6 @@ function App() {
             onNavigateBack={navigateToHome}
             onNavigateToMyOrders={navigateToMyOrders}
           />
-        )}
-
-        {/* NOVÉ USE-CASE STRÁNKY */}
-        {currentPage === "useReservations" && (
-          <UseCaseReservationsPage onNavigateBack={navigateToHome} />
-        )}
-        {currentPage === "useSupport" && (
-          <UseCaseSupportPage onNavigateBack={navigateToHome} />
-        )}
-        {currentPage === "useShop" && (
-          <UseCaseShopPage onNavigateBack={navigateToHome} />
-        )}
-        {currentPage === "useService" && (
-          <UseCaseServicePage onNavigateBack={navigateToHome} />
-        )}
-        {currentPage === "useForms" && (
-          <UseCaseFormsPage onNavigateBack={navigateToHome} />
-        )}
-        {currentPage === "useInternal" && (
-          <UseCaseInternalPage onNavigateBack={navigateToHome} />
         )}
       </div>
 
