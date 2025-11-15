@@ -2,12 +2,10 @@
 @tailwind components;
 @tailwind utilities;
 
-/* reCAPTCHA badge – v3 hore pod menu, zachovaná hover animácia */
+/* reCAPTCHA badge – posunutá vpravo hore pod menu, animáciu nechávame na Google */
 .grecaptcha-badge {
   position: fixed !important;
-  top: 96px !important;      /* nastav si výšku – vyššie / nižšie, napr. 80–120px */
-  right: 12px !important;
-  left: auto !important;
-  bottom: auto !important;
-  z-index: 9999 !important;
+  top: 110px !important;    /* výšku si môžeš doladiť (90–140px podľa oka) */
+  right: 24px !important;
+  bottom: auto !important;  /* zruší default bottom:0 */
 }
