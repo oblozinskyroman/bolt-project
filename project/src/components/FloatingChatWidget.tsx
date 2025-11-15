@@ -180,7 +180,7 @@ const FloatingChatWidget: React.FC = () => {
       <button
         type="button"
         onClick={handleToggle}
-        className="fixed bottom-30 right-4 z-50 h-14 w-14 rounded-full bg-gradient-to-br from-sky-500 to-blue-600 text-white shadow-[0_16px_40px_rgba(15,23,42,0.45)] flex items-center justify-center hover:scale-105 active:scale-95 transition-transform"
+        className="fixed bottom-25 right-4 z-50 h-14 w-14 rounded-full bg-gradient-to-br from-sky-500 to-blue-600 text-white shadow-[0_16px_40px_rgba(15,23,42,0.45)] flex items-center justify-center hover:scale-105 active:scale-95 transition-transform"
         aria-label={isOpen ? "Zavrieť chat" : "Otvoriť chat"}
       >
         {isOpen ? <X className="h-6 w-6" /> : <MessageCircle className="h-6 w-6" />}
