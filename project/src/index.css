@@ -1,15 +1,10 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
-
-/* reCAPTCHA hore pod menu, ale s pôvodnou animáciou */
+/* reCAPTCHA hore pod menu, so zachovanou hover animáciou */
 .grecaptcha-badge {
-  transform: translateY(-120px) !important; /* posun nahor */
+  transform: translateY(-200px) !important; /* bola -120, teraz vyššie */
   transition: transform 0.3s ease !important;
   z-index: 9999 !important;
 }
 
-/* Pri hoveri nech badge ostane vysunutá normálne */
 .grecaptcha-badge:hover {
-  transform: translateY(-120px) scale(1.08) !important;
+  transform: translateY(-200px) scale(1.08) !important;
 }
