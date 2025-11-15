@@ -178,21 +178,37 @@ function App() {
 
   // Auth
   const [isLoggedIn, setIsLoggedIn] = useState(false);
-  useEffect(() => {
-    const checkAuth = async () => {
-      const {
-        data: { user },
-      } = await supabase.auth.getUser();
-      setIsLoggedIn(!!user);
-    };
-    checkAuth();
+useEffect(() => {
+  const checkAuth = async () => {
     const {
-      data: { subscription },
-    } = supabase.auth.onAuthStateChange((_event, session) => {
-      setIsLoggedIn(!!session?.user);
-    });
-    return () => subscription.unsubscribe();
-  }, []);
+      data: { user },
+    } = await supabase.auth.getUser();
+    setIsLoggedIn(!!user);
+  };
+  checkAuth();
+
+  const {
+    data: { subscription },
+  } = supabase.auth.onAuthStateChange((_event, session) => {
+    const loggedIn = !!session?.user;
+    setIsLoggedIn(loggedIn);
+
+    // po odhlásení presmeruj na home
+    if (!loggedIn) {
+      // vyčisti prípadne detail firmy, aby tam neostal starý stav
+      setSelectedCompanyId(null);
+      // použijeme hash routing
+      if (typeof window !== "undefined") {
+        window.location.hash = "";
+      }
+      setCurrentPage("home");
+    }
+  });
+
+  return () => subscription.unsubscribe();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+}, []);
+
 
   // Hash routing – reaguje na back/forward a pri prvom načítaní
   useEffect(() => {
@@ -476,17 +492,18 @@ function App() {
 
             {/* Account + CTA vpravo */}
             <div className="hidden md:flex items-center space-x-4">
-              <button
-                onClick={navigateToMyAccount}
-                className={`flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-lg transition-all transform hover:scale-105 shadow-md hover:shadow-lg ${
-                  isLoggedIn
-                    ? "bg-green-100 text-green-800 border border-green-200 hover:bg-green-200"
-                    : "bg-red-100 text-red-800 border border-red-200 hover:bg-red-200"
-                }`}
-              >
-                <User size={16} />
-                {isLoggedIn ? "Prihlásený" : "Odhlásený"}
-              </button>
+<button
+  onClick={navigateToMyAccount}
+  className={`flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-lg transition-all transform hover:scale-105 shadow-md hover:shadow-lg ${
+    isLoggedIn
+      ? "bg-green-100 text-green-800 border border-green-200 hover:bg-green-200"
+      : "bg-white text-blue-700 border border-blue-200 hover:bg-blue-50"
+  }`}
+>
+  <User size={16} />
+  {isLoggedIn ? "Môj účet" : "Prihlásiť sa"}
+</button>
+
 
               <NavCta
                 onClick={navigateToAddCompany}
@@ -514,18 +531,19 @@ function App() {
             <div className="px-2 pt-2 pb-3 space-y-2">
               {mainMenuItems.map((item, i) => (
                 <button
-                  key={i}
-                  onClick={() => {
-                    handleMenuClick(item.action);
-                    setMobileMenuOpen(false);
-                  }}
-                  className="w-full text-left text-gray-700 hover:text-blue-600 px-3 py-2 text-base font-medium hover:bg-blue-50 rounded-lg transition-colors"
-                >
-                  {item.label}
-                </button>
-              ))}
-
-              <button
+  onClick={() => {
+    navigateToMyAccount();
+    setMobileMenuOpen(false);
+  }}
+  className={`w-full flex items-center gap-2 px-3 py-3 text-base font-medium rounded-lg transition-all ${
+    isLoggedIn
+      ? "bg-green-100 text-green-800 border border-green-200 hover:bg-green-200"
+      : "bg-white text-blue-700 border border-blue-200 hover:bg-blue-50"
+  }`}
+>
+  <User size={20} />
+  {isLoggedIn ? "Môj účet" : "Prihlásiť sa"}
+</button>
                 onClick={() => {
                   navigateToMyAccount();
                   setMobileMenuOpen(false);
