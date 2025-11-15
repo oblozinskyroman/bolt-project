@@ -1001,7 +1001,7 @@ function App() {
             </div>
             <div className="mt-8 pt-8 border-t border-gray-200">
               <p className="text-gray-500 text-sm">
-                © 2025 SServisAI. Všetky práva vyhradené.
+                © 2025 ServisAI. Všetky práva vyhradené.
               </p>
             </div>
           </div>
