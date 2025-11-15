@@ -6,36 +6,26 @@ type Options = {
   onText?: (text: string) => void;
 };
 
-type SpeechHook = {
-  isSupported: boolean;
-  isListening: boolean;
-  toggleListening: () => void;
-};
+export function useSpeechToText(options: Options = {}) {
+  const { lang = "sk-SK", onText } = options;
 
-export function useSpeechToText(
-  { lang = "sk-SK", onText }: Options = {}
-): SpeechHook {
-  const [isSupported, setIsSupported] = useState(false);
+  const [isSupported, setIsSupported] = useState(true);
   const [isListening, setIsListening] = useState(false);
   const recognitionRef = useRef<SpeechRecognition | null>(null);
-  const shouldListenRef = useRef(false);
 
   useEffect(() => {
-    const SR =
-      (window as any).SpeechRecognition ||
-      (window as any).webkitSpeechRecognition;
+    const w = window as any;
+    const SR = w.SpeechRecognition || w.webkitSpeechRecognition;
 
     if (!SR) {
       setIsSupported(false);
       return;
     }
 
-    setIsSupported(true);
-
     const recog: SpeechRecognition = new SR();
     recog.lang = lang;
-    recog.interimResults = false; // stačia finálne výsledky
-    recog.continuous = true;      // nech beží dlhšie, nie len 1 vetu
+    recog.interimResults = false;
+    recog.continuous = true; // dôležité – neukončí sa po 1 vete
 
     recog.onresult = (event: SpeechRecognitionEvent) => {
       const text = Array.from(event.results)
@@ -44,62 +34,46 @@ export function useSpeechToText(
       if (onText) onText(text);
     };
 
-    recog.onstart = () => {
-      setIsListening(true);
+    recog.onerror = (e) => {
+      console.error("SpeechRecognition error:", e);
+      setIsListening(false);
     };
 
     recog.onend = () => {
-      // Chrome rád ukončí session po krátkej pauze
-      setIsListening(false);
-      if (shouldListenRef.current) {
-        try {
-          recog.start(); // reštartujeme, pokiaľ je toggle stále zapnutý
-        } catch {
-          shouldListenRef.current = false;
-        }
-      }
-    };
-
-    recog.onerror = () => {
-      shouldListenRef.current = false;
+      // keď používateľ stopne mikrofón, necháme isListening = false
       setIsListening(false);
     };
 
     recognitionRef.current = recog;
 
     return () => {
-      shouldListenRef.current = false;
-      try {
-        recog.stop();
-      } catch {
-        // ignore
-      }
+      recog.abort();
       recognitionRef.current = null;
     };
   }, [lang, onText]);
 
   const toggleListening = () => {
-    if (!isSupported || !recognitionRef.current) return;
+    if (!isSupported) return;
     const recog = recognitionRef.current;
+    if (!recog) return;
 
-    if (isListening || shouldListenRef.current) {
-      // vypnúť
-      shouldListenRef.current = false;
-      try {
+    try {
+      if (isListening) {
         recog.stop();
-      } catch {
-        // ignore
-      }
-    } else {
-      // zapnúť
-      shouldListenRef.current = true;
-      try {
+        setIsListening(false);
+      } else {
         recog.start();
-      } catch {
-        shouldListenRef.current = false;
+        setIsListening(true);
       }
+    } catch (e) {
+      console.error("SpeechRecognition start/stop error:", e);
+      setIsListening(false);
     }
   };
 
-  return { isSupported, isListening, toggleListening };
+  return {
+    isSupported,
+    isListening,
+    toggleListening,
+  };
 }
