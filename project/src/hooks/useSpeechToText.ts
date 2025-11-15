@@ -1,94 +1,107 @@
 // src/hooks/useSpeechToText.ts
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from "react";
 
 type Options = {
   lang?: string;
   onText?: (text: string) => void;
 };
 
-type SpeechRecognitionLike = any;
-
-export function useSpeechToText(
-  { lang = 'sk-SK', onText }: Options = {}
-) {
+export function useSpeechToText({ lang = "sk-SK", onText }: Options = {}) {
   const [isSupported, setIsSupported] = useState(false);
   const [isListening, setIsListening] = useState(false);
-  const recognitionRef = useRef<SpeechRecognitionLike | null>(null);
+  const recognitionRef = useRef<any | null>(null);
+  const callbackRef = useRef<((text: string) => void) | undefined>(onText);
+
+  // aktualizuj callback bez re-inicializácie celej služby
+  useEffect(() => {
+    callbackRef.current = onText;
+  }, [onText]);
 
   useEffect(() => {
+    if (typeof window === "undefined") return;
+
     const SR =
       (window as any).SpeechRecognition ||
       (window as any).webkitSpeechRecognition;
 
     if (!SR) {
+      console.warn("SpeechRecognition API nie je podporovaná v tomto prehliadači.");
       setIsSupported(false);
       return;
     }
 
-    setIsSupported(true);
-
-    const recog: SpeechRecognitionLike = new SR();
+    const recog = new SR();
     recog.lang = lang;
     recog.interimResults = false;
     recog.continuous = false;
 
-    recog.onresult = (event: SpeechRecognitionEvent) => {
+    recog.onresult = (event: any) => {
       const text = Array.from(event.results)
-        .map((r) => r[0].transcript)
-        .join(' ')
+        .map((r: any) => r[0]?.transcript ?? "")
+        .join(" ")
         .trim();
 
-      if (text && onText) onText(text);
-      setIsListening(false);
-    };
-
-    recog.onerror = () => {
-      setIsListening(false);
+      console.log("[STT] onresult:", text);
+      if (text && callbackRef.current) {
+        callbackRef.current(text);
+      }
     };
 
     recog.onend = () => {
+      console.log("[STT] onend");
+      setIsListening(false);
+    };
+
+    recog.onerror = (ev: any) => {
+      console.error("[STT] error:", ev);
       setIsListening(false);
     };
 
     recognitionRef.current = recog;
+    setIsSupported(true);
+    console.log("[STT] SpeechRecognition inicializovaná");
 
     return () => {
       try {
-        recog.onresult = null as any;
-        recog.onerror = null as any;
-        recog.onend = null as any;
         recog.stop();
+        recog.abort();
       } catch {
         // ignore
       }
       recognitionRef.current = null;
+      console.log("[STT] cleanup");
     };
-  }, [lang, onText]);
+  }, [lang]);
 
-  const start = () => {
-    if (!isSupported || !recognitionRef.current) return;
-    try {
-      recognitionRef.current.start();
-      setIsListening(true);
-    } catch {
-      // napr. "start" called while already running – ignorujeme
+  const toggleListening = () => {
+    const recog = recognitionRef.current;
+    if (!recog || !isSupported) {
+      console.warn("[STT] toggleListening – nie je podporované alebo neinicializované");
+      return;
     }
-  };
 
-  const stop = () => {
-    if (!recognitionRef.current) return;
-    try {
-      recognitionRef.current.stop();
-    } catch {
-      // ignore
+    if (isListening) {
+      try {
+        recog.stop();
+      } catch (e) {
+        console.error("[STT] stop error:", e);
+      }
+      setIsListening(false);
+    } else {
+      try {
+        recog.start();
+        console.log("[STT] start – čaká sa na povolenie mikrofónu");
+        setIsListening(true);
+      } catch (e) {
+        console.error("[STT] start error:", e);
+        setIsListening(false);
+      }
     }
-    setIsListening(false);
   };
 
   return {
     isSupported,
     isListening,
-    start,
-    stop,
+    toggleListening,
   };
 }
