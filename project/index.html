@@ -1,12 +1,21 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="sk">
   <head>
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/vite.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>AI Services Landing Page</title>
-    <!-- reCAPTCHA v3 -->
-    <script src="https://www.google.com/recaptcha/api.js?render=6Lcwu6MrAAAAAGzJX-r769xyeQ4jS23JuSCT50pz"></script>
+
+    <title>ServisAI – AI asistent pre váš web</title>
+
+    <!-- reCAPTCHA v3
+         - samotná pozícia badge (vľavo dole) sa rieši v src/index.css
+           cez .grecaptcha-badge { left: 0; right: auto; bottom: 0; }
+    -->
+    <script
+      src="https://www.google.com/recaptcha/api.js?render=6Lcwu6MrAAAAAGzJX-r769xyeQ4jS23JuSCT50pz"
+      async
+      defer
+    ></script>
   </head>
   <body>
     <div id="root"></div>
