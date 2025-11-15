@@ -178,37 +178,36 @@ function App() {
 
   // Auth
   const [isLoggedIn, setIsLoggedIn] = useState(false);
-useEffect(() => {
-  const checkAuth = async () => {
+
+  useEffect(() => {
+    const checkAuth = async () => {
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
+      setIsLoggedIn(!!user);
+    };
+    checkAuth();
+
     const {
-      data: { user },
-    } = await supabase.auth.getUser();
-    setIsLoggedIn(!!user);
-  };
-  checkAuth();
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((_event, session) => {
+      const loggedIn = !!session?.user;
+      setIsLoggedIn(loggedIn);
 
-  const {
-    data: { subscription },
-  } = supabase.auth.onAuthStateChange((_event, session) => {
-    const loggedIn = !!session?.user;
-    setIsLoggedIn(loggedIn);
-
-    // po odhlásení presmeruj na home
-    if (!loggedIn) {
-      // vyčisti prípadne detail firmy, aby tam neostal starý stav
-      setSelectedCompanyId(null);
-      // použijeme hash routing
-      if (typeof window !== "undefined") {
-        window.location.hash = "";
+      // po odhlásení presmeruj na home
+      if (!loggedIn) {
+        setSelectedCompanyId(null);
+        if (typeof window !== "undefined") {
+          window.location.hash = "";
+        }
+        setCurrentPage("home");
       }
-      setCurrentPage("home");
-    }
-  });
+    });
 
-  return () => subscription.unsubscribe();
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-}, []);
-
+    return () => {
+      subscription.unsubscribe();
+    };
+  }, []);
 
   // Hash routing – reaguje na back/forward a pri prvom načítaní
   useEffect(() => {
@@ -219,8 +218,7 @@ useEffect(() => {
     };
 
     window.addEventListener("hashchange", handler);
-    // istota, že pri prvom load-e sedí stránka s hashom
-    handler();
+    handler(); // istota pri prvom loade
 
     return () => {
       window.removeEventListener("hashchange", handler);
@@ -244,7 +242,8 @@ useEffect(() => {
   useEffect(() => {
     const existing = (localStorage.getItem(LS_PREF_LOC) || "").trim();
     if (existing && !userLocation) setUserLocation(existing);
-  }, []); // úmyselne bez závislostí userLocation pri prvom loade
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   // Ukladaj preferovanú lokalitu
   useEffect(() => {
@@ -492,18 +491,17 @@ useEffect(() => {
 
             {/* Account + CTA vpravo */}
             <div className="hidden md:flex items-center space-x-4">
-<button
-  onClick={navigateToMyAccount}
-  className={`flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-lg transition-all transform hover:scale-105 shadow-md hover:shadow-lg ${
-    isLoggedIn
-      ? "bg-green-100 text-green-800 border border-green-200 hover:bg-green-200"
-      : "bg-white text-blue-700 border border-blue-200 hover:bg-blue-50"
-  }`}
->
-  <User size={16} />
-  {isLoggedIn ? "Môj účet" : "Prihlásiť sa"}
-</button>
-
+              <button
+                onClick={navigateToMyAccount}
+                className={`flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-lg transition-all transform hover:scale-105 shadow-md hover:shadow-lg ${
+                  isLoggedIn
+                    ? "bg-green-100 text-green-800 border border-green-200 hover:bg-green-200"
+                    : "bg-white text-blue-700 border border-blue-200 hover:bg-blue-50"
+                }`}
+              >
+                <User size={16} />
+                {isLoggedIn ? "Môj účet" : "Prihlásiť sa"}
+              </button>
 
               <NavCta
                 onClick={navigateToAddCompany}
@@ -550,11 +548,11 @@ useEffect(() => {
                 className={`w-full flex items-center gap-2 px-3 py-3 text-base font-medium rounded-lg transition-all ${
                   isLoggedIn
                     ? "bg-green-100 text-green-800 border border-green-200 hover:bg-green-200"
-                    : "bg-red-100 text-red-800 border border-red-200 hover:bg-red-200"
+                    : "bg-white text-blue-700 border border-blue-200 hover:bg-blue-50"
                 }`}
               >
                 <User size={20} />
-                {isLoggedIn ? "Prihlásený" : "Odhlásený"}
+                {isLoggedIn ? "Môj účet" : "Prihlásiť sa"}
               </button>
 
               <button
@@ -599,7 +597,7 @@ useEffect(() => {
                   <div className="bg-gradient-to-r from-blue-500 to-indigo-600 p-3 rounded-xl mr-4">
                     <MessageCircle className="text-white" size={24} />
                   </div>
-                <div>
+                  <div>
                     <h3 className="text-2xl font-semibold text-gray-800">
                       AI Asistent – živé demo
                     </h3>
