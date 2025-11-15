@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import CompanyListPage from "./pages/CompanyListPage";
 import AddCompanyPage from "./pages/AddCompanyPage";
 import CompanyDetailPage from "./pages/CompanyDetailPage";
@@ -12,10 +12,10 @@ import MyOrdersPage from "./pages/MyOrdersPage";
 import PaymentSuccessPage from "./pages/PaymentSuccessPage";
 import PaymentCancelPage from "./pages/PaymentCancelPage";
 import CookieConsentBanner from "./components/CookieConsentBanner";
+import FloatingChatWidget from "./components/FloatingChatWidget";
 
 import { supabase } from "./lib/supabase";
 import { askAI, type ChatTurn } from "./lib/askAI";
-import { createOrderAndRedirect } from "./lib/createOrderAndRedirect";
 
 import {
   MessageCircle,
@@ -29,7 +29,6 @@ import {
   User,
   MapPin,
   CheckCircle,
-  Star,
   Mic,
   MicOff,
 } from "lucide-react";
@@ -162,6 +161,9 @@ function App() {
     null
   );
 
+  // ref na input – kvôli autofokusu pri zapnutí mikrofónu
+  const inputRef = useRef<HTMLInputElement | null>(null);
+
   // AI
   const [message, setMessage] = useState("");
   const [lastQuery, setLastQuery] = useState("");
@@ -190,6 +192,19 @@ function App() {
         setMessage((prev) => (prev ? `${prev} ${t}` : t));
       },
     });
+
+  // pri zapnutí mikrofónu auto-fokusni input
+  const handleMicClick = () => {
+    if (!sttSupported) return;
+
+    if (!isListening && inputRef.current) {
+      inputRef.current.focus();
+      const len = inputRef.current.value.length;
+      inputRef.current.setSelectionRange(len, len);
+    }
+
+    toggleListening();
+  };
 
   // Auth
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -470,8 +485,6 @@ function App() {
     else if (action === "myOrders") navigateToMyOrders();
   };
 
-  const ORDER_AMOUNT_CENTS = 5000; // 50 €
-
   return (
     <div className="min-h-screen bg-gradient-to-br from-amber-50 via-orange-50 to-yellow-100">
       {/* Navbar */}
@@ -623,6 +636,7 @@ function App() {
                 <div className="flex flex-col gap-3 mt-4">
                   <div className="flex flex-col sm:flex-row gap-4">
                     <input
+                      ref={inputRef}
                       type="text"
                       value={message}
                       onChange={(e) => setMessage(e.target.value)}
@@ -636,7 +650,7 @@ function App() {
                     {/* Hlasové zadávanie */}
                     <button
                       type="button"
-                      onClick={toggleListening}
+                      onClick={handleMicClick}
                       disabled={!sttSupported}
                       className={`px-4 py-4 rounded-xl border flex items-center justify-center transition-all ${
                         !sttSupported
@@ -789,38 +803,11 @@ function App() {
                               ))}
                           </div>
 
-                          {/* CTA + ESCROW – demo logika */}
+                          {/* CTA – bez escrow logiky */}
                           <div
                             className="mt-auto pt-4 flex flex-wrap gap-2"
                             onClick={(e) => e.stopPropagation()}
                           >
-                            {c.id && (
-                              <button
-                                onClick={async () => {
-                                  if (!isLoggedIn) {
-                                    alert(
-                                      "Pre platbu sa prosím najprv prihláste."
-                                    );
-                                    return;
-                                  }
-                                  try {
-                                    await createOrderAndRedirect(
-                                      String(c.id),
-                                      ORDER_AMOUNT_CENTS
-                                    );
-                                  } catch (err) {
-                                    console.error(err);
-                                    alert(
-                                      "Nepodarilo sa vytvoriť escrow objednávku."
-                                    );
-                                  }
-                                }}
-                                className="px-3 py-2 rounded-xl bg-emerald-600 text-white hover:bg-emerald-700 transition"
-                              >
-                                Escrow 50 €
-                              </button>
-                            )}
-
                             {c.actions?.website ? (
                               <a
                                 href={c.actions.website}
@@ -898,8 +885,9 @@ function App() {
                   Na čo môžete AI asistenta nasadiť
                 </h3>
                 <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-                  Vyberte, čo má na vašom webe vybavovať – rezervácie, objednávky,
-                  otázky zákazníkov alebo interné procesy. Zvyšok zvládne AI.
+                  Vyberte, čo má na vašom webe vybavovať – rezervácie,
+                  objednávky, otázky zákazníkov alebo interné procesy. Zvyšok
+                  zvládne AI.
                 </p>
               </div>
 
@@ -985,6 +973,9 @@ function App() {
           />
         )}
       </div>
+
+      {/* Globálny plávajúci AI widget */}
+      <FloatingChatWidget />
 
       <CookieConsentBanner />
 
