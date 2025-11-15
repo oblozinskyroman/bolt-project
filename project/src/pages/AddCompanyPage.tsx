@@ -176,7 +176,7 @@ function AddCompanyPage({ onNavigateBack }: AddCompanyPageProps) {
                     URL webu *
                   </label>
                   <input
-                    type="url"
+                    type="text"
                     value={formData.websiteUrl}
                     onChange={(e) =>
                       handleChange("websiteUrl", e.target.value)
