@@ -6,10 +6,14 @@ type Options = {
   onText?: (text: string) => void;
 };
 
-export function useSpeechToText({ lang = 'sk-SK', onText }: Options = {}) {
+type SpeechRecognitionLike = any;
+
+export function useSpeechToText(
+  { lang = 'sk-SK', onText }: Options = {}
+) {
   const [isSupported, setIsSupported] = useState(false);
   const [isListening, setIsListening] = useState(false);
-  const recognitionRef = useRef<SpeechRecognition | null>(null);
+  const recognitionRef = useRef<SpeechRecognitionLike | null>(null);
 
   useEffect(() => {
     const SR =
@@ -21,7 +25,9 @@ export function useSpeechToText({ lang = 'sk-SK', onText }: Options = {}) {
       return;
     }
 
-    const recog: SpeechRecognition = new SR();
+    setIsSupported(true);
+
+    const recog: SpeechRecognitionLike = new SR();
     recog.lang = lang;
     recog.interimResults = false;
     recog.continuous = false;
@@ -29,8 +35,15 @@ export function useSpeechToText({ lang = 'sk-SK', onText }: Options = {}) {
     recog.onresult = (event: SpeechRecognitionEvent) => {
       const text = Array.from(event.results)
         .map((r) => r[0].transcript)
-        .join(' ');
-      if (onText) onText(text);
+        .join(' ')
+        .trim();
+
+      if (text && onText) onText(text);
+      setIsListening(false);
+    };
+
+    recog.onerror = () => {
+      setIsListening(false);
     };
 
     recog.onend = () => {
@@ -38,23 +51,38 @@ export function useSpeechToText({ lang = 'sk-SK', onText }: Options = {}) {
     };
 
     recognitionRef.current = recog;
-    setIsSupported(true);
 
     return () => {
-      recog.abort();
+      try {
+        recog.onresult = null as any;
+        recog.onerror = null as any;
+        recog.onend = null as any;
+        recog.stop();
+      } catch {
+        // ignore
+      }
+      recognitionRef.current = null;
     };
   }, [lang, onText]);
 
   const start = () => {
-    if (!recognitionRef.current) return;
+    if (!isSupported || !recognitionRef.current) return;
     try {
       recognitionRef.current.start();
       setIsListening(true);
-    } catch {}
+    } catch {
+      // napr. "start" called while already running – ignorujeme
+    }
   };
 
   const stop = () => {
-    recognitionRef.current?.stop();
+    if (!recognitionRef.current) return;
+    try {
+      recognitionRef.current.stop();
+    } catch {
+      // ignore
+    }
+    setIsListening(false);
   };
 
   return {
