@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useState } from "react";
 import CompanyListPage from "./pages/CompanyListPage";
 import AddCompanyPage from "./pages/AddCompanyPage";
 import CompanyDetailPage from "./pages/CompanyDetailPage";
@@ -19,7 +19,6 @@ import { createOrderAndRedirect } from "./lib/createOrderAndRedirect";
 
 import {
   MessageCircle,
-  HelpCircle,
   Calendar,
   Shield,
   Zap,
@@ -31,7 +30,6 @@ import {
   MapPin,
   CheckCircle,
   Star,
-  Euro,
 } from "lucide-react";
 
 /** Lokálny storage kľúč pre preferovanú lokalitu */
@@ -175,7 +173,7 @@ function App() {
     null
   );
   const [ack, setAck] = useState("");
-  const [aiActiveFilters, setAiActiveFilters] = useState<string[]>([]);
+  const [aiActiveFilters] = useState<string[]>([]);
   const [sortBy, setSortBy] = useState<SortBy>("relevance");
 
   // Auth
@@ -230,7 +228,7 @@ function App() {
   useEffect(() => {
     const existing = (localStorage.getItem(LS_PREF_LOC) || "").trim();
     if (existing && !userLocation) setUserLocation(existing);
-  }, []);
+  }, []); // úmyselne bez závislostí userLocation pri prvom loade
 
   // Ukladaj preferovanú lokalitu
   useEffect(() => {
@@ -284,12 +282,6 @@ function App() {
     },
   ];
 
-  const aiQuickFilters = [
-    // len kvôli kompatibilite s backendom – v UI ich už neukazujeme
-    { id: "verified", label: "Overené", icon: Shield },
-    { id: "rating-4plus", label: "★ 4+", icon: Star },
-  ];
-
   const menuItems = [
     { label: "Ako fungujeme", action: "howItWorks" },
     { label: "Funkcie", action: "references" },
@@ -301,34 +293,6 @@ function App() {
 
   const relyOrEmpty = (s?: string) => (typeof s === "string" ? s : "");
 
-  /* ---------- Geolokácia (momentálne v deme bez tlačidla) ---------- */
-  const useMyLocation = () => {
-    if (!("geolocation" in navigator)) {
-      alert("Prehliadač nepodporuje geolokáciu.");
-      return;
-    }
-    const controller = new AbortController();
-    const timer = setTimeout(() => {
-      controller.abort();
-      alert("Nepodarilo sa získať polohu v časovom limite.");
-    }, 9000);
-
-    navigator.geolocation.getCurrentPosition(
-      (pos) => {
-        clearTimeout(timer);
-        const { latitude, longitude } = pos.coords;
-        setCoords({ lat: latitude, lng: longitude });
-        if (!userLocation) setUserLocation("Moje okolie");
-      },
-      (err) => {
-        clearTimeout(timer);
-        console.error(err);
-        alert("Nepodarilo sa získať polohu.");
-      },
-      { enableHighAccuracy: true, timeout: 8000, maximumAge: 300000 }
-    );
-  };
-
   const makeAck = (intent?: any, fallbackLocation?: string) => {
     const s = (intent?.service ?? "").toString().trim();
     const loc = (intent?.location ?? fallbackLocation ?? "").toString().trim();
@@ -336,14 +300,6 @@ function App() {
     if (s) parts.push(`službu ${s.toLowerCase()}`);
     if (loc) parts.push(`lokalita ${loc}`);
     return parts.length ? `Rozumiem — ${parts.join(", ")}.` : "";
-  };
-
-  const toggleAiFilter = (filterId: string) => {
-    setAiActiveFilters((prev) =>
-      prev.includes(filterId)
-        ? prev.filter((f) => f !== filterId)
-        : [...prev, filterId]
-    );
   };
 
   const withDistances = (arr: UICard[]): UICard[] => {
@@ -487,16 +443,6 @@ function App() {
     else if (action === "myOrders") navigateToMyOrders();
   };
 
-  const gpsBadge = useMemo(
-    () =>
-      coords ? (
-        <span className="inline-flex items-center text-xs px-2 py-1 rounded-full bg-green-100 text-green-700 border border-green-200">
-          GPS aktívne
-        </span>
-      ) : null,
-    [coords]
-  );
-
   const ORDER_AMOUNT_CENTS = 5000; // 50 €
 
   return (
@@ -636,7 +582,7 @@ function App() {
                   <div className="bg-gradient-to-r from-blue-500 to-indigo-600 p-3 rounded-xl mr-4">
                     <MessageCircle className="text-white" size={24} />
                   </div>
-                  <div>
+                <div>
                     <h3 className="text-2xl font-semibold text-gray-800">
                       AI Asistent – živé demo
                     </h3>
