@@ -185,7 +185,6 @@ function App() {
     useSpeechToText({
       lang: "sk-SK",
       onText: (text: string) => {
-        // pridáme rozpoznaný text na koniec inputu
         const t = text.trim();
         if (!t) return;
         setMessage((prev) => (prev ? `${prev} ${t}` : t));
@@ -210,7 +209,6 @@ function App() {
       const loggedIn = !!session?.user;
       setIsLoggedIn(loggedIn);
 
-      // po odhlásení presmeruj na home
       if (!loggedIn) {
         setSelectedCompanyId(null);
         if (typeof window !== "undefined") {
@@ -225,7 +223,7 @@ function App() {
     };
   }, []);
 
-  // Hash routing – reaguje na back/forward a pri prvom načítaní
+  // Hash routing
   useEffect(() => {
     if (typeof window === "undefined") return;
 
@@ -234,34 +232,32 @@ function App() {
     };
 
     window.addEventListener("hashchange", handler);
-    handler(); // istota pri prvom loade
+    handler();
 
     return () => {
       window.removeEventListener("hashchange", handler);
     };
   }, []);
 
-  // jednotné presúvanie medzi stránkami + zapis hash do URL
+  // Navigácia + hash
   const goTo = (page: PageId) => {
     if (typeof window !== "undefined") {
       const hash = page === "home" ? "" : `#${page}`;
       if (window.location.hash !== hash) {
         window.location.hash = hash;
-        // currentPage sa nastaví cez hashchange handler
         return;
       }
     }
     setCurrentPage(page);
   };
 
-  // Načítaj preferovanú lokalitu z localStorage pri štarte
+  // localStorage – preferovaná lokalita
   useEffect(() => {
     const existing = (localStorage.getItem(LS_PREF_LOC) || "").trim();
     if (existing && !userLocation) setUserLocation(existing);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // Ukladaj preferovanú lokalitu
   useEffect(() => {
     const t = setTimeout(() => {
       const v = (userLocation || "").trim();
