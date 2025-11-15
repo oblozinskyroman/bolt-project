@@ -30,7 +30,11 @@ import {
   MapPin,
   CheckCircle,
   Star,
+  Mic,
+  MicOff,
 } from "lucide-react";
+
+import { useSpeechToText } from "./hooks/useSpeechToText";
 
 /** Lokálny storage kľúč pre preferovanú lokalitu */
 const LS_PREF_LOC = "sa_pref_loc";
@@ -175,6 +179,18 @@ function App() {
   const [ack, setAck] = useState("");
   const [aiActiveFilters] = useState<string[]>([]);
   const [sortBy, setSortBy] = useState<SortBy>("relevance");
+
+  // HLAS → TEXT
+  const { isSupported: sttSupported, isListening, toggleListening } =
+    useSpeechToText({
+      lang: "sk-SK",
+      onText: (text: string) => {
+        // pridáme rozpoznaný text na koniec inputu
+        const t = text.trim();
+        if (!t) return;
+        setMessage((prev) => (prev ? `${prev} ${t}` : t));
+      },
+    });
 
   // Auth
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -620,6 +636,28 @@ function App() {
                         e.key === "Enter" && !isLoading && handleAsk()
                       }
                     />
+
+                    {/* Hlasové zadávanie */}
+                    <button
+                      type="button"
+                      onClick={toggleListening}
+                      disabled={!sttSupported}
+                      className={`px-4 py-4 rounded-xl border flex items-center justify-center transition-all ${
+                        !sttSupported
+                          ? "border-gray-200 text-gray-400 bg-gray-100 cursor-not-allowed"
+                          : isListening
+                          ? "border-emerald-500 bg-emerald-50 text-emerald-700 shadow-inner"
+                          : "border-gray-200 bg-white hover:bg-gray-100 text-gray-700"
+                      }`}
+                      title={
+                        sttSupported
+                          ? "Hlasové zadávanie otázky"
+                          : "Tento prehliadač nepodporuje hlasové zadávanie"
+                      }
+                    >
+                      {isListening ? <Mic size={20} /> : <MicOff size={20} />}
+                    </button>
+
                     <button
                       onClick={handleAsk}
                       disabled={isLoading}
