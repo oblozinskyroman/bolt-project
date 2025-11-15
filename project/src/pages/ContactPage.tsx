@@ -1,11 +1,11 @@
-import React, { useState } from 'react';
-import { 
-  ArrowLeft, 
-  Mail, 
-  Phone, 
-  MapPin, 
-  Clock, 
-  User, 
+import React, { useState } from "react";
+import {
+  ArrowLeft,
+  Mail,
+  Phone,
+  MapPin,
+  Clock,
+  User,
   MessageSquare,
   Send,
   CheckCircle,
@@ -13,9 +13,7 @@ import {
   Building2,
   Globe,
   Calendar,
-  Menu,
-  X
-} from 'lucide-react';
+} from "lucide-react";
 
 interface ContactPageProps {
   onNavigateBack: () => void;
@@ -30,46 +28,46 @@ interface ContactFormData {
 
 function ContactPage({ onNavigateBack }: ContactPageProps) {
   const [formData, setFormData] = useState<ContactFormData>({
-    name: '',
-    email: '',
-    subject: '',
-    message: ''
+    name: "",
+    email: "",
+    subject: "",
+    message: "",
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [submitStatus, setSubmitStatus] = useState<'idle' | 'success' | 'error'>('idle');
+  const [submitStatus, setSubmitStatus] =
+    useState<"idle" | "success" | "error">("idle");
 
   const handleInputChange = (field: keyof ContactFormData, value: string) => {
-    setFormData(prev => ({ ...prev, [field]: value }));
+    setFormData((prev) => ({ ...prev, [field]: value }));
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
-    setSubmitStatus('idle');
+    setSubmitStatus("idle");
 
     try {
       // TODO: Implement actual form submission
-      console.log('Odosielanie správy:', formData);
-      
-      // Simulate delay
-      await new Promise(resolve => setTimeout(resolve, 2000));
-      
-      setSubmitStatus('success');
-      
-      // Reset form after successful submission
+      console.log("Odosielanie správy:", formData);
+
+      // Simulácia oneskorenia
+      await new Promise((resolve) => setTimeout(resolve, 2000));
+
+      setSubmitStatus("success");
+
+      // Reset formulára po úspešnom odoslaní
       setTimeout(() => {
         setFormData({
-          name: '',
-          email: '',
-          subject: '',
-          message: ''
+          name: "",
+          email: "",
+          subject: "",
+          message: "",
         });
-        setSubmitStatus('idle');
+        setSubmitStatus("idle");
       }, 3000);
-      
     } catch (error) {
-      console.error('Chyba pri odosielaní správy:', error);
-      setSubmitStatus('error');
+      console.error("Chyba pri odosielaní správy:", error);
+      setSubmitStatus("error");
     } finally {
       setIsSubmitting(false);
     }
@@ -91,11 +89,10 @@ function ContactPage({ onNavigateBack }: ContactPageProps) {
           <div className="bg-white/20 backdrop-blur-md rounded-2xl p-3 w-16 h-16 mx-auto mb-6 flex items-center justify-center">
             <MessageSquare className="text-white" size={32} />
           </div>
-          <h1 className="text-5xl md:text-6xl font-bold mb-6">
-            Kontakt
-          </h1>
+          <h1 className="text-5xl md:text-6xl font-bold mb-6">Kontakt</h1>
           <p className="text-xl md:text-2xl text-blue-100 max-w-3xl mx-auto leading-relaxed">
-            Máte otázky? Radi vám pomôžeme. Kontaktujte nás kedykoľvek.
+            Máte otázky k ServisAI alebo AI asistentovi na vašom webe? Ozvite sa
+            nám, radi odpovieme.
           </p>
         </div>
       </div>
@@ -103,7 +100,6 @@ function ContactPage({ onNavigateBack }: ContactPageProps) {
       {/* Contact Information & Form */}
       <div className="max-w-screen-2xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
-          
           {/* Contact Information */}
           <div className="space-y-8">
             <div>
@@ -119,11 +115,15 @@ function ContactPage({ onNavigateBack }: ContactPageProps) {
                   <User className="text-white" size={24} />
                 </div>
                 <div>
-                  <h3 className="text-xl font-semibold text-gray-800">Majiteľ</h3>
+                  <h3 className="text-xl font-semibold text-gray-800">
+                    Majiteľ
+                  </h3>
                   <p className="text-gray-600">Zakladateľ a CEO</p>
                 </div>
               </div>
-              <p className="text-lg font-semibold text-gray-800">Roman Oblozinsky</p>
+              <p className="text-lg font-semibold text-gray-800">
+                Roman Oblozinsky
+              </p>
             </div>
 
             {/* Email */}
@@ -133,11 +133,13 @@ function ContactPage({ onNavigateBack }: ContactPageProps) {
                   <Mail className="text-white" size={24} />
                 </div>
                 <div>
-                  <h3 className="text-xl font-semibold text-gray-800">E-mail</h3>
+                  <h3 className="text-xl font-semibold text-gray-800">
+                    E-mail
+                  </h3>
                   <p className="text-gray-600">Napíšte nám kedykoľvek</p>
                 </div>
               </div>
-              <a 
+              <a
                 href="mailto:info@zrovnaj.sk"
                 className="text-lg font-semibold text-blue-600 hover:text-blue-700 transition-colors duration-200"
               >
@@ -154,11 +156,15 @@ function ContactPage({ onNavigateBack }: ContactPageProps) {
                     <Phone className="text-white" size={24} />
                   </div>
                   <div>
-                    <h3 className="text-xl font-semibold text-gray-800">Telefón</h3>
+                    <h3 className="text-xl font-semibold text-gray-800">
+                      Telefón
+                    </h3>
                     <p className="text-gray-600">Bude doplnený</p>
                   </div>
                 </div>
-                <p className="text-gray-500 italic">Telefónne číslo bude doplnené</p>
+                <p className="text-gray-500 italic">
+                  Telefónne číslo bude doplnené
+                </p>
               </div>
 
               {/* Address - Placeholder */}
@@ -168,11 +174,15 @@ function ContactPage({ onNavigateBack }: ContactPageProps) {
                     <MapPin className="text-white" size={24} />
                   </div>
                   <div>
-                    <h3 className="text-xl font-semibold text-gray-800">Adresa</h3>
+                    <h3 className="text-xl font-semibold text-gray-800">
+                      Adresa
+                    </h3>
                     <p className="text-gray-600">Bude doplnená</p>
                   </div>
                 </div>
-                <p className="text-gray-500 italic">Adresa sídla bude doplnená</p>
+                <p className="text-gray-500 italic">
+                  Adresa sídla bude doplnená
+                </p>
               </div>
 
               {/* Business Hours - Placeholder */}
@@ -182,42 +192,52 @@ function ContactPage({ onNavigateBack }: ContactPageProps) {
                     <Clock className="text-white" size={24} />
                   </div>
                   <div>
-                    <h3 className="text-xl font-semibold text-gray-800">Pracovné hodiny</h3>
+                    <h3 className="text-xl font-semibold text-gray-800">
+                      Pracovné hodiny
+                    </h3>
                     <p className="text-gray-600">Budú doplnené</p>
                   </div>
                 </div>
-                <p className="text-gray-500 italic">Pracovné hodiny budú doplnené</p>
+                <p className="text-gray-500 italic">
+                  Pracovné hodiny budú doplnené
+                </p>
               </div>
             </div>
           </div>
 
           {/* Contact Form */}
           <div className="bg-white/70 backdrop-blur-md rounded-2xl shadow-xl p-8">
-            <h2 className="text-3xl font-bold text-gray-800 mb-8">
-              Napíšte nám
-            </h2>
+            <h2 className="text-3xl font-bold text-gray-800 mb-8">Napíšte nám</h2>
 
             {/* Success Message */}
-            {submitStatus === 'success' && (
+            {submitStatus === "success" && (
               <div className="mb-6 p-4 bg-gradient-to-r from-green-50 to-emerald-50 rounded-xl border border-green-200">
                 <div className="flex items-center">
                   <CheckCircle className="text-green-600 mr-3" size={20} />
                   <div>
-                    <h4 className="font-semibold text-green-800">Správa odoslaná!</h4>
-                    <p className="text-green-700 text-sm">Odpovieme vám čo najskôr.</p>
+                    <h4 className="font-semibold text-green-800">
+                      Správa odoslaná!
+                    </h4>
+                    <p className="text-green-700 text-sm">
+                      Odpovieme vám čo najskôr.
+                    </p>
                   </div>
                 </div>
               </div>
             )}
 
             {/* Error Message */}
-            {submitStatus === 'error' && (
+            {submitStatus === "error" && (
               <div className="mb-6 p-4 bg-gradient-to-r from-red-50 to-pink-50 rounded-xl border border-red-200">
                 <div className="flex items-center">
                   <AlertCircle className="text-red-600 mr-3" size={20} />
                   <div>
-                    <h4 className="font-semibold text-red-800">Chyba pri odosielaní</h4>
-                    <p className="text-red-700 text-sm">Skúste to prosím znovu alebo nás kontaktujte e-mailom.</p>
+                    <h4 className="font-semibold text-red-800">
+                      Chyba pri odosielaní
+                    </h4>
+                    <p className="text-red-700 text-sm">
+                      Skúste to prosím znovu alebo nás kontaktujte e-mailom.
+                    </p>
                   </div>
                 </div>
               </div>
@@ -232,7 +252,7 @@ function ContactPage({ onNavigateBack }: ContactPageProps) {
                 <input
                   type="text"
                   value={formData.name}
-                  onChange={(e) => handleInputChange('name', e.target.value)}
+                  onChange={(e) => handleInputChange("name", e.target.value)}
                   placeholder="Vaše meno"
                   required
                   className="w-full px-4 py-3 rounded-lg border border-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white/80"
@@ -247,7 +267,7 @@ function ContactPage({ onNavigateBack }: ContactPageProps) {
                 <input
                   type="email"
                   value={formData.email}
-                  onChange={(e) => handleInputChange('email', e.target.value)}
+                  onChange={(e) => handleInputChange("email", e.target.value)}
                   placeholder="vas@email.sk"
                   required
                   className="w-full px-4 py-3 rounded-lg border border-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white/80"
@@ -262,7 +282,7 @@ function ContactPage({ onNavigateBack }: ContactPageProps) {
                 <input
                   type="text"
                   value={formData.subject}
-                  onChange={(e) => handleInputChange('subject', e.target.value)}
+                  onChange={(e) => handleInputChange("subject", e.target.value)}
                   placeholder="Predmet správy"
                   required
                   className="w-full px-4 py-3 rounded-lg border border-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white/80"
@@ -276,7 +296,7 @@ function ContactPage({ onNavigateBack }: ContactPageProps) {
                 </label>
                 <textarea
                   value={formData.message}
-                  onChange={(e) => handleInputChange('message', e.target.value)}
+                  onChange={(e) => handleInputChange("message", e.target.value)}
                   placeholder="Napíšte vašu správu..."
                   rows={6}
                   required
@@ -305,9 +325,7 @@ function ContactPage({ onNavigateBack }: ContactPageProps) {
             </form>
 
             <div className="mt-6 text-center">
-              <p className="text-sm text-gray-500">
-                * Povinné polia
-              </p>
+              <p className="text-sm text-gray-500">* Povinné polia</p>
             </div>
           </div>
         </div>
