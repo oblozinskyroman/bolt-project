@@ -11,17 +11,16 @@ import MyAccountPage from "./pages/MyAccountPage";
 import MyOrdersPage from "./pages/MyOrdersPage";
 import PaymentSuccessPage from "./pages/PaymentSuccessPage";
 import PaymentCancelPage from "./pages/PaymentCancelPage";
+import CookieConsentBanner from "./components/CookieConsentBanner";
+import FloatingChatWidget from "./components/FloatingChatWidget";
 
 // NOVÉ USE-CASE STRÁNKY
 import UseCaseReservationsPage from "./pages/UseCaseReservationsPage";
 import UseCaseSupportPage from "./pages/UseCaseSupportPage";
-import UseCaseOrdersPage from "./pages/UseCaseOrdersPage";
+import UseCaseShopPage from "./pages/UseCaseShopPage";
 import UseCaseServicePage from "./pages/UseCaseServicePage";
 import UseCaseFormsPage from "./pages/UseCaseFormsPage";
 import UseCaseInternalPage from "./pages/UseCaseInternalPage";
-
-import CookieConsentBanner from "./components/CookieConsentBanner";
-import FloatingChatWidget from "./components/FloatingChatWidget";
 
 import { supabase } from "./lib/supabase";
 import { askAI, type ChatTurn } from "./lib/askAI";
@@ -139,13 +138,13 @@ type PageId =
   | "myOrders"
   | "paymentSuccess"
   | "paymentCancel"
-  // nové use-case stránky:
-  | "ucReservations"
-  | "ucSupport"
-  | "ucOrders"
-  | "ucService"
-  | "ucForms"
-  | "ucInternal";
+  // nové use-case stránky
+  | "useReservations"
+  | "useSupport"
+  | "useShop"
+  | "useService"
+  | "useForms"
+  | "useInternal";
 
 const ALL_PAGES: PageId[] = [
   "home",
@@ -161,12 +160,12 @@ const ALL_PAGES: PageId[] = [
   "myOrders",
   "paymentSuccess",
   "paymentCancel",
-  "ucReservations",
-  "ucSupport",
-  "ucOrders",
-  "ucService",
-  "ucForms",
-  "ucInternal",
+  "useReservations",
+  "useSupport",
+  "useShop",
+  "useService",
+  "useForms",
+  "useInternal",
 ];
 
 function getPageFromHash(): PageId {
@@ -174,6 +173,15 @@ function getPageFromHash(): PageId {
   const raw = window.location.hash.replace("#", "").trim() as PageId;
   return ALL_PAGES.includes(raw) ? raw : "home";
 }
+
+// typ pre use-case kartu
+type UseCaseConfig = {
+  name: string;
+  icon: React.ComponentType<{ size?: number }>;
+  color: string;
+  description: string;
+  page: PageId;
+};
 
 function App() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -303,60 +311,52 @@ function App() {
     return () => clearTimeout(t);
   }, [userLocation]);
 
-  // Use-cases pre AI asistenta – TERAZ MÁME ID STRÁNOK
-  const useCases: {
-    id: PageId;
-    name: string;
-    icon: React.ComponentType<{ size?: number }>;
-    color: string;
-    description: string;
-  }[] = [
+  // Use-cases pre AI asistenta – teraz každá má svoju vlastnú stránku
+  const useCases: UseCaseConfig[] = [
     {
-      id: "ucReservations",
       name: "Rezervácie a objednávky",
       icon: Calendar,
       color: "from-blue-500 to-indigo-600",
-      description:
-        "Prijímanie rezervácií, termínov a dopytov bez telefonovania.",
+      description: "Prijímanie rezervácií, termínov a dopytov bez telefonovania.",
+      page: "useReservations",
     },
     {
-      id: "ucSupport",
       name: "Zákaznícka podpora 24/7",
       icon: MessageCircle,
       color: "from-emerald-500 to-teal-600",
       description:
         "Odpovede na časté otázky, otváracie hodiny, ceny a podmienky.",
+      page: "useSupport",
     },
     {
-      id: "ucOrders",
       name: "E-shop a produkty",
       icon: Puzzle,
       color: "from-violet-500 to-purple-600",
       description:
         "Pomoc s výberom produktu, dostupnosťou a stavom objednávky.",
+      page: "useShop",
     },
     {
-      id: "ucService",
       name: "Servis a reklamácie",
       icon: Shield,
       color: "from-amber-500 to-orange-600",
       description: "Zber údajov k poruche, otvorenie ticketu, základné rady.",
+      page: "useService",
     },
     {
-      id: "ucForms",
       name: "Formuláre a dopyty",
       icon: Palette,
       color: "from-pink-500 to-rose-600",
       description:
         "AI vyplní so zákazníkom všetko potrebné a odošle vám podklady.",
+      page: "useForms",
     },
     {
-      id: "ucInternal",
       name: "Interné otázky",
       icon: Zap,
       color: "from-slate-500 to-gray-600",
-      description:
-        "Návody, procesy a interné know-how dostupné na pár kliknutí.",
+      description: "Návody, procesy a interné know-how dostupné na pár kliknutí.",
+      page: "useInternal",
     },
   ];
 
@@ -653,11 +653,267 @@ function App() {
               </div>
 
               {/* AI chat – živé demo */}
-              {/* ... (tu nechávam tvoju existujúcu AI sekciu bez zmien) ... */}
-              {/* kvôli dĺžke som ju neskracoval, ale je identická ako v predchádzajúcej verzii */}
+              <div className="bg-white/70 backdrop-blur-md rounded-2xl shadow-xl p-8 mb-20">
+                <div className="flex items-center mb-3">
+                  <div className="bg-gradient-to-r from-blue-500 to-indigo-600 p-3 rounded-xl mr-4">
+                    <MessageCircle className="text-white" size={24} />
+                  </div>
+                  <div>
+                    <h3 className="text-2xl font-semibold text-gray-800">
+                      AI Asistent – živé demo
+                    </h3>
+                    <p className="text-sm text-gray-500 mt-1">
+                      Spýtaj sa, čo všetko by mohol vybavovať na tvojom webe.
+                      Napr.: „Ako by AI riešila rezervácie pre môj salón?“
+                    </p>
+                  </div>
+                </div>
 
-              {/* sem vlož rovnaký blok AI chatu, ktorý už máš –
-                  nemuseli sme ho meniť, takže ho môžeš nechať z pôvodného súboru */}
+                <div className="flex flex-col gap-3 mt-4">
+                  <div className="flex flex-col sm:flex-row gap-4">
+                    <input
+                      ref={inputRef}
+                      type="text"
+                      value={message}
+                      onChange={(e) => setMessage(e.target.value)}
+                      placeholder="Napíšte svoju otázku... napr. 'Ako by AI riešila rezervácie pre môj salón?'"
+                      className="flex-1 px-6 py-4 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-lg bg-white/80 backdrop-blur-sm"
+                      onKeyDown={(e) =>
+                        e.key === "Enter" && !isLoading && handleAsk()
+                      }
+                    />
+
+                    {/* Hlasové zadávanie */}
+                    <button
+                      type="button"
+                      onClick={handleMicClick}
+                      disabled={!sttSupported}
+                      className={`px-4 py-4 rounded-xl border flex items-center justify-center transition-all ${
+                        !sttSupported
+                          ? "border-gray-200 text-gray-400 bg-gray-100 cursor-not-allowed"
+                          : isListening
+                          ? "border-emerald-500 bg-emerald-50 text-emerald-700 shadow-inner"
+                          : "border-gray-200 bg-white hover:bg-gray-100 text-gray-700"
+                      }`}
+                      title={
+                        sttSupported
+                          ? "Hlasové zadávanie otázky"
+                          : "Tento prehliadač nepodporuje hlasové zadávanie"
+                      }
+                    >
+                      {isListening ? <Mic size={20} /> : <MicOff size={20} />}
+                    </button>
+
+                    <button
+                      onClick={handleAsk}
+                      disabled={isLoading}
+                      className="px-8 py-4 bg-gradient-to-r from-blue-500 to-indigo-600 text-white font-semibold rounded-xl hover:from-blue-600 hover:to-indigo-700 transition-all transform hover:scale-105 shadow-lg hover:shadow-xl disabled:opacity-50"
+                    >
+                      {isLoading ? "Načítavam..." : "Odoslať"}
+                    </button>
+                  </div>
+
+                  {ack && (
+                    <div className="mt-4 p-3 rounded-lg bg-blue-50 border border-blue-200 text-blue-800 text-sm flex items-start gap-2">
+                      <CheckCircle size={18} className="mt-0.5 flex-shrink-0" />
+                      <span>{ack}</span>
+                    </div>
+                  )}
+                </div>
+
+                {isLoading && (
+                  <div className="mt-6 p-4 bg-blue-50 rounded-xl border border-blue-200">
+                    <div className="flex items-center">
+                      <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-blue-600 mr-3"></div>
+                      <p className="text-blue-700 font-medium">
+                        AI asistent premýšľa...
+                      </p>
+                    </div>
+                  </div>
+                )}
+
+                {aiResponse && !isLoading && cards.length === 0 && (
+                  <div className="mt-6 p-6 bg-gradient-to-r from-green-50 to-emerald-50 rounded-xl border border-green-200 shadow-sm">
+                    <div className="flex items-start">
+                      <div className="bg-gradient-to-r from-green-500 to-emerald-600 p-2 rounded-lg mr-4 flex-shrink-0">
+                        <MessageCircle className="text-white" size={20} />
+                      </div>
+                      <div className="flex-1">
+                        <h4 className="text-lg font-semibold text-green-800 mb-2">
+                          AI Asistent odpovedá:
+                        </h4>
+                        <p className="text-green-700 leading-relaxed whitespace-pre-wrap">
+                          {aiResponse}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {/* Výsledky ako ukážkové karty */}
+                {cards.length > 0 && (
+                  <>
+                    <div className="flex flex-col space-y-6 mt-6">
+                      {cards.map((c) => (
+                        <div
+                          key={String(c.id ?? c.title)}
+                          className="flex flex-col h-full rounded-2xl shadow p-5 bg-white cursor-pointer hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1"
+                          onClick={() =>
+                            c.id && navigateToCompanyDetail(String(c.id))
+                          }
+                        >
+                          <div className="flex items-start justify-between gap-3">
+                            <div className="min-w-0">
+                              <h3 className="text-lg font-semibold break-words">
+                                {c.title}
+                              </h3>
+                              {c.subtitle && (
+                                <p className="text-sm text-gray-500 truncate">
+                                  {c.subtitle}
+                                </p>
+                              )}
+                            </div>
+                            <div className="flex items-center gap-2">
+                              {coords && (
+                                <span className="text-xs px-2 py-1 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200">
+                                  Demo: podľa lokality
+                                </span>
+                              )}
+                              {c.verified && (
+                                <span className="shrink-0 text-xs px-2 py-1 rounded-full bg-green-100 text-green-700">
+                                  Overená
+                                </span>
+                              )}
+                            </div>
+                          </div>
+
+                          <div className="mt-2 flex items-center gap-2 flex-wrap">
+                            {typeof c.rating === "number" ? (
+                              <>
+                                <StarRating value={c.rating} />
+                                <span className="text-xs text-gray-500">
+                                  {c.rating.toFixed(1)}
+                                </span>
+                              </>
+                            ) : (
+                              <span className="text-xs px-2 py-0.5 rounded-full bg-gray-100 text-gray-600">
+                                Ukážkový kontakt
+                              </span>
+                            )}
+
+                            {c.location && (
+                              <span className="inline-flex items-center gap-1 text-xs text-gray-500 ml-2">
+                                <MapPin size={12} />
+                                {c.location}
+                                {typeof c.distanceKm === "number" && (
+                                  <span className="text-gray-400">
+                                    &nbsp;•&nbsp;{c.distanceKm} km
+                                  </span>
+                                )}
+                              </span>
+                            )}
+                            {!c.location &&
+                              typeof c.distanceKm === "number" && (
+                                <span className="inline-flex items-center gap-1 text-xs text-gray-500 ml-2">
+                                  <MapPin size={12} />
+                                  {c.distanceKm} km
+                                </span>
+                              )}
+                          </div>
+
+                          {c.description && (
+                            <p className="mt-3 text-sm text-gray-700 line-clamp-3">
+                              {c.description}
+                            </p>
+                          )}
+
+                          <div className="mt-3 min-h-8 flex flex-wrap gap-2">
+                            {Array.isArray(c.tags) &&
+                              c.tags.map((t: string) => (
+                                <span
+                                  key={t}
+                                  className="text-xs bg-gray-100 text-gray-700 px-2 py-1 rounded-full"
+                                >
+                                  {t}
+                                </span>
+                              ))}
+                          </div>
+
+                          {/* CTA – bez escrow logiky */}
+                          <div
+                            className="mt-auto pt-4 flex flex-wrap gap-2"
+                            onClick={(e) => e.stopPropagation()}
+                          >
+                            {c.actions?.website ? (
+                              <a
+                                href={c.actions.website}
+                                target="_blank"
+                                rel="noreferrer"
+                                className="px-3 py-2 rounded-xl bg-blue-600 text-white"
+                              >
+                                Kontaktovať
+                              </a>
+                            ) : c.actions?.call ? (
+                              <a
+                                href={`tel:${c.actions.call}`}
+                                className="px-3 py-2 rounded-xl bg-blue-600 text-white"
+                              >
+                                Zavolať
+                              </a>
+                            ) : c.actions?.email ? (
+                              <a
+                                href={`mailto:${c.actions.email}`}
+                                className="px-3 py-2 rounded-xl bg-blue-600 text-white"
+                              >
+                                Napísať e-mail
+                              </a>
+                            ) : null}
+
+                            {c.actions?.call && (
+                              <a
+                                href={`tel:${c.actions.call}`}
+                                className="px-3 py-2 rounded-xl bg-blue-100 text-blue-700"
+                              >
+                                Tel.
+                              </a>
+                            )}
+                            {c.actions?.email && (
+                              <a
+                                href={`mailto:${c.actions.email}`}
+                                className="px-3 py-2 rounded-xl bg-blue-100 text-blue-700"
+                              >
+                                Email
+                              </a>
+                            )}
+                            {c.actions?.website && (
+                              <a
+                                href={c.actions.website}
+                                target="_blank"
+                                rel="noreferrer"
+                                className="px-3 py-2 rounded-xl bg-gray-100"
+                              >
+                                Web
+                              </a>
+                            )}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+
+                    {hasMore && (
+                      <div className="mt-6 flex justify-center">
+                        <button
+                          onClick={loadMore}
+                          disabled={isLoading}
+                          className="px-6 py-3 rounded-xl bg-gray-900 text-white hover:bg-black transition disabled:opacity-60"
+                        >
+                          {isLoading ? "Načítavam…" : "Zobraziť viac"}
+                        </button>
+                      </div>
+                    )}
+                  </>
+                )}
+              </div>
 
               {/* Use cases sekcia */}
               <div className="text-center mb-12">
@@ -677,7 +933,7 @@ function App() {
                   return (
                     <div
                       key={index}
-                      onClick={() => goTo(useCase.id)}
+                      onClick={() => goTo(useCase.page)}
                       className="bg-white/70 backdrop-blur-md rounded-2xl p-6 shadow-lg hover:shadow-xl transition-all transform hover:-translate-y-2 cursor-pointer group"
                     >
                       <div
@@ -753,23 +1009,23 @@ function App() {
           />
         )}
 
-        {/* NOVÝ ROUTING PRE USE-CASE STRÁNKY */}
-        {currentPage === "ucReservations" && (
+        {/* NOVÉ USE-CASE STRÁNKY */}
+        {currentPage === "useReservations" && (
           <UseCaseReservationsPage onNavigateBack={navigateToHome} />
         )}
-        {currentPage === "ucSupport" && (
+        {currentPage === "useSupport" && (
           <UseCaseSupportPage onNavigateBack={navigateToHome} />
         )}
-        {currentPage === "ucOrders" && (
-          <UseCaseOrdersPage onNavigateBack={navigateToHome} />
+        {currentPage === "useShop" && (
+          <UseCaseShopPage onNavigateBack={navigateToHome} />
         )}
-        {currentPage === "ucService" && (
+        {currentPage === "useService" && (
           <UseCaseServicePage onNavigateBack={navigateToHome} />
         )}
-        {currentPage === "ucForms" && (
+        {currentPage === "useForms" && (
           <UseCaseFormsPage onNavigateBack={navigateToHome} />
         )}
-        {currentPage === "ucInternal" && (
+        {currentPage === "useInternal" && (
           <UseCaseInternalPage onNavigateBack={navigateToHome} />
         )}
       </div>
