@@ -11,6 +11,7 @@ import {
   Shield,
   Users,
 } from "lucide-react";
+import { saveWebProject } from "../lib/saveWebProject";
 
 interface AddCompanyPageProps {
   onNavigateBack: () => void;
@@ -50,17 +51,30 @@ function AddCompanyPage({ onNavigateBack }: AddCompanyPageProps) {
     setStatus("idle");
 
     try {
-      // TODO: napojenie na reálny backend / Supabase
-      console.log("Onboarding webu – odoslané dáta:", formData);
-
-      await new Promise((resolve) => setTimeout(resolve, 1500));
+      // uloženie do Supabase (web_projects)
+      await saveWebProject(formData);
 
       setStatus("success");
+      // voliteľné: po úspechu vyčistiť formulár
+      // setFormData({
+      //   projectName: "",
+      //   websiteUrl: "",
+      //   contactName: "",
+      //   contactEmail: "",
+      //   businessType: "",
+      //   aiTasks: "",
+      //   notes: "",
+      // });
       setTimeout(() => {
         setStatus("idle");
       }, 3000);
-    } catch (err) {
+    } catch (err: any) {
       console.error("Chyba pri odoslaní formulára:", err);
+
+      if (err?.message === "Not logged in") {
+        alert("Na odoslanie formulára sa musíš najprv prihlásiť.");
+      }
+
       setStatus("error");
     } finally {
       setIsSubmitting(false);
@@ -341,8 +355,8 @@ function AddCompanyPage({ onNavigateBack }: AddCompanyPageProps) {
             <div className="bg-white/80 backdrop-blur-md rounded-2xl shadow-lg p-6 flex items-center gap-3">
               <Zap className="text-yellow-500" size={24} />
               <p className="text-sm text-gray-700">
-                Cieľ: čo najskôr otestovať, či ti AI asistent šetrí čas a peniaze.
-                Žiadne zbytočné okecávanie.
+                Cieľ: čo najskôr otestovať, či ti AI asistent šetrí čas a
+                peniaze. Žiadne zbytočné okecávanie.
               </p>
             </div>
           </div>
