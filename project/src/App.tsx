@@ -299,7 +299,7 @@ function App() {
 
   const menuItems = [
     { label: "Ako fungujeme", action: "howItWorks" },
-    { label: "Funkcie", action: "references" },
+    { label: "Referencie", action: "references" },
     { label: "Cenník", action: "news" },
     { label: "Integrácia", action: "helpCenter" },
     { label: "Kontakt", action: "contact" },
