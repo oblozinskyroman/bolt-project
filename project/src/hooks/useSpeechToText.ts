@@ -1,79 +1,92 @@
-// src/hooks/useSpeechToText.ts
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 
 type Options = {
   lang?: string;
   onText?: (text: string) => void;
 };
 
-export function useSpeechToText(options: Options = {}) {
-  const { lang = "sk-SK", onText } = options;
+type UseSpeechToTextResult = {
+  isSupported: boolean;
+  isListening: boolean;
+  toggleListening: () => void;
+};
 
-  const [isSupported, setIsSupported] = useState(true);
+export function useSpeechToText({
+  lang = "sk-SK",
+  onText,
+}: Options): UseSpeechToTextResult {
+  const [isSupported, setIsSupported] = useState(false);
   const [isListening, setIsListening] = useState(false);
+
+  // držíme si jednu inštanciu recognition
   const recognitionRef = useRef<SpeechRecognition | null>(null);
+  const onTextRef = useRef<typeof onText>();
+
+  // vždy aktualizujeme callback, ale nerozbíjame recognition
+  useEffect(() => {
+    onTextRef.current = onText;
+  }, [onText]);
 
   useEffect(() => {
-    const w = window as any;
-    const SR = w.SpeechRecognition || w.webkitSpeechRecognition;
+    if (typeof window === "undefined") return;
 
-    if (!SR) {
+    const AnyWindow = window as any;
+    const SpeechRecognition =
+      AnyWindow.SpeechRecognition || AnyWindow.webkitSpeechRecognition;
+
+    if (!SpeechRecognition) {
       setIsSupported(false);
       return;
     }
 
-    const recog: SpeechRecognition = new SR();
-    recog.lang = lang;
-    recog.interimResults = false;
-    recog.continuous = true; // dôležité – neukončí sa po 1 vete
+    const recognition: SpeechRecognition = new SpeechRecognition();
+    recognition.lang = lang;
+    recognition.interimResults = false;
+    recognition.continuous = true;
 
-    recog.onresult = (event: SpeechRecognitionEvent) => {
-      const text = Array.from(event.results)
-        .map((r) => r[0].transcript)
-        .join(" ");
-      if (onText) onText(text);
+    recognition.onresult = (event: SpeechRecognitionEvent) => {
+      const last = event.results[event.results.length - 1];
+      if (!last) return;
+      const text = last[0].transcript;
+      if (onTextRef.current) {
+        onTextRef.current(text);
+      }
     };
 
-    recog.onerror = (e) => {
-      console.error("SpeechRecognition error:", e);
+    recognition.onstart = () => setIsListening(true);
+    recognition.onend = () => setIsListening(false);
+    recognition.onerror = (e) => {
+      console.error("Speech recognition error:", e);
       setIsListening(false);
     };
 
-    recog.onend = () => {
-      // keď používateľ stopne mikrofón, necháme isListening = false
-      setIsListening(false);
-    };
-
-    recognitionRef.current = recog;
+    recognitionRef.current = recognition;
+    setIsSupported(true);
 
     return () => {
-      recog.abort();
+      try {
+        recognition.stop();
+      } catch {
+        // ignore
+      }
       recognitionRef.current = null;
     };
-  }, [lang, onText]);
+  }, [lang]);
 
-  const toggleListening = () => {
-    if (!isSupported) return;
-    const recog = recognitionRef.current;
-    if (!recog) return;
+  const toggleListening = useCallback(() => {
+    const recognition = recognitionRef.current;
+    if (!recognition) return;
 
     try {
       if (isListening) {
-        recog.stop();
-        setIsListening(false);
+        recognition.stop();
       } else {
-        recog.start();
-        setIsListening(true);
+        recognition.start();
       }
     } catch (e) {
-      console.error("SpeechRecognition start/stop error:", e);
-      setIsListening(false);
+      console.error("Speech recognition start/stop failed:", e);
     }
-  };
+  }, [isListening]);
 
-  return {
-    isSupported,
-    isListening,
-    toggleListening,
-  };
+  return { isSupported, isListening, toggleListening };
 }
