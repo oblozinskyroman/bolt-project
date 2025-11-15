@@ -1,3 +1,10 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/* reCAPTCHA badge – posunutá vyššie, ale animácia ostáva pôvodná */
+.grecaptcha-badge {
+  right: 16px !important;
+  bottom: 140px !important; /* výška – pokojne doladíš na 120 / 160 atď. */
+  z-index: 9999 !important;
+}
