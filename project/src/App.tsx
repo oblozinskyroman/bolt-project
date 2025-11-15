@@ -531,19 +531,18 @@ useEffect(() => {
             <div className="px-2 pt-2 pb-3 space-y-2">
               {mainMenuItems.map((item, i) => (
                 <button
-  onClick={() => {
-    navigateToMyAccount();
-    setMobileMenuOpen(false);
-  }}
-  className={`w-full flex items-center gap-2 px-3 py-3 text-base font-medium rounded-lg transition-all ${
-    isLoggedIn
-      ? "bg-green-100 text-green-800 border border-green-200 hover:bg-green-200"
-      : "bg-white text-blue-700 border border-blue-200 hover:bg-blue-50"
-  }`}
->
-  <User size={20} />
-  {isLoggedIn ? "Môj účet" : "Prihlásiť sa"}
-</button>
+                  key={i}
+                  onClick={() => {
+                    handleMenuClick(item.action);
+                    setMobileMenuOpen(false);
+                  }}
+                  className="w-full text-left text-gray-700 hover:text-blue-600 px-3 py-2 text-base font-medium hover:bg-blue-50 rounded-lg transition-colors"
+                >
+                  {item.label}
+                </button>
+              ))}
+
+              <button
                 onClick={() => {
                   navigateToMyAccount();
                   setMobileMenuOpen(false);
