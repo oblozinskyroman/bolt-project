@@ -143,11 +143,12 @@ function NewsPage({ onNavigateBack }: NewsPageProps) {
 
       {/* PLÁNY */}
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+        {/* items-stretch = všetky karty rovnako vysoké */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 items-stretch">
           {PLANS.map((plan) => (
             <div
               key={plan.id}
-              className={`relative bg-white/80 backdrop-blur-md rounded-2xl p-8 shadow-lg border ${
+              className={`relative bg-white/80 backdrop-blur-md rounded-2xl p-8 shadow-lg border flex flex-col h-full ${
                 plan.popular
                   ? "border-blue-500 shadow-xl scale-[1.02]"
                   : "border-gray-100"
@@ -172,7 +173,8 @@ function NewsPage({ onNavigateBack }: NewsPageProps) {
               )}
               <p className="text-gray-600 text-sm mb-4">{plan.description}</p>
               <p className="text-gray-500 text-xs mb-4">
-                Najlepšie pre: <span className="font-medium">{plan.bestFor}</span>
+                Najlepšie pre:{" "}
+                <span className="font-medium">{plan.bestFor}</span>
               </p>
 
               <div className="flex flex-wrap gap-2 mb-4">
@@ -187,6 +189,7 @@ function NewsPage({ onNavigateBack }: NewsPageProps) {
                 ))}
               </div>
 
+              {/* obsah necháme „flex-grow“, aby tlačidlo skončilo dole */}
               <ul className="mt-4 space-y-2 text-sm text-gray-700 mb-6">
                 {plan.features.map((f) => (
                   <li key={f} className="flex items-start gap-2">
