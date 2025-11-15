@@ -1,3 +1,10 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/* Posun reCAPTCHA badge doľava */
+.grecaptcha-badge {
+  right: auto !important;
+  left: 12px !important;
+  bottom: 12px !important;
+}
