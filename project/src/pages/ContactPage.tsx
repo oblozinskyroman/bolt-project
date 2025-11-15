@@ -22,7 +22,6 @@ interface ContactPageProps {
 interface ContactFormData {
   name: string;
   email: string;
-  subject: string;
   message: string;
 }
 
@@ -30,12 +29,12 @@ function ContactPage({ onNavigateBack }: ContactPageProps) {
   const [formData, setFormData] = useState<ContactFormData>({
     name: "",
     email: "",
-    subject: "",
     message: "",
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [submitStatus, setSubmitStatus] =
-    useState<"idle" | "success" | "error">("idle");
+  const [submitStatus, setSubmitStatus] = useState<
+    "idle" | "success" | "error"
+  >("idle");
 
   const handleInputChange = (field: keyof ContactFormData, value: string) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
@@ -55,12 +54,11 @@ function ContactPage({ onNavigateBack }: ContactPageProps) {
 
       setSubmitStatus("success");
 
-      // Reset formulára po úspešnom odoslaní
+      // Reset formu po úspešnom odoslaní
       setTimeout(() => {
         setFormData({
           name: "",
           email: "",
-          subject: "",
           message: "",
         });
         setSubmitStatus("idle");
@@ -91,8 +89,7 @@ function ContactPage({ onNavigateBack }: ContactPageProps) {
           </div>
           <h1 className="text-5xl md:text-6xl font-bold mb-6">Kontakt</h1>
           <p className="text-xl md:text-2xl text-blue-100 max-w-3xl mx-auto leading-relaxed">
-            Máte otázky k ServisAI alebo AI asistentovi na vašom webe? Ozvite sa
-            nám, radi odpovieme.
+            Máte otázky? Radi vám pomôžeme. Kontaktujte nás kedykoľvek.
           </p>
         </div>
       </div>
@@ -180,9 +177,7 @@ function ContactPage({ onNavigateBack }: ContactPageProps) {
                     <p className="text-gray-600">Bude doplnená</p>
                   </div>
                 </div>
-                <p className="text-gray-500 italic">
-                  Adresa sídla bude doplnená
-                </p>
+                <p className="text-gray-500 italic">Adresa sídla bude doplnená</p>
               </div>
 
               {/* Business Hours - Placeholder */}
@@ -207,7 +202,9 @@ function ContactPage({ onNavigateBack }: ContactPageProps) {
 
           {/* Contact Form */}
           <div className="bg-white/70 backdrop-blur-md rounded-2xl shadow-xl p-8">
-            <h2 className="text-3xl font-bold text-gray-800 mb-8">Napíšte nám</h2>
+            <h2 className="text-3xl font-bold text-gray-800 mb-8">
+              Napíšte nám
+            </h2>
 
             {/* Success Message */}
             {submitStatus === "success" && (
@@ -274,21 +271,6 @@ function ContactPage({ onNavigateBack }: ContactPageProps) {
                 />
               </div>
 
-              {/* Subject */}
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Predmet *
-                </label>
-                <input
-                  type="text"
-                  value={formData.subject}
-                  onChange={(e) => handleInputChange("subject", e.target.value)}
-                  placeholder="Predmet správy"
-                  required
-                  className="w-full px-4 py-3 rounded-lg border border-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white/80"
-                />
-              </div>
-
               {/* Message */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -296,7 +278,9 @@ function ContactPage({ onNavigateBack }: ContactPageProps) {
                 </label>
                 <textarea
                   value={formData.message}
-                  onChange={(e) => handleInputChange("message", e.target.value)}
+                  onChange={(e) =>
+                    handleInputChange("message", e.target.value)
+                  }
                   placeholder="Napíšte vašu správu..."
                   rows={6}
                   required
@@ -312,7 +296,7 @@ function ContactPage({ onNavigateBack }: ContactPageProps) {
               >
                 {isSubmitting ? (
                   <>
-                    <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
+                    <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white" />
                     Odosielam...
                   </>
                 ) : (
