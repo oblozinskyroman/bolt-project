@@ -3,7 +3,6 @@ import {
   ArrowLeft,
   Globe,
   Mail,
-  User,
   MessageSquare,
   CheckCircle,
   AlertCircle,
