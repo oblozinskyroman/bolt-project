@@ -6,102 +6,100 @@ type Options = {
   onText?: (text: string) => void;
 };
 
-export function useSpeechToText({ lang = "sk-SK", onText }: Options = {}) {
+type SpeechHook = {
+  isSupported: boolean;
+  isListening: boolean;
+  toggleListening: () => void;
+};
+
+export function useSpeechToText(
+  { lang = "sk-SK", onText }: Options = {}
+): SpeechHook {
   const [isSupported, setIsSupported] = useState(false);
   const [isListening, setIsListening] = useState(false);
-  const recognitionRef = useRef<any | null>(null);
-  const callbackRef = useRef<((text: string) => void) | undefined>(onText);
-
-  // aktualizuj callback bez re-inicializácie celej služby
-  useEffect(() => {
-    callbackRef.current = onText;
-  }, [onText]);
+  const recognitionRef = useRef<SpeechRecognition | null>(null);
+  const shouldListenRef = useRef(false);
 
   useEffect(() => {
-    if (typeof window === "undefined") return;
-
     const SR =
       (window as any).SpeechRecognition ||
       (window as any).webkitSpeechRecognition;
 
     if (!SR) {
-      console.warn("SpeechRecognition API nie je podporovaná v tomto prehliadači.");
       setIsSupported(false);
       return;
     }
 
-    const recog = new SR();
+    setIsSupported(true);
+
+    const recog: SpeechRecognition = new SR();
     recog.lang = lang;
-    recog.interimResults = false;
-    recog.continuous = false;
+    recog.interimResults = false; // stačia finálne výsledky
+    recog.continuous = true;      // nech beží dlhšie, nie len 1 vetu
 
-    recog.onresult = (event: any) => {
+    recog.onresult = (event: SpeechRecognitionEvent) => {
       const text = Array.from(event.results)
-        .map((r: any) => r[0]?.transcript ?? "")
-        .join(" ")
-        .trim();
+        .map((r) => r[0].transcript)
+        .join(" ");
+      if (onText) onText(text);
+    };
 
-      console.log("[STT] onresult:", text);
-      if (text && callbackRef.current) {
-        callbackRef.current(text);
-      }
+    recog.onstart = () => {
+      setIsListening(true);
     };
 
     recog.onend = () => {
-      console.log("[STT] onend");
+      // Chrome rád ukončí session po krátkej pauze
       setIsListening(false);
+      if (shouldListenRef.current) {
+        try {
+          recog.start(); // reštartujeme, pokiaľ je toggle stále zapnutý
+        } catch {
+          shouldListenRef.current = false;
+        }
+      }
     };
 
-    recog.onerror = (ev: any) => {
-      console.error("[STT] error:", ev);
+    recog.onerror = () => {
+      shouldListenRef.current = false;
       setIsListening(false);
     };
 
     recognitionRef.current = recog;
-    setIsSupported(true);
-    console.log("[STT] SpeechRecognition inicializovaná");
 
     return () => {
+      shouldListenRef.current = false;
       try {
         recog.stop();
-        recog.abort();
       } catch {
         // ignore
       }
       recognitionRef.current = null;
-      console.log("[STT] cleanup");
     };
-  }, [lang]);
+  }, [lang, onText]);
 
   const toggleListening = () => {
+    if (!isSupported || !recognitionRef.current) return;
     const recog = recognitionRef.current;
-    if (!recog || !isSupported) {
-      console.warn("[STT] toggleListening – nie je podporované alebo neinicializované");
-      return;
-    }
 
-    if (isListening) {
+    if (isListening || shouldListenRef.current) {
+      // vypnúť
+      shouldListenRef.current = false;
       try {
         recog.stop();
-      } catch (e) {
-        console.error("[STT] stop error:", e);
+      } catch {
+        // ignore
       }
-      setIsListening(false);
     } else {
+      // zapnúť
+      shouldListenRef.current = true;
       try {
         recog.start();
-        console.log("[STT] start – čaká sa na povolenie mikrofónu");
-        setIsListening(true);
-      } catch (e) {
-        console.error("[STT] start error:", e);
-        setIsListening(false);
+      } catch {
+        shouldListenRef.current = false;
       }
     }
   };
 
-  return {
-    isSupported,
-    isListening,
-    toggleListening,
-  };
+  return { isSupported, isListening, toggleListening };
 }
