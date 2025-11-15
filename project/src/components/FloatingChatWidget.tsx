@@ -30,7 +30,7 @@ const FloatingChatWidget: React.FC = () => {
     setIsOpen((prev) => !prev);
   };
 
-  // scroll na spodok vždy, keď pribudne správa alebo sa otvorí widget
+  // Scroll na spodok vždy, keď pribudne správa alebo sa otvorí widget
   useEffect(() => {
     if (!isOpen) return;
     if (messagesEndRef.current) {
@@ -42,7 +42,7 @@ const FloatingChatWidget: React.FC = () => {
     const text = input.trim();
     if (!text || isSending) return;
 
-    // lokálna user správa
+    // Lokálna user správa
     const userMessage: ChatMessage = {
       id: `user-${Date.now()}`,
       role: "user",
@@ -52,7 +52,7 @@ const FloatingChatWidget: React.FC = () => {
     setMessages(nextMessages);
     setInput("");
 
-    // história pre backend
+    // História pre backend
     const nextHistory: ChatTurn[] = [
       ...history,
       { role: "user", content: text },
@@ -107,7 +107,7 @@ const FloatingChatWidget: React.FC = () => {
     }
   };
 
-  // fokús na input po otvorení
+  // Fokús na input po otvorení
   useEffect(() => {
     if (isOpen && inputRef.current) {
       inputRef.current.focus();
@@ -129,7 +129,7 @@ const FloatingChatWidget: React.FC = () => {
                 <div className="flex flex-col">
                   <span className="font-semibold text-sm">ServisAI Chat</span>
                   <span className="text-[11px] opacity-80">
-                    AI asistent pre tvoji web
+                    AI asistent pre tvoj web
                   </span>
                 </div>
               </div>
@@ -212,7 +212,7 @@ const FloatingChatWidget: React.FC = () => {
         </div>
       )}
 
-      {/* Floating bubble – POSUNUTÁ NAD reCAPTCHA */}
+      {/* Floating bubble */}
       <button
         type="button"
         onClick={handleToggle}
