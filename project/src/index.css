@@ -2,9 +2,11 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Posun reCAPTCHA badge doľava */
+/* Presun reCAPTCHA badge hore doprava */
 .grecaptcha-badge {
-  right: auto !important;
-  left: 12px !important;
-  bottom: 12px !important;
+  bottom: auto !important;
+  top: 20px !important;
+  right: 20px !important;
+  left: auto !important;
+  z-index: 9999 !important;
 }
