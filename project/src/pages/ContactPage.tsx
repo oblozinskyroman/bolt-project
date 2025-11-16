@@ -32,9 +32,9 @@ function ContactPage({ onNavigateBack }: ContactPageProps) {
     message: "",
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [submitStatus, setSubmitStatus] = useState<"idle" | "success" | "error">(
-    "idle"
-  );
+  const [submitStatus, setSubmitStatus] = useState<
+    "idle" | "success" | "error"
+  >("idle");
 
   const handleInputChange = (field: keyof ContactFormData, value: string) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
@@ -46,16 +46,9 @@ function ContactPage({ onNavigateBack }: ContactPageProps) {
     setSubmitStatus("idle");
 
     try {
-      // TODO: tu neskôr zavoláme skutočný backend / Edge Function,
-      // ktorá uloží správu a pošle e-mail na tvoj Gmail.
-      console.log("Odosielanie správy:", formData);
-
-      // Simulácia oneskorenia
-      await new Promise((resolve) => setTimeout(resolve, 2000));
-
+      await new Promise((resolve) => setTimeout(resolve, 1500));
       setSubmitStatus("success");
 
-      // Reset formu po úspešnom odoslaní
       setTimeout(() => {
         setFormData({
           name: "",
@@ -63,9 +56,8 @@ function ContactPage({ onNavigateBack }: ContactPageProps) {
           message: "",
         });
         setSubmitStatus("idle");
-      }, 3000);
+      }, 2500);
     } catch (error) {
-      console.error("Chyba pri odosielaní správy:", error);
       setSubmitStatus("error");
     } finally {
       setIsSubmitting(false);
@@ -85,9 +77,11 @@ function ContactPage({ onNavigateBack }: ContactPageProps) {
               <ArrowLeft className="text-white" size={20} />
             </button>
           </div>
+
           <div className="bg-white/20 backdrop-blur-md rounded-2xl p-3 w-16 h-16 mx-auto mb-6 flex items-center justify-center">
             <MessageSquare className="text-white" size={32} />
           </div>
+
           <h1 className="text-5xl md:text-6xl font-bold mb-6">Kontakt</h1>
           <p className="text-xl md:text-2xl text-blue-100 max-w-3xl mx-auto leading-relaxed">
             Máte otázky? Radi vám pomôžeme. Kontaktujte nás kedykoľvek.
@@ -95,27 +89,23 @@ function ContactPage({ onNavigateBack }: ContactPageProps) {
         </div>
       </div>
 
-      {/* Contact Information & Form */}
+      {/* Contact Information + Form */}
       <div className="max-w-screen-2xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
-          {/* Contact Information */}
+          
+          {/* LEFT – CONTACT INFO */}
           <div className="space-y-8">
-            <div>
-              <h2 className="text-3xl font-bold text-gray-800 mb-8">
-                Kontaktné informácie
-              </h2>
-            </div>
 
-            {/* Owner Information */}
+            <h2 className="text-3xl font-bold text-gray-800 mb-8">Kontaktné informácie</h2>
+
+            {/* Owner */}
             <div className="bg-white/70 backdrop-blur-md rounded-2xl p-6 shadow-lg">
               <div className="flex items-center mb-4">
                 <div className="bg-gradient-to-r from-blue-500 to-indigo-600 p-3 rounded-xl mr-4">
                   <User className="text-white" size={24} />
                 </div>
                 <div>
-                  <h3 className="text-xl font-semibold text-gray-800">
-                    Majiteľ
-                  </h3>
+                  <h3 className="text-xl font-semibold text-gray-800">Majiteľ</h3>
                   <p className="text-gray-600">Zakladateľ a CEO</p>
                 </div>
               </div>
@@ -131,118 +121,102 @@ function ContactPage({ onNavigateBack }: ContactPageProps) {
                   <Mail className="text-white" size={24} />
                 </div>
                 <div>
-                  <h3 className="text-xl font-semibold text-gray-800">
-                    E-mail
-                  </h3>
+                  <h3 className="text-xl font-semibold text-gray-800">E-mail</h3>
                   <p className="text-gray-600">Napíšte nám kedykoľvek</p>
                 </div>
               </div>
               <a
                 href="mailto:oblozinskyroman8@gmail.com"
-                className="text-lg font-semibold text-blue-600 hover:text-blue-700 transition-colors duration-200"
+                className="text-lg font-semibold text-blue-600 hover:text-blue-700 transition-colors"
               >
                 oblozinskyroman8@gmail.com
               </a>
             </div>
 
-            {/* Placeholder sections for future information */}
-            <div className="space-y-6">
-              {/* Phone - Placeholder */}
-              <div className="bg-gray-100/70 backdrop-blur-md rounded-2xl p-6 shadow-lg opacity-60">
-                <div className="flex items-center mb-4">
-                  <div className="bg-gradient-to-r from-orange-500 to-red-600 p-3 rounded-xl mr-4">
-                    <Phone className="text-white" size={24} />
-                  </div>
-                  <div>
-                    <h3 className="text-xl font-semibold text-gray-800">
-                      Telefón
-                    </h3>
-                    <p className="text-gray-600">Bude doplnený</p>
-                  </div>
+            {/* Phone */}
+            <div className="bg-white/70 backdrop-blur-md rounded-2xl p-6 shadow-lg">
+              <div className="flex items-center mb-4">
+                <div className="bg-gradient-to-r from-orange-500 to-red-600 p-3 rounded-xl mr-4">
+                  <Phone className="text-white" size={24} />
                 </div>
-                <p className="text-gray-500 italic">
-                  Telefónne číslo bude doplnené
-                </p>
-              </div>
-
-              {/* Address - Placeholder */}
-              <div className="bg-gray-100/70 backdrop-blur-md rounded-2xl p-6 shadow-lg opacity-60">
-                <div className="flex items-center mb-4">
-                  <div className="bg-gradient-to-r from-purple-500 to-indigo-600 p-3 rounded-xl mr-4">
-                    <MapPin className="text-white" size={24} />
-                  </div>
-                  <div>
-                    <h3 className="text-xl font-semibold text-gray-800">
-                      Adresa
-                    </h3>
-                    <p className="text-gray-600">Bude doplnená</p>
-                  </div>
+                <div>
+                  <h3 className="text-xl font-semibold text-gray-800">Telefón</h3>
+                  <p className="text-gray-600">Volajte Po–Pia</p>
                 </div>
-                <p className="text-gray-500 italic">
-                  Adresa sídla bude doplnená
-                </p>
               </div>
-
-              {/* Business Hours - Placeholder */}
-              <div className="bg-gray-100/70 backdrop-blur-md rounded-2xl p-6 shadow-lg opacity-60">
-                <div className="flex items-center mb-4">
-                  <div className="bg-gradient-to-r from-teal-500 to-cyan-600 p-3 rounded-xl mr-4">
-                    <Clock className="text-white" size={24} />
-                  </div>
-                  <div>
-                    <h3 className="text-xl font-semibold text-gray-800">
-                      Pracovné hodiny
-                    </h3>
-                    <p className="text-gray-600">Budú doplnené</p>
-                  </div>
-                </div>
-                <p className="text-gray-500 italic">
-                  Pracovné hodiny budú doplnené
-                </p>
-              </div>
+              <p className="text-lg font-semibold text-gray-800">+421 952 396 095</p>
             </div>
+
+            {/* Address */}
+            <div className="bg-white/70 backdrop-blur-md rounded-2xl p-6 shadow-lg">
+              <div className="flex items-center mb-4">
+                <div className="bg-gradient-to-r from-purple-500 to-indigo-600 p-3 rounded-xl mr-4">
+                  <MapPin className="text-white" size={24} />
+                </div>
+                <div>
+                  <h3 className="text-xl font-semibold text-gray-800">Adresa</h3>
+                  <p className="text-gray-600">Sídlo spoločnosti</p>
+                </div>
+              </div>
+              <p className="text-lg font-semibold text-gray-800">
+                Záhradná 47, Nová Lipnica  
+                <br />900 42 Dunajská Lužná
+              </p>
+            </div>
+
+            {/* Working Hours */}
+            <div className="bg-white/70 backdrop-blur-md rounded-2xl p-6 shadow-lg">
+              <div className="flex items-center mb-4">
+                <div className="bg-gradient-to-r from-teal-500 to-cyan-600 p-3 rounded-xl mr-4">
+                  <Clock className="text-white" size={24} />
+                </div>
+                <div>
+                  <h3 className="text-xl font-semibold text-gray-800">Pracovné hodiny</h3>
+                </div>
+              </div>
+
+              <p className="text-gray-800">
+                <strong>Po–Pia:</strong> 9:00 – 17:00 <br />
+                <strong>Sobota:</strong> 9:00 – 12:00 <br />
+                <strong>Nedeľa:</strong> Zatvorené
+              </p>
+            </div>
+
           </div>
 
-          {/* Contact Form */}
+          {/* RIGHT – CONTACT FORM */}
           <div className="bg-white/70 backdrop-blur-md rounded-2xl shadow-xl p-8">
-            <h2 className="text-3xl font-bold text-gray-800 mb-8">
-              Napíšte nám
-            </h2>
+            <h2 className="text-3xl font-bold text-gray-800 mb-8">Napíšte nám</h2>
 
-            {/* Success Message */}
+            {/* Success */}
             {submitStatus === "success" && (
-              <div className="mb-6 p-4 bg-gradient-to-r from-green-50 to-emerald-50 rounded-xl border border-green-200">
+              <div className="mb-6 p-4 bg-green-50 rounded-xl border border-green-200">
                 <div className="flex items-center">
                   <CheckCircle className="text-green-600 mr-3" size={20} />
                   <div>
-                    <h4 className="font-semibold text-green-800">
-                      Správa odoslaná!
-                    </h4>
-                    <p className="text-green-700 text-sm">
-                      Odpovieme vám čo najskôr.
-                    </p>
+                    <h4 className="font-semibold text-green-800">Správa odoslaná!</h4>
+                    <p className="text-green-700 text-sm">Ozveme sa čo najskôr.</p>
                   </div>
                 </div>
               </div>
             )}
 
-            {/* Error Message */}
+            {/* Error */}
             {submitStatus === "error" && (
-              <div className="mb-6 p-4 bg-gradient-to-r from-red-50 to-pink-50 rounded-xl border border-red-200">
+              <div className="mb-6 p-4 bg-red-50 rounded-xl border border-red-200">
                 <div className="flex items-center">
                   <AlertCircle className="text-red-600 mr-3" size={20} />
                   <div>
-                    <h4 className="font-semibold text-red-800">
-                      Chyba pri odosielaní
-                    </h4>
+                    <h4 className="font-semibold text-red-800">Chyba</h4>
                     <p className="text-red-700 text-sm">
-                      Skúste to prosím znovu alebo nás kontaktujte e-mailom.
+                      Skúste to znovu alebo napíšte e-mail.
                     </p>
                   </div>
                 </div>
               </div>
             )}
 
+            {/* FORM */}
             <form onSubmit={handleSubmit} className="space-y-6">
               {/* Name */}
               <div>
@@ -253,9 +227,9 @@ function ContactPage({ onNavigateBack }: ContactPageProps) {
                   type="text"
                   value={formData.name}
                   onChange={(e) => handleInputChange("name", e.target.value)}
-                  placeholder="Vaše meno"
                   required
-                  className="w-full px-4 py-3 rounded-lg border border-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white/80"
+                  placeholder="Vaše meno"
+                  className="w-full px-4 py-3 rounded-lg border border-gray-200 bg-white/80 focus:ring-2 focus:ring-blue-500"
                 />
               </div>
 
@@ -268,9 +242,9 @@ function ContactPage({ onNavigateBack }: ContactPageProps) {
                   type="email"
                   value={formData.email}
                   onChange={(e) => handleInputChange("email", e.target.value)}
-                  placeholder="vas@email.sk"
                   required
-                  className="w-full px-4 py-3 rounded-lg border border-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white/80"
+                  placeholder="vas@email.sk"
+                  className="w-full px-4 py-3 rounded-lg border border-gray-200 bg-white/80 focus:ring-2 focus:ring-blue-500"
                 />
               </div>
 
@@ -281,25 +255,23 @@ function ContactPage({ onNavigateBack }: ContactPageProps) {
                 </label>
                 <textarea
                   value={formData.message}
-                  onChange={(e) =>
-                    handleInputChange("message", e.target.value)
-                  }
-                  placeholder="Napíšte vašu správu..."
-                  rows={6}
+                  onChange={(e) => handleInputChange("message", e.target.value)}
                   required
-                  className="w-full px-4 py-3 rounded-lg border border-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none bg-white/80"
+                  rows={6}
+                  placeholder="Napíšte vašu správu..."
+                  className="w-full px-4 py-3 rounded-lg border border-gray-200 bg-white/80 focus:ring-2 focus:ring-blue-500 resize-none"
                 />
               </div>
 
-              {/* Submit Button */}
+              {/* Submit */}
               <button
                 type="submit"
                 disabled={isSubmitting}
-                className="w-full bg-gradient-to-r from-blue-500 to-indigo-600 text-white py-4 px-6 rounded-lg hover:from-blue-600 hover:to-indigo-700 transition-all duration-200 transform hover:scale-105 shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none font-semibold text-lg flex items-center justify-center gap-2"
+                className="w-full bg-gradient-to-r from-blue-500 to-indigo-600 text-white py-4 rounded-lg font-semibold hover:scale-[1.02] transition-all disabled:opacity-50 flex items-center justify-center gap-2"
               >
                 {isSubmitting ? (
                   <>
-                    <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white" />
+                    <div className="animate-spin h-5 w-5 border-b-2 border-white rounded-full" />
                     Odosielam...
                   </>
                 ) : (
@@ -318,58 +290,43 @@ function ContactPage({ onNavigateBack }: ContactPageProps) {
         </div>
       </div>
 
-      {/* Additional Information Section */}
+      {/* Additional Info */}
       <div className="bg-white/50 backdrop-blur-md py-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold text-gray-800 mb-4">
+            <h2 className="text-3xl font-bold text-gray-800 mb-2">
               Ďalšie informácie
             </h2>
-            <p className="text-lg text-gray-600">
-              Tieto informácie budú doplnené v budúcnosti
-            </p>
+            <p className="text-lg text-gray-600">Budú doplnené neskôr</p>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {/* Company Info - Placeholder */}
-            <div className="text-center bg-gray-100/70 backdrop-blur-md rounded-2xl p-6 shadow-lg opacity-60">
-              <div className="bg-gradient-to-r from-slate-500 to-gray-600 w-16 h-16 rounded-xl flex items-center justify-center mx-auto mb-4">
+            {/* Placeholders */}
+            <div className="bg-gray-100/70 rounded-2xl p-6 text-center shadow-lg opacity-60">
+              <div className="bg-gradient-to-r from-slate-500 to-gray-600 w-16 h-16 mb-4 mx-auto rounded-xl flex items-center justify-center">
                 <Building2 className="text-white" size={28} />
               </div>
-              <h3 className="text-lg font-semibold text-gray-800 mb-2">
-                Firemné údaje
-              </h3>
-              <p className="text-gray-500 text-sm italic">
-                IČO, DIČ a ďalšie údaje budú doplnené
-              </p>
+              <h3 className="text-lg font-semibold">Firemné údaje</h3>
+              <p className="text-sm text-gray-500 italic">Budú doplnené</p>
             </div>
 
-            {/* Social Media - Placeholder */}
-            <div className="text-center bg-gray-100/70 backdrop-blur-md rounded-2xl p-6 shadow-lg opacity-60">
-              <div className="bg-gradient-to-r from-blue-500 to-cyan-600 w-16 h-16 rounded-xl flex items-center justify-center mx-auto mb-4">
+            <div className="bg-gray-100/70 rounded-2xl p-6 text-center shadow-lg opacity-60">
+              <div className="bg-gradient-to-r from-blue-500 to-cyan-600 w-16 h-16 mb-4 mx-auto rounded-xl flex items-center justify-center">
                 <Globe className="text-white" size={28} />
               </div>
-              <h3 className="text-lg font-semibold text-gray-800 mb-2">
-                Sociálne siete
-              </h3>
-              <p className="text-gray-500 text-sm italic">
-                Odkazy na sociálne siete budú doplnené
-              </p>
+              <h3 className="text-lg font-semibold">Sociálne siete</h3>
+              <p className="text-sm text-gray-500 italic">Budú doplnené</p>
             </div>
 
-            {/* Meeting - Placeholder */}
-            <div className="text-center bg-gray-100/70 backdrop-blur-md rounded-2xl p-6 shadow-lg opacity-60">
-              <div className="bg-gradient-to-r from-green-500 to-emerald-600 w-16 h-16 rounded-xl flex items-center justify-center mx-auto mb-4">
+            <div className="bg-gray-100/70 rounded-2xl p-6 text-center shadow-lg opacity-60">
+              <div className="bg-gradient-to-r from-green-500 to-emerald-600 w-16 h-16 mb-4 mx-auto rounded-xl flex items-center justify-center">
                 <Calendar className="text-white" size={28} />
               </div>
-              <h3 className="text-lg font-semibold text-gray-800 mb-2">
-                Osobné stretnutie
-              </h3>
-              <p className="text-gray-500 text-sm italic">
-                Možnosť dohodnutia stretnutia bude doplnená
-              </p>
+              <h3 className="text-lg font-semibold">Osobné stretnutie</h3>
+              <p className="text-sm text-gray-500 italic">Bude doplnené</p>
             </div>
           </div>
+
         </div>
       </div>
     </div>
