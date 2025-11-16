@@ -952,7 +952,7 @@ function App() {
           </>
         )}
 
-        {/* Pôvodné stránky */}
+        {/* Pôvodné stránky – nechávame, aby build nepadal a aby si ich vedel používať ďalej */}
         {currentPage === "companyList" && (
           <CompanyListPage
             selectedService={selectedService}
@@ -1018,7 +1018,7 @@ function App() {
           <UseCaseEshopPage onNavigateBack={navigateToHome} />
         )}
         {currentPage === "useService" && (
-          <UseCaseServicePage onNavigateToHome={navigateToHome} />
+          <UseCaseServicePage onNavigateBack={navigateToHome} />
         )}
         {currentPage === "useForms" && (
           <UseCaseFormsPage onNavigateBack={navigateToHome} />
