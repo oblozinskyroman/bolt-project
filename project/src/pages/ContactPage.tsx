@@ -403,7 +403,7 @@ function ContactPage({ onNavigateBack }: ContactPageProps) {
                 Osobné stretnutie
               </h3>
               <p className="text-gray-500 text-sm italic">
-                Možnosť dohodnutia stretnutia bude doplnená
+                Možnosť dohodnutia stretnutia bude doplnena
               </p>
             </div>
           </div>
