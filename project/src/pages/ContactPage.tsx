@@ -270,83 +270,81 @@ function ContactPage({ onNavigateBack }: ContactPageProps) {
             )}
 
             <form
-              name="contact"
-              data-netlify="true"
-              onSubmit={handleSubmit}
-              className="space-y-6"
-            >
-              {/* skrytý input pre Netlify Forms */}
-              <input type="hidden" name="form-name" value="contact" />
+  name="contact"
+  method="POST"
+  data-netlify="true"
+  onSubmit={handleSubmit}
+  className="space-y-6"
+>
+  <input type="hidden" name="form-name" value="contact" />
 
-              {/* Name */}
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Meno *
-                </label>
-                <input
-                  type="text"
-                  name="name"
-                  value={formData.name}
-                  onChange={(e) => handleInputChange("name", e.target.value)}
-                  placeholder="Vaše meno"
-                  required
-                  className="w-full px-4 py-3 rounded-lg border border-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white/80"
-                />
-              </div>
+  {/* Name */}
+  <div>
+    <label className="block text-sm font-medium text-gray-700 mb-2">
+      Meno *
+    </label>
+    <input
+      type="text"
+      name="name"
+      value={formData.name}
+      onChange={(e) => handleInputChange("name", e.target.value)}
+      placeholder="Vaše meno"
+      required
+      className="w-full px-4 py-3 rounded-lg border border-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white/80"
+    />
+  </div>
 
-              {/* Email */}
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  E-mail *
-                </label>
-                <input
-                  type="email"
-                  name="email"
-                  value={formData.email}
-                  onChange={(e) => handleInputChange("email", e.target.value)}
-                  placeholder="vas@email.sk"
-                  required
-                  className="w-full px-4 py-3 rounded-lg border border-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white/80"
-                />
-              </div>
+  {/* Email */}
+  <div>
+    <label className="block text-sm font-medium text-gray-700 mb-2">
+      E-mail *
+    </label>
+    <input
+      type="email"
+      name="email"
+      value={formData.email}
+      onChange={(e) => handleInputChange("email", e.target.value)}
+      placeholder="vas@email.sk"
+      required
+      className="w-full px-4 py-3 rounded-lg border border-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white/80"
+    />
+  </div>
 
-              {/* Message */}
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Správa *
-                </label>
-                <textarea
-                  name="message"
-                  value={formData.message}
-                  onChange={(e) =>
-                    handleInputChange("message", e.target.value)
-                  }
-                  placeholder="Napíšte vašu správu..."
-                  rows={6}
-                  required
-                  className="w-full px-4 py-3 rounded-lg border border-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none bg-white/80"
-                />
-              </div>
+  {/* Message */}
+  <div>
+    <label className="block text-sm font-medium text-gray-700 mb-2">
+      Správa *
+    </label>
+    <textarea
+      name="message"
+      value={formData.message}
+      onChange={(e) => handleInputChange("message", e.target.value)}
+      placeholder="Napíšte vašu správu..."
+      rows={6}
+      required
+      className="w-full px-4 py-3 rounded-lg border border-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none bg-white/80"
+    />
+  </div>
 
-              {/* Submit Button */}
-              <button
-                type="submit"
-                disabled={isSubmitting}
-                className="w-full bg-gradient-to-r from-blue-500 to-indigo-600 text-white py-4 px-6 rounded-lg hover:from-blue-600 hover:to-indigo-700 transition-all duration-200 transform hover:scale-105 shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none font-semibold text-lg flex items-center justify-center gap-2"
-              >
-                {isSubmitting ? (
-                  <>
-                    <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white" />
-                    Odosielam...
-                  </>
-                ) : (
-                  <>
-                    <Send size={20} />
-                    Odoslať správu
-                  </>
-                )}
-              </button>
-            </form>
+  <button
+    type="submit"
+    disabled={isSubmitting}
+    className="w-full bg-gradient-to-r from-blue-500 to-indigo-600 text-white py-4 px-6 rounded-lg hover:from-blue-600 hover:to-indigo-700 transition-all duration-200 transform hover:scale-105 shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none font-semibold text-lg flex items-center justify-center gap-2"
+  >
+    {isSubmitting ? (
+      <>
+        <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white" />
+        Odosielam...
+      </>
+    ) : (
+      <>
+        <Send size={20} />
+        Odoslať správu
+      </>
+    )}
+  </button>
+</form>
+
 
             <div className="mt-6 text-center">
               <p className="text-sm text-gray-500">* Povinné polia</p>
@@ -403,7 +401,7 @@ function ContactPage({ onNavigateBack }: ContactPageProps) {
                 Osobné stretnutie
               </h3>
               <p className="text-gray-500 text-sm italic">
-                Možnosť dohodnutia stretnutia bude doplnena
+                Možnosť dohodnutia stretnutia bude doplnená
               </p>
             </div>
           </div>
