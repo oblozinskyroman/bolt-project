@@ -3,7 +3,6 @@
 const BASE = import.meta.env.VITE_SUPABASE_URL;
 const URL = `${BASE}/functions/v1/ai-assistant`;
 
-// čo si ukladáme do histórie chatu
 export type ChatTurn = {
   role: "user" | "assistant" | "system";
   content: string;
@@ -15,15 +14,15 @@ export type AskMeta = {
   userLocation?: string;
   coords?: { lat: number; lng: number } | null;
   filters?: string[];
-  // necháme si priestor na ďalšie veci
-  [key: string]: any;
 };
 
-export type AskResult = {
-  reply: string;
-  cards: any[];
+type RawResponse = {
+  ok?: boolean;
+  answer?: string;
+  cards?: any[];
   intent?: any;
-  meta: Record<string, any>;
+  meta?: any;
+  error?: string;
 };
 
 export async function askAI(
@@ -31,38 +30,40 @@ export async function askAI(
   history: ChatTurn[] = [],
   temperature = 0.7,
   meta: AskMeta = {}
-): Promise<AskResult> {
+) {
   const res = await fetch(URL, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
     },
+    // dôležité: posielame prompt + history + temperature + meta
     body: JSON.stringify({
-      prompt,
+      message: prompt,
       history,
       temperature,
       meta,
     }),
   });
 
-  let data: any = null;
+  let data: RawResponse | null = null;
   try {
-    data = await res.json();
+    data = (await res.json()) as RawResponse;
   } catch {
-    // nič – chybu ošetríme nižšie
+    // necháme data = null, nižšie to ošetríme
   }
 
-  // chytáme HTTP chybu aj ok:false z funkcie
+  // ak padne HTTP alebo funkcia vráti ok:false
   if (!res.ok || data?.ok === false) {
     const msg =
-      data?.error || data?.message || `AI request failed (${res.status})`;
+      data?.error ||
+      `AI request failed (${res.status} ${res.statusText || ""})`.trim();
     throw new Error(msg);
   }
 
   return {
     reply: data?.answer ?? "",
-    cards: Array.isArray(data?.cards) ? data.cards : [],
-    intent: data?.intent ?? undefined,
+    cards: data?.cards ?? [],
+    intent: data?.intent,
     meta: data?.meta ?? {},
   };
 }
