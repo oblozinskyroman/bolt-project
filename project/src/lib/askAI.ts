@@ -3,29 +3,45 @@
 const BASE = import.meta.env.VITE_SUPABASE_URL;
 const URL = `${BASE}/functions/v1/ai-assistant`;
 
-type ChatMessage = {
+// čo si ukladáme do histórie chatu
+export type ChatTurn = {
   role: "user" | "assistant" | "system";
   content: string;
 };
 
 export type AskMeta = {
-  history?: ChatMessage[];
-  temperature?: number;
-  // prípadne ďalšie polia, ktoré budeš chcieť posielať
+  page?: number;
+  limit?: number;
+  userLocation?: string;
+  coords?: { lat: number; lng: number } | null;
+  filters?: string[];
+  // necháme si priestor na ďalšie veci
   [key: string]: any;
 };
 
-export async function askAI(prompt: string, meta: AskMeta = {}) {
+export type AskResult = {
+  reply: string;
+  cards: any[];
+  intent?: any;
+  meta: Record<string, any>;
+};
+
+export async function askAI(
+  prompt: string,
+  history: ChatTurn[] = [],
+  temperature = 0.7,
+  meta: AskMeta = {}
+): Promise<AskResult> {
   const res = await fetch(URL, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
     },
-    // dôležité: meta rozpustíme na root úroveň,
-    // aby sa do Edge Function dostali history, temperature atď.
     body: JSON.stringify({
       prompt,
-      ...meta,
+      history,
+      temperature,
+      meta,
     }),
   });
 
@@ -33,18 +49,20 @@ export async function askAI(prompt: string, meta: AskMeta = {}) {
   try {
     data = await res.json();
   } catch {
-    // necháme data = null, nižšie to ošetríme
+    // nič – chybu ošetríme nižšie
   }
 
-  // kontrolujeme HTTP chybu aj ok:false z funkcie
+  // chytáme HTTP chybu aj ok:false z funkcie
   if (!res.ok || data?.ok === false) {
     const msg =
-      data?.error || `AI request failed (${res.status})`;
+      data?.error || data?.message || `AI request failed (${res.status})`;
     throw new Error(msg);
   }
 
   return {
     reply: data?.answer ?? "",
+    cards: Array.isArray(data?.cards) ? data.cards : [],
+    intent: data?.intent ?? undefined,
     meta: data?.meta ?? {},
   };
 }
