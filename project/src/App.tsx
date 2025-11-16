@@ -11,6 +11,15 @@ import MyAccountPage from "./pages/MyAccountPage";
 import MyOrdersPage from "./pages/MyOrdersPage";
 import PaymentSuccessPage from "./pages/PaymentSuccessPage";
 import PaymentCancelPage from "./pages/PaymentCancelPage";
+
+// NOVÉ use-case stránky
+import UseCaseReservationsPage from "./pages/UseCaseReservationsPage";
+import UseCaseSupportPage from "./pages/UseCaseSupportPage";
+import UseCaseEshopPage from "./pages/UseCaseEshopPage";
+import UseCaseServicePage from "./pages/UseCaseServicePage";
+import UseCaseFormsPage from "./pages/UseCaseFormsPage";
+import UseCaseInternalPage from "./pages/UseCaseInternalPage";
+
 import CookieConsentBanner from "./components/CookieConsentBanner";
 import FloatingChatWidget from "./components/FloatingChatWidget";
 
@@ -129,7 +138,14 @@ type PageId =
   | "myAccount"
   | "myOrders"
   | "paymentSuccess"
-  | "paymentCancel";
+  | "paymentCancel"
+  // nové use-case podstránky
+  | "useReservations"
+  | "useSupport"
+  | "useEshop"
+  | "useService"
+  | "useForms"
+  | "useInternal";
 
 const ALL_PAGES: PageId[] = [
   "home",
@@ -145,6 +161,12 @@ const ALL_PAGES: PageId[] = [
   "myOrders",
   "paymentSuccess",
   "paymentCancel",
+  "useReservations",
+  "useSupport",
+  "useEshop",
+  "useService",
+  "useForms",
+  "useInternal",
 ];
 
 function getPageFromHash(): PageId {
@@ -156,7 +178,9 @@ function getPageFromHash(): PageId {
 function App() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [currentPage, setCurrentPage] = useState<PageId>(getPageFromHash);
-  const [selectedService, setSelectedService] = useState<string>("");
+
+  // pre CompanyListPage – nechávame, aj keď ho už nevoláš z use-cases
+  const [selectedService] = useState<string>("");
   const [selectedCompanyId, setSelectedCompanyId] = useState<string | null>(
     null
   );
@@ -255,15 +279,15 @@ function App() {
   }, []);
 
   // Navigácia + hash
-  const goTo = (page: PageId) => {
+  const goTo = (pageId: PageId) => {
     if (typeof window !== "undefined") {
-      const hash = page === "home" ? "" : `#${page}`;
+      const hash = pageId === "home" ? "" : `#${pageId}`;
       if (window.location.hash !== hash) {
         window.location.hash = hash;
         return;
       }
     }
-    setCurrentPage(page);
+    setCurrentPage(pageId);
   };
 
   // localStorage – preferovaná lokalita
@@ -281,15 +305,17 @@ function App() {
     return () => clearTimeout(t);
   }, [userLocation]);
 
-  // Use-cases pre AI asistenta
+  // Use-cases pre AI asistenta – teraz majú ID stránok
   const useCases = [
     {
+      id: "useReservations" as PageId,
       name: "Rezervácie a objednávky",
       icon: Calendar,
       color: "from-blue-500 to-indigo-600",
       description: "Prijímanie rezervácií, termínov a dopytov bez telefonovania.",
     },
     {
+      id: "useSupport" as PageId,
       name: "Zákaznícka podpora 24/7",
       icon: MessageCircle,
       color: "from-emerald-500 to-teal-600",
@@ -297,6 +323,7 @@ function App() {
         "Odpovede na časté otázky, otváracie hodiny, ceny a podmienky.",
     },
     {
+      id: "useEshop" as PageId,
       name: "E-shop a produkty",
       icon: Puzzle,
       color: "from-violet-500 to-purple-600",
@@ -304,12 +331,14 @@ function App() {
         "Pomoc s výberom produktu, dostupnosťou a stavom objednávky.",
     },
     {
+      id: "useService" as PageId,
       name: "Servis a reklamácie",
       icon: Shield,
       color: "from-amber-500 to-orange-600",
       description: "Zber údajov k poruche, otvorenie ticketu, základné rady.",
     },
     {
+      id: "useForms" as PageId,
       name: "Formuláre a dopyty",
       icon: Palette,
       color: "from-pink-500 to-rose-600",
@@ -317,19 +346,21 @@ function App() {
         "AI vyplní so zákazníkom všetko potrebné a odošle vám podklady.",
     },
     {
+      id: "useInternal" as PageId,
       name: "Interné otázky",
       icon: Zap,
       color: "from-slate-500 to-gray-600",
-      description: "Návody, procesy a interné know-how dostupné na pár kliknutí.",
+      description:
+        "Návody, procesy a interné know-how dostupné na pár kliknutí.",
     },
   ];
 
   const menuItems = [
-    { label: "Ako fungujeme", action: "howItWorks" },
-    { label: "Referencie", action: "references" },
-    { label: "Cenník", action: "news" },
-    { label: "Integrácia", action: "helpCenter" },
-    { label: "Kontakt", action: "contact" },
+    { label: "Ako fungujeme", action: "howItWorks" as const },
+    { label: "Referencie", action: "references" as const },
+    { label: "Cenník", action: "news" as const },
+    { label: "Integrácia", action: "helpCenter" as const },
+    { label: "Kontakt", action: "contact" as const },
   ];
   const mainMenuItems = [...menuItems];
 
@@ -452,12 +483,7 @@ function App() {
   }, [sortBy]);
 
   /* ---------- Navigácia ---------- */
-  const navigateToCompanyList = (serviceName: string) => {
-    setSelectedService(serviceName);
-    goTo("companyList");
-  };
   const navigateToHome = () => {
-    setSelectedService("");
     goTo("home");
   };
   const navigateToAddCompany = () => goTo("addCompany");
@@ -897,7 +923,7 @@ function App() {
                   return (
                     <div
                       key={index}
-                      onClick={() => navigateToCompanyList(useCase.name)}
+                      onClick={() => goTo(useCase.id)}
                       className="bg-white/70 backdrop-blur-md rounded-2xl p-6 shadow-lg hover:shadow-xl transition-all transform hover:-translate-y-2 cursor-pointer group"
                     >
                       <div
@@ -919,6 +945,7 @@ function App() {
           </>
         )}
 
+        {/* Pôvodné stránky – nechávame, aby build nepadal a aby si ich vedel používať ďalej */}
         {currentPage === "companyList" && (
           <CompanyListPage
             selectedService={selectedService}
@@ -971,6 +998,26 @@ function App() {
             onNavigateBack={navigateToHome}
             onNavigateToMyOrders={navigateToMyOrders}
           />
+        )}
+
+        {/* NOVÉ use-case podstránky */}
+        {currentPage === "useReservations" && (
+          <UseCaseReservationsPage onNavigateBack={navigateToHome} />
+        )}
+        {currentPage === "useSupport" && (
+          <UseCaseSupportPage onNavigateBack={navigateToHome} />
+        )}
+        {currentPage === "useEshop" && (
+          <UseCaseEshopPage onNavigateBack={navigateToHome} />
+        )}
+        {currentPage === "useService" && (
+          <UseCaseServicePage onNavigateBack={navigateToHome} />
+        )}
+        {currentPage === "useForms" && (
+          <UseCaseFormsPage onNavigateBack={navigateToHome} />
+        )}
+        {currentPage === "useInternal" && (
+          <UseCaseInternalPage onNavigateBack={navigateToHome} />
         )}
       </div>
 
