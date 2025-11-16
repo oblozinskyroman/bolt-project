@@ -410,12 +410,15 @@ function App() {
         ...history,
         { role: "user", content: msg },
       ];
+
       const {
         reply,
         cards: incoming,
         intent,
         meta,
-      } = await askAI(msg, nextHistory, 0.7, {
+      } = await askAI(msg, {
+        history: nextHistory,
+        temperature: 0.7,
         page: 0,
         limit,
         userLocation,
@@ -452,13 +455,17 @@ function App() {
     setIsLoading(true);
     try {
       const nextPage = page + 1;
-      const { cards: incoming, meta } = await askAI(lastQuery, history, 0.7, {
+
+      const { cards: incoming, meta } = await askAI(lastQuery, {
+        history,
+        temperature: 0.7,
         page: nextPage,
         limit,
         userLocation,
         coords,
         filters: aiActiveFilters,
       });
+
       const enriched = withDistances(incoming || []);
       const merged = [...cards, ...enriched];
       setCards(sortCards(merged, sortBy));
