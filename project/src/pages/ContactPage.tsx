@@ -25,12 +25,7 @@ interface ContactFormData {
   message: string;
 }
 
-const encode = (data: Record<string, string>) =>
-  Object.keys(data)
-    .map(
-      (key) => encodeURIComponent(key) + "=" + encodeURIComponent(data[key])
-    )
-    .join("&");
+const NETLIFY_FORM_NAME = "contact";
 
 function ContactPage({ onNavigateBack }: ContactPageProps) {
   const [formData, setFormData] = useState<ContactFormData>({
@@ -47,37 +42,44 @@ function ContactPage({ onNavigateBack }: ContactPageProps) {
     setFormData((prev) => ({ ...prev, [field]: value }));
   };
 
+  const encode = (data: Record<string, string>) =>
+    Object.keys(data)
+      .map(
+        (key) =>
+          encodeURIComponent(key) + "=" + encodeURIComponent(data[key] ?? "")
+      )
+      .join("&");
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
     setSubmitStatus("idle");
 
     try {
-      // Netlify Forms – odoslanie dát
-      await fetch("/", {
+      const body = encode({
+        "form-name": NETLIFY_FORM_NAME,
+        name: formData.name,
+        email: formData.email,
+        message: formData.message,
+      });
+
+      const resp = await fetch("/", {
         method: "POST",
         headers: { "Content-Type": "application/x-www-form-urlencoded" },
-        body: encode({
-          "form-name": "contact",
-          name: formData.name,
-          email: formData.email,
-          message: formData.message,
-        }),
+        body,
       });
+
+      if (!resp.ok) {
+        throw new Error(`Netlify form error: ${resp.status}`);
+      }
 
       setSubmitStatus("success");
 
-      // Reset formulára po úspešnom odoslaní
       setFormData({
         name: "",
         email: "",
         message: "",
       });
-
-      // necháme success správu chvíľu zobrazenú
-      setTimeout(() => {
-        setSubmitStatus("idle");
-      }, 4000);
     } catch (error) {
       console.error("Chyba pri odosielaní správy:", error);
       setSubmitStatus("error");
@@ -160,72 +162,64 @@ function ContactPage({ onNavigateBack }: ContactPageProps) {
             </div>
 
             {/* Phone */}
-            <div className="space-y-6">
-              <div className="bg-white/70 backdrop-blur-md rounded-2xl p-6 shadow-lg">
-                <div className="flex items-center mb-4">
-                  <div className="bg-gradient-to-r from-orange-500 to-red-600 p-3 rounded-xl mr-4">
-                    <Phone className="text-white" size={24} />
-                  </div>
-                  <div>
-                    <h3 className="text-xl font-semibold text-gray-800">
-                      Telefón
-                    </h3>
-                    <p className="text-gray-600">
-                      Zavolajte počas pracovných hodín
-                    </p>
-                  </div>
+            <div className="bg-white/70 backdrop-blur-md rounded-2xl p-6 shadow-lg">
+              <div className="flex items-center mb-4">
+                <div className="bg-gradient-to-r from-orange-500 to-red-600 p-3 rounded-xl mr-4">
+                  <Phone className="text-white" size={24} />
                 </div>
-                <a
-                  href="tel:+421952396095"
-                  className="text-lg font-semibold text-blue-600 hover:text-blue-700 transition-colors duration-200"
-                >
-                  +421 952 396 095
-                </a>
+                <div>
+                  <h3 className="text-xl font-semibold text-gray-800">
+                    Telefón
+                  </h3>
+                  <p className="text-gray-600">Volajte v pracovných dňoch</p>
+                </div>
               </div>
+              <a
+                href="tel:+421952396095"
+                className="text-lg font-semibold text-gray-800"
+              >
+                +421 952 396 095
+              </a>
+            </div>
 
-              {/* Address */}
-              <div className="bg-white/70 backdrop-blur-md rounded-2xl p-6 shadow-lg">
-                <div className="flex items-center mb-4">
-                  <div className="bg-gradient-to-r from-purple-500 to-indigo-600 p-3 rounded-xl mr-4">
-                    <MapPin className="text-white" size={24} />
-                  </div>
-                  <div>
-                    <h3 className="text-xl font-semibold text-gray-800">
-                      Adresa
-                    </h3>
-                    <p className="text-gray-600">Sídlo / korešpondenčná adresa</p>
-                  </div>
+            {/* Address */}
+            <div className="bg-white/70 backdrop-blur-md rounded-2xl p-6 shadow-lg">
+              <div className="flex items-center mb-4">
+                <div className="bg-gradient-to-r from-purple-500 to-indigo-600 p-3 rounded-xl mr-4">
+                  <MapPin className="text-white" size={24} />
                 </div>
-                <p className="text-gray-800">
-                  Dunajská Lužná, Záhradná 47
-                  <br />
-                  Nová Lipnica
-                  <br />
-                  900 42, Slovensko
-                </p>
+                <div>
+                  <h3 className="text-xl font-semibold text-gray-800">
+                    Adresa
+                  </h3>
+                  <p className="text-gray-600">Sídlo / korešpondenčná adresa</p>
+                </div>
               </div>
+              <p className="text-gray-800">
+                Dunajská Lužná, Záhradná 47
+                <br />
+                Nová Lipnica, 900 42
+              </p>
+            </div>
 
-              {/* Business Hours */}
-              <div className="bg-white/70 backdrop-blur-md rounded-2xl p-6 shadow-lg">
-                <div className="flex items-center mb-4">
-                  <div className="bg-gradient-to-r from-teal-500 to-cyan-600 p-3 rounded-xl mr-4">
-                    <Clock className="text-white" size={24} />
-                  </div>
-                  <div>
-                    <h3 className="text-xl font-semibold text-gray-800">
-                      Pracovné hodiny
-                    </h3>
-                    <p className="text-gray-600">
-                      Flexibilne, ale orientačne podľa nižšie
-                    </p>
-                  </div>
+            {/* Working hours */}
+            <div className="bg-white/70 backdrop-blur-md rounded-2xl p-6 shadow-lg">
+              <div className="flex items-center mb-4">
+                <div className="bg-gradient-to-r from-teal-500 to-cyan-600 p-3 rounded-xl mr-4">
+                  <Clock className="text-white" size={24} />
                 </div>
-                <ul className="text-gray-800 text-sm space-y-1">
-                  <li>Pon – Pia: 9:00 – 17:00</li>
-                  <li>Sobota: podľa dohody</li>
-                  <li>Nedeľa: zatvorené (iba urgentné správy e-mailom)</li>
-                </ul>
+                <div>
+                  <h3 className="text-xl font-semibold text-gray-800">
+                    Pracovné hodiny
+                  </h3>
+                  <p className="text-gray-600">Kedy odpovedáme najčastejšie</p>
+                </div>
               </div>
+              <p className="text-gray-800">
+                Pondelok – Piatok: 9:00 – 17:00
+                <br />
+                Sobota – Nedeľa: podľa dohody, odpoveď môže trvať dlhšie
+              </p>
             </div>
           </div>
 
@@ -270,81 +264,94 @@ function ContactPage({ onNavigateBack }: ContactPageProps) {
             )}
 
             <form
-  name="contact"
-  method="POST"
-  data-netlify="true"
-  onSubmit={handleSubmit}
-  className="space-y-6"
->
-  <input type="hidden" name="form-name" value="contact" />
+              name={NETLIFY_FORM_NAME}
+              data-netlify="true"
+              netlify-honeypot="bot-field"
+              onSubmit={handleSubmit}
+              className="space-y-6"
+            >
+              {/* Netlify hidden fields */}
+              <input
+                type="hidden"
+                name="form-name"
+                value={NETLIFY_FORM_NAME}
+              />
+              <div className="hidden">
+                <label>
+                  Nechajte prázdne:
+                  <input name="bot-field" />
+                </label>
+              </div>
 
-  {/* Name */}
-  <div>
-    <label className="block text-sm font-medium text-gray-700 mb-2">
-      Meno *
-    </label>
-    <input
-      type="text"
-      name="name"
-      value={formData.name}
-      onChange={(e) => handleInputChange("name", e.target.value)}
-      placeholder="Vaše meno"
-      required
-      className="w-full px-4 py-3 rounded-lg border border-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white/80"
-    />
-  </div>
+              {/* Name */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Meno *
+                </label>
+                <input
+                  type="text"
+                  name="name"
+                  value={formData.name}
+                  onChange={(e) => handleInputChange("name", e.target.value)}
+                  placeholder="Vaše meno"
+                  required
+                  className="w-full px-4 py-3 rounded-lg border border-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white/80"
+                />
+              </div>
 
-  {/* Email */}
-  <div>
-    <label className="block text-sm font-medium text-gray-700 mb-2">
-      E-mail *
-    </label>
-    <input
-      type="email"
-      name="email"
-      value={formData.email}
-      onChange={(e) => handleInputChange("email", e.target.value)}
-      placeholder="vas@email.sk"
-      required
-      className="w-full px-4 py-3 rounded-lg border border-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white/80"
-    />
-  </div>
+              {/* Email */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  E-mail *
+                </label>
+                <input
+                  type="email"
+                  name="email"
+                  value={formData.email}
+                  onChange={(e) => handleInputChange("email", e.target.value)}
+                  placeholder="vas@email.sk"
+                  required
+                  className="w-full px-4 py-3 rounded-lg border border-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white/80"
+                />
+              </div>
 
-  {/* Message */}
-  <div>
-    <label className="block text-sm font-medium text-gray-700 mb-2">
-      Správa *
-    </label>
-    <textarea
-      name="message"
-      value={formData.message}
-      onChange={(e) => handleInputChange("message", e.target.value)}
-      placeholder="Napíšte vašu správu..."
-      rows={6}
-      required
-      className="w-full px-4 py-3 rounded-lg border border-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none bg-white/80"
-    />
-  </div>
+              {/* Message */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Správa *
+                </label>
+                <textarea
+                  name="message"
+                  value={formData.message}
+                  onChange={(e) =>
+                    handleInputChange("message", e.target.value)
+                  }
+                  placeholder="Napíšte vašu správu..."
+                  rows={6}
+                  required
+                  className="w-full px-4 py-3 rounded-lg border border-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none bg-white/80"
+                />
+              </div>
 
-  <button
-    type="submit"
-    disabled={isSubmitting}
-    className="w-full bg-gradient-to-r from-blue-500 to-indigo-600 text-white py-4 px-6 rounded-lg hover:from-blue-600 hover:to-indigo-700 transition-all duration-200 transform hover:scale-105 shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none font-semibold text-lg flex items-center justify-center gap-2"
-  >
-    {isSubmitting ? (
-      <>
-        <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white" />
-        Odosielam...
-      </>
-    ) : (
-      <>
-        <Send size={20} />
-        Odoslať správu
-      </>
-    )}
-  </button>
-</form>
-
+              {/* Submit Button */}
+              <button
+                type="submit"
+                disabled={isSubmitting}
+                className="w-full bg-gradient-to-r from-blue-500 to-indigo-600 text-white py-4 px-6 rounded-lg hover:from-blue-600 hover:to-indigo-700 transition-all duration-200 transform hover:scale-105 shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none font-semibold text-lg flex items-center justify-center gap-2"
+              >
+                {isSubmitting ? (
+                  <>
+                    <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white" />
+                    Odosielam...
+                  </>
+                ) : (
+                  <>
+                    <Send size={20} />
+                    Odoslať správu
+                  </>
+                )}
+              </button>
+            </form>
 
             <div className="mt-6 text-center">
               <p className="text-sm text-gray-500">* Povinné polia</p>
