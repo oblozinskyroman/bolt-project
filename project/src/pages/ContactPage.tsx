@@ -265,6 +265,7 @@ function ContactPage({ onNavigateBack }: ContactPageProps) {
 
             <form
               name={NETLIFY_FORM_NAME}
+              method="POST"
               data-netlify="true"
               netlify-honeypot="bot-field"
               onSubmit={handleSubmit}
