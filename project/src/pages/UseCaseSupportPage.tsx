@@ -1,5 +1,5 @@
 import React from "react";
-import { ArrowLeft, MessageCircle, CheckCircle2, Headphones } from "lucide-react";
+import { ArrowLeft, MessageCircle, Headphones } from "lucide-react";
 
 interface UseCasePageProps {
   onNavigateBack: () => void;
@@ -29,8 +29,8 @@ const UseCaseSupportPage: React.FC<UseCasePageProps> = ({ onNavigateBack }) => {
                 Zákaznícka podpora 24/7
               </h1>
               <p className="text-gray-600 text-sm md:text-base">
-                AI, ktorá pozná tvoje služby, dokumenty a podmienky. Odpovedá nonstop,
-                okamžite a vždy rovnako presne.
+                AI, ktorá pozná tvoje služby, dokumenty a podmienky. Odpovedá
+                nonstop, okamžite a vždy rovnako presne.
               </p>
             </div>
           </div>
@@ -40,8 +40,8 @@ const UseCaseSupportPage: React.FC<UseCasePageProps> = ({ onNavigateBack }) => {
               Ideálne pre:
             </p>
             <p className="text-sm text-emerald-900">
-              E-shopy, salóny, služby, servisy, poradne, reštaurácie – všade tam,
-              kde sa opakujú tie isté otázky.
+              E-shopy, salóny, služby, servisy, poradne, reštaurácie – všade
+              tam, kde sa opakujú tie isté otázky.
             </p>
           </div>
         </div>
@@ -75,7 +75,9 @@ const UseCaseSupportPage: React.FC<UseCasePageProps> = ({ onNavigateBack }) => {
 
             <div className="space-y-3 text-sm">
               <div>
-                <p className="text-xs uppercase text-gray-500 mb-1">Zákazník</p>
+                <p className="text-xs uppercase text-gray-500 mb-1">
+                  Zákazník
+                </p>
                 <div className="rounded-xl bg-gray-100 px-4 py-2 inline-block">
                   Máte dnes otvorené? A robíte aj cez víkend?
                 </div>
@@ -86,13 +88,15 @@ const UseCaseSupportPage: React.FC<UseCasePageProps> = ({ onNavigateBack }) => {
                   ServisAI asistent
                 </p>
                 <div className="rounded-xl bg-emerald-500/10 border border-emerald-400/30 px-4 py-2 inline-block">
-                  Áno, dnes sme otvorení do 18:00.  
-                  Cez víkend je prevádzka otvorená len v sobotu do 12:00.
+                  Áno, dnes sme otvorení do 18:00. Cez víkend je prevádzka
+                  otvorená len v sobotu do 12:00.
                 </div>
               </div>
 
               <div>
-                <p className="text-xs uppercase text-gray-500 mb-1">Zákazník</p>
+                <p className="text-xs uppercase text-gray-500 mb-1">
+                  Zákazník
+                </p>
                 <div className="rounded-xl bg-gray-100 px-4 py-2 inline-block">
                   A koľko stojí diagnostika problému?
                 </div>
@@ -103,8 +107,8 @@ const UseCaseSupportPage: React.FC<UseCasePageProps> = ({ onNavigateBack }) => {
                   ServisAI asistent
                 </p>
                 <div className="rounded-xl bg-emerald-500/10 border border-emerald-400/30 px-4 py-2 inline-block">
-                  Základná diagnostika stojí 15 €.  
-                  Ak necháte produkt u nás na opravu, diagnostika je zadarmo.
+                  Základná diagnostika stojí 15 €. Ak necháte produkt u nás na
+                  opravu, diagnostika je zadarmo.
                 </div>
               </div>
             </div>
@@ -115,9 +119,9 @@ const UseCaseSupportPage: React.FC<UseCasePageProps> = ({ onNavigateBack }) => {
             <h2 className="text-lg font-semibold mb-3">Prečo je to efektívne</h2>
             <p className="text-sm text-slate-300 leading-relaxed">
               Zákazníci nechcú čakať na odpoveď v e-maile ani telefonovať.
-              Chcú rýchlu, jasnú odpoveď, bez omáčok.  
-              ServisAI odpovedá do 1 sekundy, vždy presne podľa vašich
-              podkladov a nikdy nezabudne informáciu alebo pravidlo.
+              Chcú rýchlu, jasnú odpoveď, bez omáčok. ServisAI odpovedá do 1
+              sekundy, vždy presne podľa vašich podkladov a nikdy nezabudne
+              informáciu alebo pravidlo.
             </p>
           </section>
         </div>
@@ -158,13 +162,13 @@ const UseCaseSupportPage: React.FC<UseCasePageProps> = ({ onNavigateBack }) => {
               Na základe tvojich textov vytvoríme hotového asistenta, ktorý
               odpovedá presne podľa tvojej značky.
             </p>
-            <button
-              onClick={onNavigateBack}
+            <a
+              href="#contact"
               className="inline-flex items-center justify-center gap-2 px-4 py-2 rounded-xl bg-white text-emerald-700 text-sm font-semibold hover:bg-emerald-50 transition-colors"
             >
               <Headphones className="w-4 h-4" />
               Dohodnúť konzultáciu
-            </button>
+            </a>
           </section>
         </div>
       </div>
