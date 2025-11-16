@@ -32,9 +32,9 @@ function ContactPage({ onNavigateBack }: ContactPageProps) {
     message: "",
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [submitStatus, setSubmitStatus] = useState<
-    "idle" | "success" | "error"
-  >("idle");
+  const [submitStatus, setSubmitStatus] = useState<"idle" | "success" | "error">(
+    "idle"
+  );
 
   const handleInputChange = (field: keyof ContactFormData, value: string) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
@@ -46,7 +46,8 @@ function ContactPage({ onNavigateBack }: ContactPageProps) {
     setSubmitStatus("idle");
 
     try {
-      // TODO: Implement actual form submission
+      // TODO: tu neskôr zavoláme skutočný backend / Edge Function,
+      // ktorá uloží správu a pošle e-mail na tvoj Gmail.
       console.log("Odosielanie správy:", formData);
 
       // Simulácia oneskorenia
@@ -137,10 +138,10 @@ function ContactPage({ onNavigateBack }: ContactPageProps) {
                 </div>
               </div>
               <a
-                href="mailto:info@zrovnaj.sk"
+                href="mailto:oblozinskyroman8@gmail.com"
                 className="text-lg font-semibold text-blue-600 hover:text-blue-700 transition-colors duration-200"
               >
-                info@zrovnaj.sk
+                oblozinskyroman8@gmail.com
               </a>
             </div>
 
@@ -177,7 +178,9 @@ function ContactPage({ onNavigateBack }: ContactPageProps) {
                     <p className="text-gray-600">Bude doplnená</p>
                   </div>
                 </div>
-                <p className="text-gray-500 italic">Adresa sídla bude doplnená</p>
+                <p className="text-gray-500 italic">
+                  Adresa sídla bude doplnená
+                </p>
               </div>
 
               {/* Business Hours - Placeholder */}
