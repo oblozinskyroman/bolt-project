@@ -25,6 +25,13 @@ interface ContactFormData {
   message: string;
 }
 
+const encode = (data: Record<string, string>) =>
+  Object.keys(data)
+    .map(
+      (key) => encodeURIComponent(key) + "=" + encodeURIComponent(data[key])
+    )
+    .join("&");
+
 function ContactPage({ onNavigateBack }: ContactPageProps) {
   const [formData, setFormData] = useState<ContactFormData>({
     name: "",
@@ -32,9 +39,9 @@ function ContactPage({ onNavigateBack }: ContactPageProps) {
     message: "",
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [submitStatus, setSubmitStatus] = useState<
-    "idle" | "success" | "error"
-  >("idle");
+  const [submitStatus, setSubmitStatus] = useState<"idle" | "success" | "error">(
+    "idle"
+  );
 
   const handleInputChange = (field: keyof ContactFormData, value: string) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
@@ -46,25 +53,31 @@ function ContactPage({ onNavigateBack }: ContactPageProps) {
     setSubmitStatus("idle");
 
     try {
-      // TU sa musí volať backend / edge function / Netlify form / čokoľvek,
-      // čo skutočne odošle email na tvoj Gmail.
-      // Zatiaľ len logujeme, aby sa nič nerozbilo.
-      console.log("Odosielanie správy:", formData);
-
-      // Simulácia oneskorenia
-      await new Promise((resolve) => setTimeout(resolve, 2000));
+      // Netlify Forms – odoslanie dát
+      await fetch("/", {
+        method: "POST",
+        headers: { "Content-Type": "application/x-www-form-urlencoded" },
+        body: encode({
+          "form-name": "contact",
+          name: formData.name,
+          email: formData.email,
+          message: formData.message,
+        }),
+      });
 
       setSubmitStatus("success");
 
-      // Reset formu po úspešnom odoslaní
+      // Reset formulára po úspešnom odoslaní
+      setFormData({
+        name: "",
+        email: "",
+        message: "",
+      });
+
+      // necháme success správu chvíľu zobrazenú
       setTimeout(() => {
-        setFormData({
-          name: "",
-          email: "",
-          message: "",
-        });
         setSubmitStatus("idle");
-      }, 3000);
+      }, 4000);
     } catch (error) {
       console.error("Chyba pri odosielaní správy:", error);
       setSubmitStatus("error");
@@ -157,14 +170,16 @@ function ContactPage({ onNavigateBack }: ContactPageProps) {
                     <h3 className="text-xl font-semibold text-gray-800">
                       Telefón
                     </h3>
-                    <p className="text-gray-600">Volajte v pracovných hodinách</p>
+                    <p className="text-gray-600">
+                      Zavolajte počas pracovných hodín
+                    </p>
                   </div>
                 </div>
                 <a
                   href="tel:+421952396095"
-                  className="text-lg font-semibold text-gray-800"
+                  className="text-lg font-semibold text-blue-600 hover:text-blue-700 transition-colors duration-200"
                 >
-                  +421&nbsp;952&nbsp;396&nbsp;095
+                  +421 952 396 095
                 </a>
               </div>
 
@@ -178,15 +193,15 @@ function ContactPage({ onNavigateBack }: ContactPageProps) {
                     <h3 className="text-xl font-semibold text-gray-800">
                       Adresa
                     </h3>
-                    <p className="text-gray-600">Prevádzka / korešpondenčná adresa</p>
+                    <p className="text-gray-600">Sídlo / korešpondenčná adresa</p>
                   </div>
                 </div>
-                <p className="text-gray-800 leading-relaxed">
-                  Záhradná 47, Nová Lipnica
+                <p className="text-gray-800">
+                  Dunajská Lužná, Záhradná 47
                   <br />
-                  900&nbsp;42 Dunajská Lužná
+                  Nová Lipnica
                   <br />
-                  Slovensko
+                  900 42, Slovensko
                 </p>
               </div>
 
@@ -200,20 +215,15 @@ function ContactPage({ onNavigateBack }: ContactPageProps) {
                     <h3 className="text-xl font-semibold text-gray-800">
                       Pracovné hodiny
                     </h3>
-                    <p className="text-gray-600">Môžete sa ozvať v týchto časoch</p>
+                    <p className="text-gray-600">
+                      Flexibilne, ale orientačne podľa nižšie
+                    </p>
                   </div>
                 </div>
                 <ul className="text-gray-800 text-sm space-y-1">
-                  <li>
-                    <span className="font-semibold">Pondelok – Piatok:</span>{" "}
-                    09:00 – 17:00
-                  </li>
-                  <li>
-                    <span className="font-semibold">Sobota:</span> podľa dohody
-                  </li>
-                  <li>
-                    <span className="font-semibold">Nedeľa:</span> zatvorené
-                  </li>
+                  <li>Pon – Pia: 9:00 – 17:00</li>
+                  <li>Sobota: podľa dohody</li>
+                  <li>Nedeľa: zatvorené (iba urgentné správy e-mailom)</li>
                 </ul>
               </div>
             </div>
@@ -259,7 +269,15 @@ function ContactPage({ onNavigateBack }: ContactPageProps) {
               </div>
             )}
 
-            <form onSubmit={handleSubmit} className="space-y-6">
+            <form
+              name="contact"
+              data-netlify="true"
+              onSubmit={handleSubmit}
+              className="space-y-6"
+            >
+              {/* skrytý input pre Netlify Forms */}
+              <input type="hidden" name="form-name" value="contact" />
+
               {/* Name */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -267,6 +285,7 @@ function ContactPage({ onNavigateBack }: ContactPageProps) {
                 </label>
                 <input
                   type="text"
+                  name="name"
                   value={formData.name}
                   onChange={(e) => handleInputChange("name", e.target.value)}
                   placeholder="Vaše meno"
@@ -282,6 +301,7 @@ function ContactPage({ onNavigateBack }: ContactPageProps) {
                 </label>
                 <input
                   type="email"
+                  name="email"
                   value={formData.email}
                   onChange={(e) => handleInputChange("email", e.target.value)}
                   placeholder="vas@email.sk"
@@ -296,6 +316,7 @@ function ContactPage({ onNavigateBack }: ContactPageProps) {
                   Správa *
                 </label>
                 <textarea
+                  name="message"
                   value={formData.message}
                   onChange={(e) =>
                     handleInputChange("message", e.target.value)
