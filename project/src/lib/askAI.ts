@@ -14,6 +14,7 @@ export type AskMeta = {
   userLocation?: string;
   coords?: { lat: number; lng: number } | null;
   filters?: string[];
+  site_slug?: string;     // ⭐ pridali sme sem
 };
 
 type RawResponse = {
@@ -31,28 +32,30 @@ export async function askAI(
   temperature = 0.7,
   meta: AskMeta = {}
 ) {
+  // ⭐ Keď meta neobsahuje site_slug → nastav vždy "servisai"
+  const fixedMeta = {
+    site_slug: "servisai",
+    ...meta,
+  };
+
   const res = await fetch(URL, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
     },
-    // dôležité: posielame prompt + history + temperature + meta
     body: JSON.stringify({
       message: prompt,
       history,
       temperature,
-      meta,
+      ...fixedMeta,
     }),
   });
 
   let data: RawResponse | null = null;
   try {
     data = (await res.json()) as RawResponse;
-  } catch {
-    // necháme data = null, nižšie to ošetríme
-  }
+  } catch {}
 
-  // ak padne HTTP alebo funkcia vráti ok:false
   if (!res.ok || data?.ok === false) {
     const msg =
       data?.error ||
