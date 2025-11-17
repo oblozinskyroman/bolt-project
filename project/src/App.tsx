@@ -13,6 +13,7 @@ import PaymentSuccessPage from "./pages/PaymentSuccessPage";
 import PaymentCancelPage from "./pages/PaymentCancelPage";
 
 // NOVÉ use-case stránky
+import AdminLogsPage from "./pages/AdminLogsPage";
 import UseCaseReservationsPage from "./pages/UseCaseReservationsPage";
 import UseCaseSupportPage from "./pages/UseCaseSupportPage";
 import UseCaseEshopPage from "./pages/UseCaseEshopPage";
@@ -126,7 +127,8 @@ function haversineKm(
 type SortBy = "relevance" | "rating" | "distance";
 
 type PageId =
-  | "home"
+    "adminLogs"| 
+    "home"
   | "companyList"
   | "addCompany"
   | "companyDetail"
@@ -161,6 +163,7 @@ const ALL_PAGES: PageId[] = [
   "myOrders",
   "paymentSuccess",
   "paymentCancel",
+  "adminLogs"
   "useReservations",
   "useSupport",
   "useEshop",
@@ -1005,6 +1008,11 @@ function App() {
             onNavigateBack={navigateToHome}
             onNavigateToMyOrders={navigateToMyOrders}
           />
+        )}
+
+    {/* Admin logy – skrytá stránka pre teba */}
+        {currentPage === "adminLogs" && (
+          <AdminLogsPage onNavigateBack={navigateToHome} />
         )}
 
         {/* NOVÉ use-case podstránky */}
