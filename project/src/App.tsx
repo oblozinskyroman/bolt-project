@@ -236,34 +236,27 @@ function App() {
   // Auth
   const [isLoggedIn, setIsLoggedIn] = useState(false);
 
-  useEffect(() => {
-    const checkAuth = async () => {
-      const {
-        data: { user },
-      } = await supabase.auth.getUser();
-      setIsLoggedIn(!!user);
-    };
-    checkAuth();
-
+useEffect(() => {
+  const checkAuth = async () => {
     const {
-      data: { subscription },
-    } = supabase.auth.onAuthStateChange((_event, session) => {
-      const loggedIn = !!session?.user;
-      setIsLoggedIn(loggedIn);
+      data: { user },
+    } = await supabase.auth.getUser();
+    setIsLoggedIn(!!user);
+  };
+  checkAuth();
 
-      if (!loggedIn) {
-        setSelectedCompanyId(null);
-        if (typeof window !== "undefined") {
-          window.location.hash = "";
-        }
-        setCurrentPage("home");
-      }
-    });
+  const {
+    data: { subscription },
+  } = supabase.auth.onAuthStateChange((_event, session) => {
+    const loggedIn = !!session?.user;
+    setIsLoggedIn(loggedIn);
+    // ŽIADNY redirect na home pri !loggedIn
+  });
 
-    return () => {
-      subscription.unsubscribe();
-    };
-  }, []);
+  return () => {
+    subscription.unsubscribe();
+  };
+}, []);
 
   // Hash routing
   useEffect(() => {
