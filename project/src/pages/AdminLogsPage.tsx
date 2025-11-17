@@ -1,75 +1,62 @@
 import React, { useEffect, useState } from "react";
-import { createClient } from "@supabase/supabase-js";
-import { ArrowLeft, Download, Loader2, Filter } from "lucide-react";
+import { ArrowLeft, Download, Filter } from "lucide-react";
+import { supabase } from "../lib/supabase";
 
 interface AdminLogsPageProps {
   onNavigateBack: () => void;
 }
 
-// typ z DB (prispôsobené tvojej tabuľke)
-interface AiLogRow {
+type AiLogRow = {
   id: string;
   created_at: string;
   site_slug: string;
   question: string | null;
   answer: string | null;
-  history: any | null;
   meta: any | null;
   lead_name: string | null;
   lead_email: string | null;
-}
-
-const supabaseUrl = import.meta.env.VITE_SUPABASE_URL as string;
-const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY as string;
-
-const supabase = createClient(supabaseUrl, supabaseAnonKey);
+};
 
 const AdminLogsPage: React.FC<AdminLogsPageProps> = ({ onNavigateBack }) => {
-  const [siteSlug, setSiteSlug] = useState<string>("servisai");
-  const [limit, setLimit] = useState<number>(100);
+  const [siteSlug, setSiteSlug] = useState("servisai");
+  const [limit, setLimit] = useState(100);
+  const [onlyLeads, setOnlyLeads] = useState(false);
   const [logs, setLogs] = useState<AiLogRow[]>([]);
-  const [loading, setLoading] = useState<boolean>(false);
+  const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [showOnlyLeads, setShowOnlyLeads] = useState<boolean>(false);
 
-  // načítanie logov
+  // štatistiky
+  const total = logs.length;
+  const leadsCount = logs.filter(
+    (row) => row.lead_email || row.lead_name
+  ).length;
+  const conversion =
+    total > 0 ? Math.round((leadsCount / total) * 100) : 0;
+
+  const filteredLogs = onlyLeads
+    ? logs.filter((row) => row.lead_email || row.lead_name)
+    : logs;
+
   const loadLogs = async () => {
-    setLoading(true);
+    setIsLoading(true);
     setError(null);
     try {
       const { data, error } = await supabase
         .from("ai_logs")
         .select(
-          `
-          id,
-          created_at,
-          site_slug,
-          question,
-          answer,
-          history,
-          meta,
-          lead_name,
-          lead_email
-        `
+          "id, created_at, site_slug, question, answer, meta, lead_name, lead_email"
         )
         .eq("site_slug", siteSlug)
         .order("created_at", { ascending: false })
         .limit(limit);
 
-      if (error) {
-        console.error("Supabase error:", error);
-        setError(error.message);
-        setLogs([]);
-        return;
-      }
-
-      setLogs((data as AiLogRow[]) ?? []);
-    } catch (err: any) {
-      console.error("Load logs failed:", err);
-      setError("Chyba pri načítaní logov.");
-      setLogs([]);
+      if (error) throw error;
+      setLogs((data || []) as AiLogRow[]);
+    } catch (e: any) {
+      console.error(e);
+      setError(e.message ?? "Nepodarilo sa načítať logy.");
     } finally {
-      setLoading(false);
+      setIsLoading(false);
     }
   };
 
@@ -78,241 +65,234 @@ const AdminLogsPage: React.FC<AdminLogsPageProps> = ({ onNavigateBack }) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // helper: či je daný log lead
-  const isLead = (row: AiLogRow): boolean => {
-    const meta = row.meta || {};
-    const intent = meta.intent || {};
-    if (intent.is_lead === true) return true;
-    if (row.lead_email || row.lead_name) return true;
-    return false;
+  const handleRefresh = () => {
+    loadLogs();
   };
 
-  const filteredLogs = showOnlyLeads ? logs.filter(isLead) : logs;
-
-  // štatistiky
-  const total = logs.length;
-  const leadsCount = logs.filter(isLead).length;
-  const conversion =
-    total > 0 ? Math.round((leadsCount / total) * 100) : 0;
-
-  // export CSV – použijeme už vyfiltrované logy (čo vidíš na obrazovke)
   const handleExportCsv = () => {
-    const rows = filteredLogs.map((row) => {
-      const meta = row.meta || {};
-      const intent = meta.intent || {};
-      const lead = meta.lead || {};
-      return {
-        id: row.id,
-        created_at: row.created_at,
-        site_slug: row.site_slug,
-        question: row.question ?? "",
-        answer: row.answer ?? "",
-        lead_name: row.lead_name ?? lead.name ?? "",
-        lead_email: row.lead_email ?? lead.email ?? "",
-        intent_is_lead: intent.is_lead === true ? "1" : "0",
-        intent_contact: intent.contact === true ? "1" : "0",
-      };
-    });
+    if (!filteredLogs.length) return;
 
-    const header = Object.keys(rows[0] || {});
+    const headers = [
+      "created_at",
+      "site_slug",
+      "question",
+      "answer",
+      "lead_name",
+      "lead_email",
+      "meta_json",
+    ];
+
+    const rows = filteredLogs.map((row) => [
+      row.created_at,
+      row.site_slug,
+      (row.question ?? "").replace(/\s+/g, " ").trim(),
+      (row.answer ?? "").replace(/\s+/g, " ").trim(),
+      row.lead_name ?? "",
+      row.lead_email ?? "",
+      JSON.stringify(row.meta ?? {}),
+    ]);
+
     const csvLines = [
-      header.join(";"),
+      headers.join(";"),
       ...rows.map((r) =>
-        header
-          .map((key) =>
-            String((r as any)[key] ?? "").replace(/"/g, '""')
-          )
-          .map((v) => `"${v}"`)
+        r
+          .map((cell) => {
+            const val = String(cell ?? "");
+            // jednoduché escapovanie ; a "
+            const needQuote = /[;"\n]/.test(val);
+            const escaped = val.replace(/"/g, '""');
+            return needQuote ? `"${escaped}"` : escaped;
+          })
           .join(";")
       ),
     ];
 
-    const blob = new Blob([csvLines.join("\n")], {
-      type: "text/csv;charset=utf-8;",
-    });
+    const csvContent = csvLines.join("\n");
+    const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
     const url = URL.createObjectURL(blob);
+
     const a = document.createElement("a");
     a.href = url;
     a.download = `ai_logs_${siteSlug}.csv`;
+    document.body.appendChild(a);
     a.click();
+    document.body.removeChild(a);
     URL.revokeObjectURL(url);
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50">
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
-        {/* Header */}
-        <div className="flex items-center justify-between mb-6">
-          <div className="flex items-center gap-3">
-            <button
-              onClick={onNavigateBack}
-              className="inline-flex items-center gap-2 px-3 py-2 rounded-lg bg-white shadow hover:shadow-md text-gray-700 text-sm"
-            >
-              <ArrowLeft size={16} />
-              Späť na web
-            </button>
-            <h1 className="text-2xl font-bold text-gray-800">
-              Admin – AI logy
-            </h1>
-          </div>
-
+    <div className="min-h-screen bg-gray-50">
+      <header className="bg-white border-b sticky top-0 z-20">
+        <div className="max-w-6xl mx-auto px-4 py-3 flex items-center justify-between gap-3">
           <button
-            onClick={handleExportCsv}
-            disabled={filteredLogs.length === 0}
-            className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-blue-600 text-white text-sm font-medium shadow hover:bg-blue-700 disabled:opacity-50"
+            onClick={onNavigateBack}
+            className="inline-flex items-center gap-2 text-sm text-gray-600 hover:text-gray-900"
           >
-            <Download size={16} />
-            Exportovať CSV
+            <ArrowLeft size={16} />
+            Späť na web
           </button>
+          <h1 className="text-lg md:text-xl font-semibold text-gray-800">
+            Admin – AI logy
+          </h1>
+          <div className="flex items-center gap-2">
+            <button
+              onClick={handleExportCsv}
+              disabled={isLoading || filteredLogs.length === 0}
+              className="inline-flex items-center gap-2 px-3 py-2 text-xs md:text-sm rounded-lg border border-blue-200 bg-blue-50 text-blue-700 hover:bg-blue-100 disabled:opacity-60"
+            >
+              <Download size={16} />
+              Exportovať CSV
+            </button>
+          </div>
         </div>
+      </header>
 
-        {/* Filter panel */}
-        <div className="bg-white rounded-xl shadow p-4 mb-6 flex flex-wrap items-end gap-4">
-          <div className="flex flex-col">
-            <label className="text-xs font-medium text-gray-600 mb-1">
+      <main className="max-w-6xl mx-auto px-4 py-6 space-y-6">
+        {/* Filter */}
+        <section className="bg-white rounded-xl shadow-sm border p-4 flex flex-col md:flex-row gap-4 md:items-end">
+          <div className="flex-1">
+            <label className="block text-xs font-medium text-gray-500 mb-1">
               site_slug
             </label>
             <input
               type="text"
               value={siteSlug}
               onChange={(e) => setSiteSlug(e.target.value)}
-              className="px-3 py-2 border rounded-lg text-sm w-40"
+              className="w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
           </div>
 
-          <div className="flex flex-col">
-            <label className="text-xs font-medium text-gray-600 mb-1">
+          <div>
+            <label className="block text-xs font-medium text-gray-500 mb-1">
               Počet záznamov
             </label>
             <select
               value={limit}
               onChange={(e) => setLimit(Number(e.target.value))}
-              className="px-3 py-2 border rounded-lg text-sm"
+              className="border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
             >
               <option value={50}>50</option>
               <option value={100}>100</option>
               <option value={200}>200</option>
+              <option value={500}>500</option>
             </select>
           </div>
 
           <button
-            onClick={loadLogs}
-            className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-gray-900 text-white text-sm font-medium shadow hover:bg-black"
+            onClick={handleRefresh}
+            className="px-4 py-2 rounded-lg bg-gray-900 text-white text-sm font-semibold hover:bg-black"
           >
-            {loading ? (
-              <>
-                <Loader2 size={16} className="animate-spin" />
-                Načítavam...
-              </>
-            ) : (
-              "Obnoviť"
-            )}
+            Obnoviť
           </button>
 
           <button
-            onClick={() => setShowOnlyLeads((v) => !v)}
-            className={`inline-flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium border shadow-sm ${
-              showOnlyLeads
-                ? "bg-emerald-100 border-emerald-300 text-emerald-800"
+            type="button"
+            onClick={() => setOnlyLeads((v) => !v)}
+            className={`inline-flex items-center gap-2 px-3 py-2 rounded-lg border text-sm ${
+              onlyLeads
+                ? "bg-emerald-50 border-emerald-200 text-emerald-700"
                 : "bg-white border-gray-200 text-gray-700"
             }`}
           >
-            <Filter size={16} />
-            {showOnlyLeads ? "Zobraziť všetko" : "Len leady"}
+            <Filter size={14} />
+            Len leady
           </button>
-        </div>
+        </section>
 
         {/* Štatistiky */}
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
-          <div className="bg-white rounded-xl shadow p-4">
-            <p className="text-xs text-gray-500 mb-1">
+        <section className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div className="bg-white rounded-xl shadow-sm border p-4">
+            <p className="text-xs font-medium text-gray-500 mb-1">
               Počet otázok (aktuálny filter)
             </p>
             <p className="text-2xl font-bold text-gray-900">{total}</p>
           </div>
-          <div className="bg-white rounded-xl shadow p-4">
-            <p className="text-xs text-gray-500 mb-1">
+          <div className="bg-white rounded-xl shadow-sm border p-4">
+            <p className="text-xs font-medium text-gray-500 mb-1">
               Zachytené leady
             </p>
-            <p className="text-2xl font-bold text-emerald-700">
-              {leadsCount}
-            </p>
+            <p className="text-2xl font-bold text-emerald-700">{leadsCount}</p>
           </div>
-          <div className="bg-white rounded-xl shadow p-4">
-            <p className="text-xs text-gray-500 mb-1">
+          <div className="bg-white rounded-xl shadow-sm border p-4">
+            <p className="text-xs font-medium text-gray-500 mb-1">
               Konverzná miera
             </p>
             <p className="text-2xl font-bold text-indigo-700">
               {conversion}%
             </p>
           </div>
-        </div>
+        </section>
 
-        {/* Zoznam logov */}
-        <div className="bg-white rounded-xl shadow overflow-hidden">
+        {/* Error */}
+        {error && (
+          <div className="bg-red-50 border border-red-200 text-red-700 text-sm rounded-lg p-3">
+            {error}
+          </div>
+        )}
+
+        {/* Záznamy */}
+        <section className="bg-white rounded-xl shadow-sm border">
           <div className="border-b px-4 py-3 text-sm font-medium text-gray-600 flex">
-            <div className="w-48">Čas</div>
+            <div className="w-32">Čas</div>
             <div className="flex-1">Otázka</div>
             <div className="flex-1">Odpoveď</div>
             <div className="w-64">Lead</div>
           </div>
 
-          {loading && (
-            <div className="px-4 py-6 text-sm text-gray-500 flex items-center gap-2">
-              <Loader2 className="animate-spin" size={16} />
-              Načítavam logy...
-            </div>
-          )}
-
-          {!loading && filteredLogs.length === 0 && (
+          {isLoading && (
             <div className="px-4 py-6 text-sm text-gray-500">
-              Žiadne logy pre tento <code>site_slug</code>.
+              Načítavam záznamy...
             </div>
           )}
 
-          {!loading &&
-            filteredLogs.map((row) => {
-              const meta = row.meta || {};
-              const lead = meta.lead || {};
-              const isLeadRow = isLead(row);
+          {!isLoading && filteredLogs.length === 0 && (
+            <div className="px-4 py-6 text-sm text-gray-500">
+              Žiadne logy pre tento filter.
+            </div>
+          )}
 
-              return (
-                <div
-                  key={row.id}
-                  className={`border-t px-4 py-3 text-sm flex ${
-                    isLeadRow ? "bg-emerald-50/40" : "bg-white"
-                  }`}
-                >
-                  <div className="w-48 text-xs text-gray-500 whitespace-nowrap pr-2">
-                    {new Date(row.created_at).toLocaleString("sk-SK")}
-                  </div>
-                  <div className="flex-1 pr-4 text-gray-800 whitespace-pre-wrap">
-                    {row.question}
-                  </div>
-                  <div className="flex-1 pr-4 text-gray-600 whitespace-pre-wrap">
-                    {row.answer}
-                  </div>
-                  <div className="w-64 text-xs text-gray-700">
-                    {isLeadRow ? (
-                      <>
-                        <div>
-                          <span className="font-semibold">Meno: </span>
-                          {row.lead_name || lead.name || "—"}
-                        </div>
-                        <div>
-                          <span className="font-semibold">Email: </span>
-                          {row.lead_email || lead.email || "—"}
-                        </div>
-                      </>
-                    ) : (
-                      <span className="text-gray-400">Nie je lead</span>
-                    )}
-                  </div>
+          {!isLoading &&
+            filteredLogs.map((row) => (
+              <div
+                key={row.id}
+                className={`px-4 py-3 text-sm border-t flex hover:bg-gray-50 ${
+                  row.lead_email || row.lead_name ? "bg-emerald-50/40" : ""
+                }`}
+              >
+                <div className="w-32 text-xs text-gray-500 pr-2">
+                  {new Date(row.created_at).toLocaleString("sk-SK")}
                 </div>
-              );
-            })}
-        </div>
-      </div>
+                <div className="flex-1 pr-4">
+                  <p className="text-gray-800 line-clamp-3">
+                    {row.question}
+                  </p>
+                </div>
+                <div className="flex-1 pr-4">
+                  <p className="text-gray-600 line-clamp-3">
+                    {row.answer}
+                  </p>
+                </div>
+                <div className="w-64 text-xs text-gray-700">
+                  {row.lead_email || row.lead_name ? (
+                    <>
+                      <p className="font-semibold text-emerald-700">
+                        Lead zachytený
+                      </p>
+                      {row.lead_name && (
+                        <p>Meno: {row.lead_name}</p>
+                      )}
+                      {row.lead_email && (
+                        <p>Email: {row.lead_email}</p>
+                      )}
+                    </>
+                  ) : (
+                    <p className="text-gray-400">Nie je lead</p>
+                  )}
+                </div>
+              </div>
+            ))}
+        </section>
+      </main>
     </div>
   );
 };
