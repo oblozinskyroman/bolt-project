@@ -3,6 +3,9 @@
 const BASE = import.meta.env.VITE_SUPABASE_URL;
 const URL = `${BASE}/functions/v1/ai-assistant`;
 
+// defaultný slug pre ServisAI demo web
+const DEFAULT_SITE_SLUG = "servisai";
+
 export type ChatTurn = {
   role: "user" | "assistant" | "system";
   content: string;
@@ -14,7 +17,9 @@ export type AskMeta = {
   userLocation?: string;
   coords?: { lat: number; lng: number } | null;
   filters?: string[];
-  site_slug?: string;     // ⭐ pridali sme sem
+
+  // nový field – na budúce multi-web nastavenia
+  site_slug?: string;
 };
 
 type RawResponse = {
@@ -32,11 +37,8 @@ export async function askAI(
   temperature = 0.7,
   meta: AskMeta = {}
 ) {
-  // ⭐ Keď meta neobsahuje site_slug → nastav vždy "servisai"
-  const fixedMeta = {
-    site_slug: "servisai",
-    ...meta,
-  };
+  // výsledný slug – buď meta.site_slug, alebo default "servisai"
+  const siteSlug = meta.site_slug?.trim() || DEFAULT_SITE_SLUG;
 
   const res = await fetch(URL, {
     method: "POST",
@@ -47,14 +49,24 @@ export async function askAI(
       message: prompt,
       history,
       temperature,
-      ...fixedMeta,
+
+      // pošleme meta (zostáva ako doteraz)
+      meta: {
+        ...meta,
+        site_slug: siteSlug,
+      },
+
+      // a zároveň pošleme site_slug aj na top-level
+      site_slug: siteSlug,
     }),
   });
 
   let data: RawResponse | null = null;
   try {
     data = (await res.json()) as RawResponse;
-  } catch {}
+  } catch {
+    // necháme data = null, nižšie to ošetríme
+  }
 
   if (!res.ok || data?.ok === false) {
     const msg =
