@@ -1,42 +1,34 @@
 // src/lib/askAI.ts
 
 const BASE = import.meta.env.VITE_SUPABASE_URL;
-
-// Môže pomôcť pri debugovaní, ak zabudneš env premennú
-if (!BASE) {
-  console.warn(
-    "[askAI] VITE_SUPABASE_URL nie je nastavené – volanie AI asistenta zlyhá."
-  );
-}
-
 const URL = `${BASE}/functions/v1/ai-assistant`;
 
+// Jeden krok v chate (user / assistant / system)
 export type ChatTurn = {
   role: "user" | "assistant" | "system";
   content: string;
 };
 
-// Informácie o leadovi, ktoré vieš poslať k logu (voliteľné)
-export type LeadMeta = {
+// Info o leadovi – používaj v meta.lead
+export type LeadInfo = {
   name?: string;
   email?: string;
   phone?: string;
-  note?: string; // napr. „záujem o plán Growth“
+  note?: string;
+  consent?: boolean; // napr. súhlas so spätným kontaktom
 };
 
-// Všetko, čo posielame do meta – je to voliteľné, takže ti nič nerozbije
+// Meta údaje, ktoré posielame do Edge funkcie a logujeme do ai_logs.meta
 export type AskMeta = {
-  // existujúce veci, ktoré už používame
   page?: number;
   limit?: number;
-  userLocation?: string;
+  userLocation?: string;          // napr. "Bratislava"
   coords?: { lat: number; lng: number } | null;
-  filters?: string[];
-
-  // nové polia pre budúci reporting a lead capture
-  siteSlug?: string;      // napr. "servisai", "klient1", ...
-  sourcePath?: string;    // napr. location.pathname
-  lead?: LeadMeta;        // kontakt, ak ho od užívateľa získaš
+  filters?: string[];             // tvoje quick filtre, tagy atď.
+  sessionId?: string;             // ID aktuálnej relácie / návštevy
+  tags?: string[];                // voľné tagy, napr. ["pricing", "lead"]
+  lead?: LeadInfo;                // tu pošleš email/telefon, keď ho v UI zistíš
+  [key: string]: any;             // fallback, keby si chcel pridať niečo navyše
 };
 
 type RawResponse = {
@@ -48,48 +40,41 @@ type RawResponse = {
   error?: string;
 };
 
-/**
- * Hlavná funkcia na volanie AI asistenta.
- *
- * - `prompt`     → aktuálna otázka používateľa
- * - `history`    → predošlé repliky (user/assistant), aby mal model kontext
- * - `temperature`→ tvorivosť odpovede (0–1)
- * - `meta`       → doplnkové dáta (siteSlug, lead, geo, filtre...)
- */
+// Hlavná funkcia, ktorú volá frontend
 export async function askAI(
   prompt: string,
   history: ChatTurn[] = [],
   temperature = 0.7,
-  meta: AskMeta = {}
+  meta: AskMeta = {},
+  siteSlug = "servisai" // môžeš prebiť pri viacerých weboch
 ) {
   const res = await fetch(URL, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
     },
-    // Dôležité: posielame prompt + history + temperature + meta
     body: JSON.stringify({
+      // to, čo očakáva Edge funkcia
       message: prompt,
       history,
       temperature,
       meta,
+      site_slug: siteSlug,
     }),
   });
 
   let data: RawResponse | null = null;
-
   try {
     data = (await res.json()) as RawResponse;
   } catch {
-    // Ak odpoveď nie je validné JSON, necháme data = null
+    // necháme data = null, nižšie to ošetríme
   }
 
-  // HTTP chyba alebo funkcia explicitne vrátila ok:false
+  // ak HTTP zlyhá alebo nám funkcia vráti ok:false -> vyhodíme chybu
   if (!res.ok || data?.ok === false) {
     const msg =
       data?.error ||
       `AI request failed (${res.status} ${res.statusText || ""})`.trim();
-
     throw new Error(msg);
   }
 
