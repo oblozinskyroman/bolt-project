@@ -1,4 +1,4 @@
-// src/lib/askAI.ts 
+// src/lib/askAI.ts
 
 const BASE = import.meta.env.VITE_SUPABASE_URL;
 const URL = `${BASE}/functions/v1/ai-assistant`;
@@ -14,9 +14,11 @@ export type AskMeta = {
   userLocation?: string;
   coords?: { lat: number; lng: number } | null;
   filters?: string[];
+
+  // NOVÉ – ktorý web / klient:
+  siteSlug?: string; // napr. "servisai", "dataoptic", ...
 };
 
-// interný typ odpovede z edge funkcie
 type RawResponse = {
   ok?: boolean;
   answer?: string;
@@ -30,9 +32,11 @@ export async function askAI(
   prompt: string,
   history: ChatTurn[] = [],
   temperature = 0.7,
-  meta: AskMeta = {},
-  siteSlug: string = "servisai"   // 👈 nový parameter s defaultom
+  meta: AskMeta = {}
 ) {
+  // oddelíme siteSlug od ostatných meta informácií
+  const { siteSlug, ...restMeta } = meta ?? {};
+
   const res = await fetch(URL, {
     method: "POST",
     headers: {
@@ -42,8 +46,12 @@ export async function askAI(
       message: prompt,
       history,
       temperature,
-      meta,
-      site_slug: siteSlug,        // 👈 pošleme do edge funkcie
+
+      // TOTO číta edge funkcia a podľa toho berie dáta z tabuľky
+      site_slug: siteSlug || "servisai", // default pre tvoj web
+
+      // zvyšné meta info necháme, keby sme ich neskôr chceli použiť
+      meta: restMeta,
     }),
   });
 
