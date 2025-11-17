@@ -12,7 +12,7 @@ import MyOrdersPage from "./pages/MyOrdersPage";
 import PaymentSuccessPage from "./pages/PaymentSuccessPage";
 import PaymentCancelPage from "./pages/PaymentCancelPage";
 
-// NOVÉ use-case stránky
+// NOVÉ stránky
 import AdminLogsPage from "./pages/AdminLogsPage";
 import UseCaseReservationsPage from "./pages/UseCaseReservationsPage";
 import UseCaseSupportPage from "./pages/UseCaseSupportPage";
@@ -127,8 +127,8 @@ function haversineKm(
 type SortBy = "relevance" | "rating" | "distance";
 
 type PageId =
-    "adminLogs"| 
-    "home"
+  | "adminLogs"
+  | "home"
   | "companyList"
   | "addCompany"
   | "companyDetail"
@@ -163,7 +163,7 @@ const ALL_PAGES: PageId[] = [
   "myOrders",
   "paymentSuccess",
   "paymentCancel",
-  "adminLogs"
+  "adminLogs",
   "useReservations",
   "useSupport",
   "useEshop",
@@ -955,7 +955,7 @@ function App() {
           </>
         )}
 
-        {/* Pôvodné stránky – nechávame, aby build nepadal a aby si ich vedel používať ďalej */}
+        {/* Pôvodné stránky */}
         {currentPage === "companyList" && (
           <CompanyListPage
             selectedService={selectedService}
@@ -1010,7 +1010,7 @@ function App() {
           />
         )}
 
-    {/* Admin logy – skrytá stránka pre teba */}
+        {/* Admin logy – skrytá stránka pre teba */}
         {currentPage === "adminLogs" && (
           <AdminLogsPage onNavigateBack={navigateToHome} />
         )}
